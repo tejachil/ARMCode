@@ -13,7 +13,7 @@
 //   pass the structure as an argument to the API calls
 typedef struct __vtLCDStruct {
 	xQueueHandle inQ;					   	// Queue used to send messages from other tasks to the LCD task to print
-} vtLCDStruct;
+} vtLCDStruct; //Teja: this handles the ID or something similar. messages are added to queue and received and used to print with same inQ
 
 // Structure used to define the messages that are sent to the LCD thread
 //   the maximum length of a message to be printed is the size of the "buf" field below

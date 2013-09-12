@@ -72,13 +72,13 @@ portBASE_TYPE SendTempTimerMsg(vtTempStruct *tempData,portTickType ticksElapsed,
 	}
 	memcpy(tempBuffer.buf,(char *)&ticksElapsed,sizeof(ticksElapsed));
 	tempBuffer.msgType = TempMsgTypeTimer;
-	return(xQueueSend(tempData->inQ,(void *) (&tempBuffer),ticksToBlock));
+	return(xQueueSend(tempData->inQ,(void *) (&tempBuffer),ticksToBlock)); //Teja: this is where the temperature message is sent from for timer
 }
 
 portBASE_TYPE SendTempValueMsg(vtTempStruct *tempData,uint8_t msgType,uint8_t value,portTickType ticksToBlock)
 {
 	vtTempMsg tempBuffer;
-
+	
 	if (tempData == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
@@ -87,9 +87,10 @@ portBASE_TYPE SendTempValueMsg(vtTempStruct *tempData,uint8_t msgType,uint8_t va
 		// no room for this message
 		VT_HANDLE_FATAL_ERROR(tempBuffer.length);
 	}
-	memcpy(tempBuffer.buf,(char *)&value,sizeof(value));
+	//memcpy(tempBuffer.buf,(char *)&value,sizeof(value));
+	memcpy(tempBuffer.buf,(char *)"SendTempValueMsg Works!",sizeof(value)); // Teja: changed to text
 	tempBuffer.msgType = msgType;
-	return(xQueueSend(tempData->inQ,(void *) (&tempBuffer),ticksToBlock));
+	return(xQueueSend(tempData->inQ,(void *) (&tempBuffer),ticksToBlock));//Teja: this is where the temp value text is sent
 }
 
 // End of Public API
@@ -224,14 +225,16 @@ static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 				// Now have all of the values, so compute the temperature and send to the LCD Task
 				// Do the accurate temperature calculation
 				temperature += -0.25 + ((countPerC-countRemain)/countPerC);
-
+				//Teja: THIS IS WHERE MESSAGE GETS CREATED
+				static int tejaCount = 0; tejaCount++;
 				#if PRINTF_VERSION == 1
 				printf("Temp %f F (%f C)\n",(32.0 + ((9.0/5.0)*temperature)), (temperature));
 				sprintf(lcdBuffer,"T=%6.2fF (%6.2fC)",(32.0 + ((9.0/5.0)*temperature)),temperature);
 				#else
 				// we do not have full printf (so no %f) and therefore need to print out integers
 				printf("Temp %d F (%d C)\n",lrint(32.0 + ((9.0/5.0)*temperature)), lrint(temperature));
-				sprintf(lcdBuffer,"T=%d F (%d C)",lrint(32.0 + ((9.0/5.0)*temperature)),lrint(temperature));
+				//sprintf(lcdBuffer,"T=%d F (%d C)",lrint(32.0 + ((9.0/5.0)*temperature)),lrint(temperature));
+				sprintf(lcdBuffer,"Counter: %d",tejaCount); // Teja: added this instead of above
 				#endif
 				if (lcdData != NULL) {
 					if (SendLCDPrintMsg(lcdData,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {

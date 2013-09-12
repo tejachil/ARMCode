@@ -43,13 +43,13 @@ typedef struct __vtLCDMsg {
 static portTASK_FUNCTION_PROTO( vLCDUpdateTask, pvParameters );
 
 /*-----------------------------------------------------------*/
-
+//Initializes LCD
 void StartLCDTask(vtLCDStruct *ptr, unsigned portBASE_TYPE uxPriority)
 {
 	if (ptr == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
-
+	
 	// Create the queue that will be used to talk to this task
 	if ((ptr->inQ = xQueueCreate(vtLCDQLen,sizeof(vtLCDMsg))) == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
@@ -179,21 +179,46 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 	}
 	#endif
 
-	/* Initialize the LCD and set the initial colors */
+	/* Initialize the LCD and set the initial colors */ //Teja: this is where we can change colors
 	GLCD_Init();
-	tscr = Green; // may be reset in the LCDMsgTypeTimer code below
-	screenColor = Red; // may be reset in the LCDMsgTypeTimer code below
+	tscr = Black; // may be reset in the LCDMsgTypeTimer code below
+	screenColor = White; // may be reset in the LCDMsgTypeTimer code below
 	GLCD_SetTextColor(tscr);
 	GLCD_SetBackColor(screenColor);
 	GLCD_Clear(screenColor);
+	//Teja: Initialize the environment to draw the grid
+	GLCD_SetTextColor((unsigned short)LightGrey);
+	for (y = 240/12; y < 240; y += 240/12){
+		for (x = 0;x <= 320;++x) {
+			if (y == 240/2)	GLCD_SetTextColor((unsigned short)DarkGrey);
+			GLCD_PutPixel(x,y);
+			if (y == 240/2)	GLCD_SetTextColor((unsigned short)LightGrey);
+		}
+	}
+	for (x = 320/16; x < 320; x += 320/16){
+		for (y = 0; y <= 240; ++y) {
+			if (x == 320/2)	GLCD_SetTextColor((unsigned short)DarkGrey);
+			GLCD_PutPixel(x,y);
+			if (x == 320/2)	GLCD_SetTextColor((unsigned short)LightGrey);
+		}
+	}
 
+	int xCalc, yCalc;
+	GLCD_SetTextColor((unsigned short)Red);
+	for (xCalc = -320/2; xCalc < 320/2; ++xCalc){
+		x = xCalc +160;
+		yCalc = sin(xCalc);
+		y = yCalc*100 + 240/2;
+		GLCD_PutPixel(x,y);
+	}
+	
 	// Note that srand() & rand() require the use of malloc() and should not be used unless you are using
 	//   MALLOC_VERSION==1
 	#if MALLOC_VERSION==1
 	srand((unsigned) 55); // initialize the random number generator to the same seed for repeatability
 	#endif
 
-	curLine = 5;
+	curLine = 0; //Teja: changed from 5 to 0
 	// This task should never exit
 	for(;;)
 	{	
@@ -208,7 +233,7 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 		#endif
 
 		#if LCD_EXAMPLE_OP==0
-		// Wait for a message
+		// Wait for a message Teja: this is where the message is received onto msgBuffer from the Queue
 		if (xQueueReceive(lcdPtr->inQ,(void *) &msgBuffer,portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
@@ -227,9 +252,10 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 			GLCD_ClearLn(curLine,1);
 			// show the text
 			GLCD_DisplayString(curLine,0,1,(unsigned char *)lineBuffer);
+			//GLCD_DisplayString(curLine,0,1,(unsigned char *)"hello tyler"); //Teja: location that displays text
 			curLine++;
 			if (curLine == lcdNUM_LINES) {
-				curLine = 5;
+				curLine = 0; //Teja: changed from 5 to 0
 			}
 			break;
 		}

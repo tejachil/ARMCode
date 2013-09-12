@@ -93,7 +93,7 @@ You should read the note above.
 #define USE_MTJ_LCD 1
 // Define whether to use my temperature sensor read task (the sensor is on the PIC v4 demo board, so if that isn't connected
 //   then this should be off
-#define USE_MTJ_V4Temp_Sensor 1
+#define USE_MTJ_V4Temp_Sensor 0
 // Define whether to use my USB task
 #define USE_MTJ_USE_USB 0
 
@@ -237,7 +237,7 @@ int main( void )
 	// LCD Task creates a queue to receive messages -- what it does with those messages will depend on how the task is configured (see LCDtask.c)
 	// Here we set up a timer that will send messages to the LCD task.  You don't have to have this timer for the LCD task, it is just showing
 	//  how to use a timer and how to send messages from that timer.
-	startTimerForLCD(&vtLCDdata);
+	// startTimerForLCD(&vtLCDdata); //Teja: this line does the flashing of different colors
 	#endif
 	
 	#if USE_MTJ_V4Temp_Sensor == 1
@@ -250,14 +250,14 @@ int main( void )
 	}
 	// Now, start up the task that is going to handle the temperature sensor sampling (it will talk to the I2C task and LCD task using their APIs)
 	#if USE_MTJ_LCD == 1
-	vStarti2cTempTask(&tempSensorData,mainI2CTEMP_TASK_PRIORITY,&vtI2C0,&vtLCDdata);
+	vStarti2cTempTask(&tempSensorData,mainI2CTEMP_TASK_PRIORITY,&vtI2C0,&vtLCDdata); //Teja: this displays the temperature text
 	#else
 	vStarti2cTempTask(&tempSensorData,mainI2CTEMP_TASK_PRIORITY,&vtI2C0,NULL);
 	#endif
 	// Here we set up a timer that will send messages to the Temperature sensing task.  The timer will determine how often the sensor is sampled
-	startTimerForTemperature(&tempSensorData);
+	startTimerForTemperature(&tempSensorData); //Teja: needed for temperature text to display
 	// start up a "conductor" task that will move messages around
-	vStartConductorTask(&conductorData,mainCONDUCTOR_TASK_PRIORITY,&vtI2C0,&tempSensorData);
+	vStartConductorTask(&conductorData,mainCONDUCTOR_TASK_PRIORITY,&vtI2C0,&tempSensorData); //Teja: needed for temperature text to display
 	#endif
 
     /* Create the USB task. MTJ: This routine has been modified from the original example (which is not a FreeRTOS standard demo) */
