@@ -203,14 +203,16 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 		}
 	}
 
-	int xCalc, yCalc;
+	float xCalc, yCalc;
 	GLCD_SetTextColor((unsigned short)Red);
-	for (xCalc = -320/2; xCalc < 320/2; ++xCalc){
+	for (xCalc = -360/2; xCalc < 360/2; ++xCalc){
 		x = xCalc +160;
-		yCalc = sin(xCalc);
-		y = yCalc*100 + 240/2;
+		yCalc = sin(50*xCalc);
+		y = yCalc*20 + 240/2;
 		GLCD_PutPixel(x,y);
 	}
+
+	GLCD_DisplayString(1,0,1,(unsigned char *)"hello");
 	
 	// Note that srand() & rand() require the use of malloc() and should not be used unless you are using
 	//   MALLOC_VERSION==1

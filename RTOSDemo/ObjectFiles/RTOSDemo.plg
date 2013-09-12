@@ -4,7 +4,7 @@
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
 C:\ARMCode\RTOSDemo\RTOSDemo.uvproj
-Project File Date:  01/21/2013
+Project File Date:  09/11/2013
 
 <h2>Output:</h2>
 Build target 'WebServerELF'
@@ -16,19 +16,13 @@ compiling timers.c...
 compiling main.c...
 compiling i2cTemp.c...
 MainFiles/i2cTemp.c: In function 'vi2cTempUpdateTask':
-MainFiles/i2cTemp.c(233): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(233): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(233): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(233): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(234): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(234): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-MainFiles/i2cTemp.c(234): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(234): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
+MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
+MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
+MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
+MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
 compiling vtUtilities.c...
 compiling ParTest.c...
 compiling LCDtask.c...
-MainFiles/LCDtask.c: In function 'StartLCDTask':
-MainFiles/LCDtask.c(52): warning: type defaults to 'int' in declaration of 'count'
 compiling myTimers.c...
 compiling conductor.c...
 MainFiles/conductor.c: In function 'vConductorUpdateTask':
@@ -78,201 +72,9 @@ compiling lpc17xx_ssp.c...
 ../NXPDrivers/source/lpc17xx_ssp.c(345): warning: 'wdata16' may be used uninitialized in this function
 compiling vtI2C.c...
 linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 16 Warning(s).
-Build target 'WebServerELF'
-compiling LCDtask.c...
-MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(223): warning: type defaults to 'int' in declaration of 'count'
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 1 Warning(s).
-Build target 'WebServerELF'
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 11 Warning(s).
 Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling LCDtask.c...
-MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(231): warning: cast to pointer from integer of different size
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 1 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling main.c...
-compiling i2cTemp.c...
-MainFiles/i2cTemp.c: In function 'vi2cTempUpdateTask':
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-compiling LCDtask.c...
-compiling myTimers.c...
-compiling conductor.c...
-MainFiles/conductor.c: In function 'vConductorUpdateTask':
-MainFiles/conductor.c(58): warning: unused variable 'valPtr'
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 9 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling i2cTemp.c...
-MainFiles/i2cTemp.c: In function 'SendTempTimerMsg':
-MainFiles/i2cTemp.c(74): error: 'value' undeclared (first use in this function)
-MainFiles/i2cTemp.c(74): error: note: each undeclared identifier is reported only once for each function it appears in
-MainFiles/i2cTemp.c: In function 'vi2cTempUpdateTask':
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-Target not created
-Build target 'WebServerELF'
-compiling i2cTemp.c...
-MainFiles/i2cTemp.c: In function 'vi2cTempUpdateTask':
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 8 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling i2cTemp.c...
-MainFiles/i2cTemp.c: In function 'vi2cTempUpdateTask':
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 8 Warning(s).
-Build target 'WebServerELF'
-compiling i2cTemp.c...
-MainFiles/i2cTemp.c: In function 'vi2cTempUpdateTask':
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(236): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(237): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(237): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-MainFiles/i2cTemp.c(237): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(237): warning: format '%d' expects type 'int', but argument 4 has type 'long int'
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 8 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling i2cTemp.c...
-MainFiles/i2cTemp.c: In function 'vi2cTempUpdateTask':
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 4 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling i2cTemp.c...
-MainFiles/i2cTemp.c: In function 'vi2cTempUpdateTask':
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 2 has type 'long int'
-MainFiles/i2cTemp.c(235): warning: format '%d' expects type 'int', but argument 3 has type 'long int'
-compiling LCDtask.c...
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 4 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling main.c...
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling main.c...
-compiling LCDtask.c...
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling main.c...
-compiling LCDtask.c...
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling LCDtask.c...
-MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(190): error: 'val' undeclared (first use in this function)
-MainFiles/LCDtask.c(190): error: note: each undeclared identifier is reported only once for each function it appears in
-MainFiles/LCDtask.c(191): error: 'circleColor' undeclared (first use in this function)
-MainFiles/LCDtask.c(193): error: 'radius' undeclared (first use in this function)
-MainFiles/LCDtask.c(194): error: 'offset' undeclared (first use in this function)
-Target not created
-Build target 'WebServerELF'
-compiling LCDtask.c...
-MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(191): warning: unused variable 'inc'
-MainFiles/LCDtask.c(193): warning: 'val' is used uninitialized in this function
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 2 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling LCDtask.c...
-MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(194): error: 'val' undeclared (first use in this function)
-MainFiles/LCDtask.c(194): error: note: each undeclared identifier is reported only once for each function it appears in
-MainFiles/LCDtask.c(196): warning: unused variable 'inc'
-Target not created
-Build target 'WebServerELF'
-compiling LCDtask.c...
-MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(191): warning: unused variable 'inc'
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 1 Warning(s).
+Internal DLL Error
 Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
 Full Chip Erase Done.
 Programming Done.
@@ -296,9 +98,7 @@ Verify OK.
 Build target 'WebServerELF'
 compiling LCDtask.c...
 MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(201): error: 'WIDTH' undeclared (first use in this function)
-MainFiles/LCDtask.c(201): error: note: each undeclared identifier is reported only once for each function it appears in
-MainFiles/LCDtask.c(202): error: 'HEIGHT' undeclared (first use in this function)
+MainFiles/LCDtask.c(211): error: expected ';' before 'x'
 Target not created
 Build target 'WebServerELF'
 compiling LCDtask.c...
@@ -318,8 +118,135 @@ Programming Done.
 Verify OK.
 Build target 'WebServerELF'
 compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Build target 'WebServerELF'
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
 MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(201): error: expected expression before '=' token
+MainFiles/LCDtask.c(218): error: expected ';' before 'y'
+Target not created
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+_____^
+*** error 56: cannot open file
+Build target 'WebServerELF'
+compiling LCDtask.c...
+MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
+MainFiles/LCDtask.c(218): error: expected ';' before 'y'
 Target not created
 Build target 'WebServerELF'
 compiling LCDtask.c...
@@ -331,11 +258,48 @@ Programming Done.
 Verify OK.
 Build target 'WebServerELF'
 compiling LCDtask.c...
-MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(204): warning: suggest parentheses around assignment used as truth value
-MainFiles/LCDtask.c(206): warning: suggest parentheses around assignment used as truth value
 linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 2 Warning(s).
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
 Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
 Full Chip Erase Done.
 Programming Done.
@@ -351,62 +315,64 @@ Verify OK.
 Build target 'WebServerELF'
 compiling LCDtask.c...
 MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(204): warning: suggest parentheses around assignment used as truth value
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 1 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling LCDtask.c...
-MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(204): warning: suggest parentheses around assignment used as truth value
-MainFiles/LCDtask.c(208): warning: suggest parentheses around assignment used as truth value
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 2 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling LCDtask.c...
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling LCDtask.c...
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
-Build target 'WebServerELF'
-compiling LCDtask.c...
-linking...
-".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
-Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
-Full Chip Erase Done.
-Programming Done.
-Verify OK.
-Build target 'WebServerELF'
-compiling LCDtask.c...
-MainFiles/LCDtask.c: In function 'vLCDUpdateTask':
-MainFiles/LCDtask.c(208): error: lvalue required as increment operand
-MainFiles/LCDtask.c(208): error: expected ';' before 'xCalc'
+MainFiles/LCDtask.c(210): error: invalid suffix "xCalc" on integer constant
 Target not created
 Build target 'WebServerELF'
 compiling LCDtask.c...
 linking...
 ".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
+Build target 'WebServerELF'
+compiling LCDtask.c...
+linking...
+".\ObjectFiles\RTOSDemo.elf" - 0 Error(s), 0 Warning(s).
+Load "C:\\ARMCode\\RTOSDemo\\ObjectFiles\\RTOSDemo.ELF" 
+Full Chip Erase Done.
+Programming Done.
+Verify OK.
 Build target 'WebServerELF'
 compiling LCDtask.c...
 linking...
