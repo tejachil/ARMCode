@@ -77,25 +77,20 @@ static portTASK_FUNCTION( vConductorUpdateTask, pvParameters )
 		//   other Q/tasks for other message types
 		// This isn't a state machine, it is just acting as a router for messages
 		switch(recvMsgType) {
-		//Teja: valptr is value and changed to 123 for C
 		case vtI2CMsgTypeTempInit: {
-			SendTempValueMsg(tempData,recvMsgType,123,portMAX_DELAY);
-			//SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
+			SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
 			break;
 		}
 		case vtI2CMsgTypeTempRead1: {
-			SendTempValueMsg(tempData,recvMsgType,123,portMAX_DELAY);
-			//SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
+			SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
 			break;
 		}
 		case vtI2CMsgTypeTempRead2: {
-			SendTempValueMsg(tempData,recvMsgType,123,portMAX_DELAY);
-			//SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
+			SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
 			break;
 		}
 		case vtI2CMsgTypeTempRead3: {
-			SendTempValueMsg(tempData,recvMsgType,123,portMAX_DELAY);
-			//SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
+			SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
 			break;
 		}
 		default: {

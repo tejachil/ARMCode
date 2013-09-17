@@ -13,7 +13,7 @@
 //   pass the structure as an argument to the API calls
 typedef struct __vtLCDStruct {
 	xQueueHandle inQ;					   	// Queue used to send messages from other tasks to the LCD task to print
-} vtLCDStruct; //Teja: this handles the ID or something similar. messages are added to queue and received and used to print with same inQ
+} vtLCDStruct;
 
 // Structure used to define the messages that are sent to the LCD thread
 //   the maximum length of a message to be printed is the size of the "buf" field below
@@ -47,6 +47,16 @@ portBASE_TYPE SendLCDTimerMsg(vtLCDStruct *lcdData,portTickType ticksElapsed,por
 // Return:
 //   Result of the call to xQueueSend()
 portBASE_TYPE SendLCDPrintMsg(vtLCDStruct *lcdData,int length,char *pString,portTickType ticksToBlock);
+
+// Send a string message to the LCD task for it to print
+// Args:
+//   lcdData -- a pointer to a variable of type vtLCDStruct
+//   ADC Value
+//   ticksToBlock -- how long the routine should wait if the queue is full
+// Return:
+//   Result of the call to xQueueSend()
+portBASE_TYPE SendLCDADCValue(vtLCDStruct *lcdData, int adcValue,portTickType ticksToBlock);
+
 /* ********************************************************************* */
 
 

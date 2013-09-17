@@ -18,7 +18,7 @@
 //
 // how often the timer that sends messages to the LCD task should run
 // Set the task up to run every 100 ms
-#define lcdWRITE_RATE_BASE	( ( portTickType ) 100 / portTICK_RATE_MS)
+#define lcdWRITE_RATE_BASE	( ( portTickType ) 1 / portTICK_RATE_MS)
 
 // Callback function that is called by the LCDTimer
 //   Sends a message to the queue that is read by the LCD Task
@@ -60,7 +60,7 @@ void startTimerForLCD(vtLCDStruct *vtLCDdata) {
 //
 // how often the timer that sends messages to the LCD task should run
 // Set the task up to run every 500 ms
-#define tempWRITE_RATE_BASE	( ( portTickType ) 500 / portTICK_RATE_MS)
+#define tempWRITE_RATE_BASE	( ( portTickType ) 30 / portTICK_RATE_MS)
 
 // Callback function that is called by the TemperatureTimer
 //   Sends a message to the queue that is read by the Temperature Task

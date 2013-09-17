@@ -177,10 +177,8 @@ static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 			if (currentState == fsmStateAdcReadHigh) {
 				currentState = fsmStateAdcReadLow;
 				adc |= getValue(&msgBuffer) << 8;
-				printf("ADC %d\n",adc);
-				sprintf(lcdBuffer,"ADC %d\n",adc);
 				if (lcdData != NULL) {
-					if (SendLCDPrintMsg(lcdData,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
+					if (SendLCDADCValue(lcdData, adc,portMAX_DELAY) != pdTRUE) {
 						VT_HANDLE_FATAL_ERROR(0);
 					}
 				}

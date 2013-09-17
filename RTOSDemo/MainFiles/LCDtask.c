@@ -31,6 +31,12 @@
 #define LCDMsgTypeTimer 1
 // a message to be printed
 #define LCDMsgTypePrint 2
+// a ADC value to be plotted
+#define LCDMsgTypeADC 	3
+
+#define LCD_WIDTH 	320
+#define LCD_HEIGHT 	240
+
 // actual data structure that is sent in a message
 typedef struct __vtLCDMsg {
 	uint8_t msgType;
@@ -43,13 +49,13 @@ typedef struct __vtLCDMsg {
 static portTASK_FUNCTION_PROTO( vLCDUpdateTask, pvParameters );
 
 /*-----------------------------------------------------------*/
-//Initializes LCD
+
 void StartLCDTask(vtLCDStruct *ptr, unsigned portBASE_TYPE uxPriority)
 {
 	if (ptr == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
-	
+
 	// Create the queue that will be used to talk to this task
 	if ((ptr->inQ = xQueueCreate(vtLCDQLen,sizeof(vtLCDMsg))) == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
@@ -91,6 +97,22 @@ portBASE_TYPE SendLCDPrintMsg(vtLCDStruct *lcdData,int length,char *pString,port
 	lcdBuffer.length = strnlen(pString,vtLCDMaxLen);
 	lcdBuffer.msgType = LCDMsgTypePrint;
 	strncpy((char *)lcdBuffer.buf,pString,vtLCDMaxLen);
+	return(xQueueSend(lcdData->inQ,(void *) (&lcdBuffer),ticksToBlock));
+}
+
+portBASE_TYPE SendLCDADCValue(vtLCDStruct *lcdData, int adcValue,portTickType ticksToBlock)
+{
+	if (lcdData == NULL) {
+		VT_HANDLE_FATAL_ERROR(0);
+	}
+	vtLCDMsg lcdBuffer;
+	
+	lcdBuffer.length = 2;
+	lcdBuffer.msgType = LCDMsgTypeADC;
+	lcdBuffer.buf[0] = adcValue&0xFF;
+	lcdBuffer.buf[1] = adcValue>>8;
+		
+	//strncpy((char *)lcdBuffer.buf,pString,vtLCDMaxLen);
 	return(xQueueSend(lcdData->inQ,(void *) (&lcdBuffer),ticksToBlock));
 }
 
@@ -147,6 +169,7 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 	int xoffset = 0, yoffset = 0;
 	unsigned int xmin=0, xmax=0, ymin=0, ymax=0;
 	unsigned int x, y;
+	unsigned xLCD = 0;
 	int i, j;
 	float hue=0, sat=0.2, light=0.2;
 	#elif LCD_EXAMPLE_OP==1
@@ -179,48 +202,21 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 	}
 	#endif
 
-	/* Initialize the LCD and set the initial colors */ //Teja: this is where we can change colors
+	/* Initialize the LCD and set the initial colors */
 	GLCD_Init();
-	tscr = Black; // may be reset in the LCDMsgTypeTimer code below
+	tscr = Green; // may be reset in the LCDMsgTypeTimer code below
 	screenColor = White; // may be reset in the LCDMsgTypeTimer code below
 	GLCD_SetTextColor(tscr);
 	GLCD_SetBackColor(screenColor);
 	GLCD_Clear(screenColor);
-	//Teja: Initialize the environment to draw the grid
-	GLCD_SetTextColor((unsigned short)LightGrey);
-	for (y = 240/12; y < 240; y += 240/12){
-		for (x = 0;x <= 320;++x) {
-			if (y == 240/2)	GLCD_SetTextColor((unsigned short)DarkGrey);
-			GLCD_PutPixel(x,y);
-			if (y == 240/2)	GLCD_SetTextColor((unsigned short)LightGrey);
-		}
-	}
-	for (x = 320/16; x < 320; x += 320/16){
-		for (y = 0; y <= 240; ++y) {
-			if (x == 320/2)	GLCD_SetTextColor((unsigned short)DarkGrey);
-			GLCD_PutPixel(x,y);
-			if (x == 320/2)	GLCD_SetTextColor((unsigned short)LightGrey);
-		}
-	}
 
-	float xCalc, yCalc;
-	GLCD_SetTextColor((unsigned short)Red);
-	for (xCalc = -360/2; xCalc < 360/2; ++xCalc){
-		x = xCalc +160;
-		yCalc = sin(50*xCalc);
-		y = yCalc*20 + 240/2;
-		GLCD_PutPixel(x,y);
-	}
-
-	GLCD_DisplayString(1,0,1,(unsigned char *)"hello");
-	
 	// Note that srand() & rand() require the use of malloc() and should not be used unless you are using
 	//   MALLOC_VERSION==1
 	#if MALLOC_VERSION==1
 	srand((unsigned) 55); // initialize the random number generator to the same seed for repeatability
 	#endif
 
-	curLine = 0; //Teja: changed from 5 to 0
+	curLine = 5;
 	// This task should never exit
 	for(;;)
 	{	
@@ -235,7 +231,7 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 		#endif
 
 		#if LCD_EXAMPLE_OP==0
-		// Wait for a message Teja: this is where the message is received onto msgBuffer from the Queue
+		// Wait for a message
 		if (xQueueReceive(lcdPtr->inQ,(void *) &msgBuffer,portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
@@ -254,10 +250,9 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 			GLCD_ClearLn(curLine,1);
 			// show the text
 			GLCD_DisplayString(curLine,0,1,(unsigned char *)lineBuffer);
-			//GLCD_DisplayString(curLine,0,1,(unsigned char *)"hello tyler"); //Teja: location that displays text
 			curLine++;
 			if (curLine == lcdNUM_LINES) {
-				curLine = 0; //Teja: changed from 5 to 0
+				curLine = 5;
 			}
 			break;
 		}
@@ -360,6 +355,21 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 				// This isn't for any important reason, it is just to for this example code to do "stuff"
 				timerCount = 0;
 			}
+			break;
+		}
+		case LCDMsgTypeADC: {
+			static int adcValue = 0;
+			static char lcdBuffer[vtLCDMaxLen+1];
+			adcValue = msgBuffer.buf[0]|(msgBuffer.buf[1]<<8);
+			sprintf(lcdBuffer,"ADC %d",adcValue);
+			//GLCD_DisplayString(1,0,1,(unsigned char *)lcdBuffer);
+			if (xLCD >= LCD_WIDTH){
+				xLCD = 0;
+				GLCD_Clear(screenColor);
+			}
+			GLCD_SetTextColor((unsigned short)Red);
+			GLCD_PutPixel(xLCD,LCD_HEIGHT-(adcValue*LCD_HEIGHT/1024));
+			++xLCD;
 			break;
 		}
 		default: {
