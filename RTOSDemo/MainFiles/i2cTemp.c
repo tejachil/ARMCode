@@ -16,6 +16,10 @@
 #include "i2cTemp.h"
 #include "I2CTaskMsgTypes.h"
 
+#define I2C_ADDR 0x4F
+#define I2C_ADC_LOW 0x61
+#define I2C_ADC_HIGH 0x62
+
 /* *********************************************** */
 // definitions and data structures that are private to this file
 // Length of the queue to this task
@@ -72,13 +76,13 @@ portBASE_TYPE SendTempTimerMsg(vtTempStruct *tempData,portTickType ticksElapsed,
 	}
 	memcpy(tempBuffer.buf,(char *)&ticksElapsed,sizeof(ticksElapsed));
 	tempBuffer.msgType = TempMsgTypeTimer;
-	return(xQueueSend(tempData->inQ,(void *) (&tempBuffer),ticksToBlock)); //Teja: this is where the temperature message is sent from for timer
+	return(xQueueSend(tempData->inQ,(void *) (&tempBuffer),ticksToBlock));
 }
 
 portBASE_TYPE SendTempValueMsg(vtTempStruct *tempData,uint8_t msgType,uint8_t value,portTickType ticksToBlock)
 {
 	vtTempMsg tempBuffer;
-	
+
 	if (tempData == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
@@ -87,10 +91,9 @@ portBASE_TYPE SendTempValueMsg(vtTempStruct *tempData,uint8_t msgType,uint8_t va
 		// no room for this message
 		VT_HANDLE_FATAL_ERROR(tempBuffer.length);
 	}
-	//memcpy(tempBuffer.buf,(char *)&value,sizeof(value));
-	memcpy(tempBuffer.buf,(char *)"SendTempValueMsg Works!",sizeof(value)); // Teja: changed to text
+	memcpy(tempBuffer.buf,(char *)&value,sizeof(value));
 	tempBuffer.msgType = msgType;
-	return(xQueueSend(tempData->inQ,(void *) (&tempBuffer),ticksToBlock));//Teja: this is where the temp value text is sent
+	return(xQueueSend(tempData->inQ,(void *) (&tempBuffer),ticksToBlock));
 }
 
 // End of Public API
@@ -106,25 +109,17 @@ uint8_t getValue(vtTempMsg *Buffer)
 }
 
 // I2C commands for the temperature sensor
-	const uint8_t i2cCmdInit[]= {0xAC,0x00};
-	const uint8_t i2cCmdStartConvert[]= {0xEE};
-	const uint8_t i2cCmdStopConvert[]= {0x22};
-	const uint8_t i2cCmdReadVals[]= {0xAA};
-	const uint8_t i2cCmdReadCnt[]= {0xA8};
-	const uint8_t i2cCmdReadSlope[]= {0xA9};
+	const uint8_t i2cAdcReadLow[]= {I2C_ADC_LOW};
+	const uint8_t i2cAdcReadHigh[]= {I2C_ADC_HIGH};
 // end of I2C command definitions
 
 // Definitions of the states for the FSM below
-const uint8_t fsmStateInit1Sent = 0;
-const uint8_t fsmStateInit2Sent = 1;
-const uint8_t fsmStateTempRead1 = 2;
-const uint8_t fsmStateTempRead2 = 3;
-const uint8_t fsmStateTempRead3 = 4;
+const uint8_t fsmStateAdcReadLow = 0;
+const uint8_t fsmStateAdcReadHigh = 1;
 // This is the actual task that is run
 static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 {
-	float temperature = 0.0;
-	float countPerC = 100.0, countRemain=0.0;
+	int adc = 0;
 	// Get the parameters
 	vtTempStruct *param = (vtTempStruct *) pvParameters;
 	// Get the I2C device pointer
@@ -141,12 +136,8 @@ static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 
 	// This task is implemented as a Finite State Machine.  The incoming messages are examined to see
 	//   whether or not the state should change.
-	//
-	// Temperature sensor configuration sequence (DS1621) Address 0x4F
-	if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempInit,0x4F,sizeof(i2cCmdInit),i2cCmdInit,0) != pdTRUE) {
-		VT_HANDLE_FATAL_ERROR(0);
-	}
-	currentState = fsmStateInit1Sent;
+
+	currentState = fsmStateAdcReadLow;
 	// Like all good tasks, this should never exit
 	for(;;)
 	{
@@ -157,50 +148,25 @@ static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 
 		// Now, based on the type of the message and the state, we decide on the new state and action to take
 		switch(getMsgType(&msgBuffer)) {
-		case vtI2CMsgTypeTempInit: {
-			if (currentState == fsmStateInit1Sent) {
-				currentState = fsmStateInit2Sent;
-				// Must wait 10ms after writing to the temperature sensor's configuration registers(per sensor data sheet)
-				vTaskDelay(10/portTICK_RATE_MS);
-				// Tell it to start converting
-				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempInit,0x4F,sizeof(i2cCmdStartConvert),i2cCmdStartConvert,0) != pdTRUE) {
-					VT_HANDLE_FATAL_ERROR(0);
-				}
-			} else 	if (currentState == fsmStateInit2Sent) {
-				currentState = fsmStateTempRead1;
-			} else {
-				// unexpectedly received this message
-				VT_HANDLE_FATAL_ERROR(0);
-			}
-			break;
-		}
 		case TempMsgTypeTimer: {
 			// Timer messages never change the state, they just cause an action (or not) 
-			if ((currentState != fsmStateInit1Sent) && (currentState != fsmStateInit2Sent)) {
 				// Read in the values from the temperature sensor
 				// We have three transactions on i2c to read the full temperature 
 				//   we send all three requests to the I2C thread (via a Queue) -- responses come back through the conductor thread
 				// Temperature read -- use a convenient routine defined above
-				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead1,0x4F,sizeof(i2cCmdReadVals),i2cCmdReadVals,2) != pdTRUE) {
+				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead1,I2C_ADDR,sizeof(i2cAdcReadLow),i2cAdcReadLow,1) != pdTRUE) {
 					VT_HANDLE_FATAL_ERROR(0);
 				}
 				// Read in the read counter
-				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead2,0x4F,sizeof(i2cCmdReadCnt),i2cCmdReadCnt,1) != pdTRUE) {
+				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead2,I2C_ADDR,sizeof(i2cAdcReadHigh),i2cAdcReadHigh,1) != pdTRUE) {
 					VT_HANDLE_FATAL_ERROR(0);
 				}
-				// Read in the slope;
-				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead3,0x4F,sizeof(i2cCmdReadSlope),i2cCmdReadSlope,1) != pdTRUE) {
-					VT_HANDLE_FATAL_ERROR(0);
-				}
-			} else {
-				// just ignore timer messages until initialization is complete
-			} 
 			break;
 		}
 		case vtI2CMsgTypeTempRead1: {
-			if (currentState == fsmStateTempRead1) {
-				currentState = fsmStateTempRead2;
-				temperature = getValue(&msgBuffer);
+			if (currentState == fsmStateAdcReadLow) {
+				currentState = fsmStateAdcReadHigh;
+				adc = getValue(&msgBuffer);
 			} else {
 				// unexpectedly received this message
 				VT_HANDLE_FATAL_ERROR(0);
@@ -208,34 +174,11 @@ static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 			break;
 		}
 		case vtI2CMsgTypeTempRead2: {
-			if (currentState == fsmStateTempRead2) {
-				currentState = fsmStateTempRead3;
-				countRemain = getValue(&msgBuffer);
-			} else {
-				// unexpectedly received this message
-				VT_HANDLE_FATAL_ERROR(0);
-			}
-			break;
-		}
-		case vtI2CMsgTypeTempRead3: {
-			if (currentState == fsmStateTempRead3) {
-				currentState = fsmStateTempRead1;
-				countPerC = getValue(&msgBuffer);
-
-				// Now have all of the values, so compute the temperature and send to the LCD Task
-				// Do the accurate temperature calculation
-				temperature += -0.25 + ((countPerC-countRemain)/countPerC);
-				//Teja: THIS IS WHERE MESSAGE GETS CREATED
-				static int tejaCount = 0; tejaCount++;
-				#if PRINTF_VERSION == 1
-				printf("Temp %f F (%f C)\n",(32.0 + ((9.0/5.0)*temperature)), (temperature));
-				sprintf(lcdBuffer,"T=%6.2fF (%6.2fC)",(32.0 + ((9.0/5.0)*temperature)),temperature);
-				#else
-				// we do not have full printf (so no %f) and therefore need to print out integers
-				printf("Temp %d F (%d C)\n",lrint(32.0 + ((9.0/5.0)*temperature)), lrint(temperature));
-				//sprintf(lcdBuffer,"T=%d F (%d C)",lrint(32.0 + ((9.0/5.0)*temperature)),lrint(temperature));
-				sprintf(lcdBuffer,"Counter: %d",tejaCount); // Teja: added this instead of above
-				#endif
+			if (currentState == fsmStateAdcReadHigh) {
+				currentState = fsmStateAdcReadLow;
+				adc |= getValue(&msgBuffer) << 8;
+				printf("ADC %d\n",adc);
+				sprintf(lcdBuffer,"ADC %d\n",adc);
 				if (lcdData != NULL) {
 					if (SendLCDPrintMsg(lcdData,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
 						VT_HANDLE_FATAL_ERROR(0);
