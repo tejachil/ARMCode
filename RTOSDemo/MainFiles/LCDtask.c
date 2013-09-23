@@ -111,7 +111,7 @@ portBASE_TYPE SendLCDADCValue(vtLCDStruct *lcdData, int adcValue,portTickType ti
 	lcdBuffer.msgType = LCDMsgTypeADC;
 	lcdBuffer.buf[0] = adcValue&0xFF;
 	lcdBuffer.buf[1] = adcValue>>8;
-		
+	
 	//strncpy((char *)lcdBuffer.buf,pString,vtLCDMaxLen);
 	return(xQueueSend(lcdData->inQ,(void *) (&lcdBuffer),ticksToBlock));
 }
@@ -204,7 +204,7 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 
 	/* Initialize the LCD and set the initial colors */
 	GLCD_Init();
-	tscr = Green; // may be reset in the LCDMsgTypeTimer code below
+	tscr = Red; // may be reset in the LCDMsgTypeTimer code below
 	screenColor = White; // may be reset in the LCDMsgTypeTimer code below
 	GLCD_SetTextColor(tscr);
 	GLCD_SetBackColor(screenColor);
@@ -359,15 +359,14 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 		}
 		case LCDMsgTypeADC: {
 			static int adcValue = 0;
-			static char lcdBuffer[vtLCDMaxLen+1];
+			//static char lcdBuffer[vtLCDMaxLen+1];
 			adcValue = msgBuffer.buf[0]|(msgBuffer.buf[1]<<8);
-			sprintf(lcdBuffer,"ADC %d",adcValue);
+			//sprintf(lcdBuffer,"ADC %d",adcValue);
 			//GLCD_DisplayString(1,0,1,(unsigned char *)lcdBuffer);
 			if (xLCD >= LCD_WIDTH){
 				xLCD = 0;
 				GLCD_Clear(screenColor);
 			}
-			GLCD_SetTextColor((unsigned short)Red);
 			GLCD_PutPixel(xLCD,LCD_HEIGHT-(adcValue*LCD_HEIGHT/1024));
 			++xLCD;
 			break;
