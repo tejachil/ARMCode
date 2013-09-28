@@ -3,7 +3,7 @@
 
     ***************************************************************************
     *                                                                         *
-    * If you are:                                                             *
+    * If you are:                                                             *								 	
     *                                                                         *
     *    + New to FreeRTOS,                                                   *
     *    + Wanting to learn FreeRTOS or multitasking in general quickly       *
@@ -90,12 +90,14 @@ You should read the note above.
    unless the files are actually removed from the project */
 #define USE_FREERTOS_DEMO 0
 // Define whether or not to use my LCD task
-#define USE_MTJ_LCD 1
+#define USE_MTJ_LCD 0
 // Define whether to use my temperature sensor read task (the sensor is on the PIC v4 demo board, so if that isn't connected
 //   then this should be off
-#define USE_MTJ_V4Temp_Sensor 1
+#define USE_MTJ_V4Temp_Sensor 0
 // Define whether to use my USB task
 #define USE_MTJ_USE_USB 0
+
+#define USE_UART 1
 
 #if USE_FREERTOS_DEMO == 1
 /* Demo app includes. */
@@ -121,6 +123,10 @@ You should read the note above.
 #include "myTimers.h"
 #include "conductor.h"
 
+#include "uartDriver.h" // Teja added this
+#include "lpc17xx_uart.h"
+//#include "FreeRTOS.h"
+
 /* syscalls initialization -- *must* occur first */
 #include "syscalls.h"
 #include "extUSB.h"
@@ -145,6 +151,7 @@ tick hook). */
 #define mainUSB_TASK_PRIORITY				( tskIDLE_PRIORITY)
 #define mainI2CMONITOR_TASK_PRIORITY		( tskIDLE_PRIORITY)
 #define mainCONDUCTOR_TASK_PRIORITY			( tskIDLE_PRIORITY)
+#define mainUARTMONITOR_TASK_PRIORITY		( tskIDLE_PRIORITY)
 
 /* The WEB server has a larger stack as it utilises stack hungry string
 handling library calls. */
@@ -197,6 +204,10 @@ static vtConductorStruct conductorData;
 static vtLCDStruct vtLCDdata; 
 #endif
 
+#if USE_UART == 1
+static UARTStruct uart1;
+#endif
+
 /*-----------------------------------------------------------*/
 
 int main( void )
@@ -207,10 +218,30 @@ int main( void )
 
 	// Set up the LED ports and turn them off
 	vtInitLED();
-
+	
 	/* Configure the hardware for use by this demo. */
 	prvSetupHardware();
+	
+	#if USE_UART == 1
+	UART_CFG_Type uartCfg;
+	UART_FIFO_CFG_Type uargFIFOCfg;
 
+	if (initUART(&uart1, 1, mainUARTMONITOR_TASK_PRIORITY, &uartCfg, &uargFIFOCfg) != UART_INIT_SUCCESS) {
+		VT_HANDLE_FATAL_ERROR(0);
+	}
+	vtLEDOn(0x80);
+
+	uint8_t data  = 0xAA;
+	if(UART_CheckBusy((LPC_UART_TypeDef *)LPC_UART1)==RESET){
+		UART_SendByte((LPC_UART_TypeDef *)LPC_UART1, 0xBB);
+		vtLEDOn(0x40);
+	}
+		
+	vtLEDOn(0x20);	
+	
+	#endif
+	
+	
 	#if USE_FREERTOS_DEMO == 1
 	/* Start the standard demo tasks.  These are just here to exercise the
 	kernel port and provide examples of how the FreeRTOS API can be used. */
