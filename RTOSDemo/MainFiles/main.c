@@ -99,6 +99,8 @@ You should read the note above.
 
 #define USE_UART 1
 
+#define USE_WEB_SERVER 0
+
 #if USE_FREERTOS_DEMO == 1
 /* Demo app includes. */
 #include "BlockQ.h"
@@ -123,9 +125,9 @@ You should read the note above.
 #include "myTimers.h"
 #include "conductor.h"
 
-#include "uartDriver.h" // Teja added this
+#include "uartDriver.h" // Teja added these INCLUDES
 #include "lpc17xx_uart.h"
-//#include "FreeRTOS.h"
+#include <string.h>
 
 /* syscalls initialization -- *must* occur first */
 #include "syscalls.h"
@@ -222,26 +224,6 @@ int main( void )
 	/* Configure the hardware for use by this demo. */
 	prvSetupHardware();
 	
-	#if USE_UART == 1
-	UART_CFG_Type uartCfg;
-	UART_FIFO_CFG_Type uargFIFOCfg;
-
-	if (initUART(&uart1, 1, mainUARTMONITOR_TASK_PRIORITY, &uartCfg, &uargFIFOCfg) != UART_INIT_SUCCESS) {
-		VT_HANDLE_FATAL_ERROR(0);
-	}
-	vtLEDOn(0x80);
-
-	uint8_t data  = 0xAA;
-	if(UART_CheckBusy((LPC_UART_TypeDef *)LPC_UART1)==RESET){
-		UART_SendByte((LPC_UART_TypeDef *)LPC_UART1, 0xBB);
-		vtLEDOn(0x40);
-	}
-		
-	vtLEDOn(0x20);	
-	
-	#endif
-	
-	
 	#if USE_FREERTOS_DEMO == 1
 	/* Start the standard demo tasks.  These are just here to exercise the
 	kernel port and provide examples of how the FreeRTOS API can be used. */
@@ -260,6 +242,7 @@ int main( void )
 	// Not a standard demo -- but also not one of mine (MTJ)
 	/* Create the uIP task.  The WEB server runs in this task. */
     xTaskCreate( vuIP_Task, ( signed char * ) "uIP", mainBASIC_WEB_STACK_SIZE, ( void * ) NULL, mainUIP_TASK_PRIORITY, NULL );
+	vtLEDOn(0x08);
 	#endif
 
 	#if USE_MTJ_LCD == 1
@@ -268,7 +251,7 @@ int main( void )
 	// LCD Task creates a queue to receive messages -- what it does with those messages will depend on how the task is configured (see LCDtask.c)
 	// Here we set up a timer that will send messages to the LCD task.  You don't have to have this timer for the LCD task, it is just showing
 	//  how to use a timer and how to send messages from that timer.
-	startTimerForLCD(&vtLCDdata);
+	// startTimerForLCD(&vtLCDdata);
 	#endif
 	
 	#if USE_MTJ_V4Temp_Sensor == 1
@@ -295,6 +278,30 @@ int main( void )
 	#if USE_MTJ_USE_USB == 1
 	initUSB();  // MTJ: This is my routine used to make sure we can do printf() with USB
     xTaskCreate( vUSBTask, ( signed char * ) "USB", configMINIMAL_STACK_SIZE, ( void * ) NULL, mainUSB_TASK_PRIORITY, NULL );
+	#endif
+	
+	#if USE_UART == 1
+	UART_CFG_Type uartCfg;
+	UART_FIFO_CFG_Type uargFIFOCfg;
+
+	if (initUART(&uart1, 1, mainUARTMONITOR_TASK_PRIORITY, &uartCfg, &uargFIFOCfg) != UART_INIT_SUCCESS) {
+		VT_HANDLE_FATAL_ERROR(0);
+	}
+	vtLEDOn(0x80);
+
+	uint8_t data  = 0x00;
+	int i = 0;
+	
+	while(1){
+		for (i = 0; i < 10000000; ++i);
+		if(UART_CheckBusy((LPC_UART_TypeDef *)LPC_UART1)==RESET){
+			UART_SendByte((LPC_UART_TypeDef *)LPC_UART1, data);
+			++data;
+			vtLEDOn(0x40);
+		}
+	}
+		
+	
 	#endif
 	
 	/* Start the scheduler. */
