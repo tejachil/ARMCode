@@ -97,9 +97,9 @@ You should read the note above.
 // Define whether to use my USB task
 #define USE_MTJ_USE_USB 0
 
-#define USE_UART 0
+#define USE_UART 1
 
-#define USE_WEB_SERVER 1
+#define USE_WEB_SERVER 0
 
 #if USE_FREERTOS_DEMO == 1
 /* Demo app includes. */
@@ -242,7 +242,6 @@ int main( void )
 	// Not a standard demo -- but also not one of mine (MTJ)
 	/* Create the uIP task.  The WEB server runs in this task. */
     xTaskCreate( vuIP_Task, ( signed char * ) "uIP", mainBASIC_WEB_STACK_SIZE, ( void * ) NULL, mainUIP_TASK_PRIORITY, NULL );
-	vtLEDOn(0x08);
 	#endif
 
 	#if USE_MTJ_LCD == 1
@@ -287,22 +286,26 @@ int main( void )
 	if (initUART(&uart1, 1, mainUARTMONITOR_TASK_PRIORITY, &uartCfg, &uargFIFOCfg) != UART_INIT_SUCCESS) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
-	vtLEDOn(0x80);
+	//vtLEDOn(0x80);
 
 	uint8_t data  = 0x00;
 	int i = 0;
 	
 	while(1){
 		for (i = 0; i < 10000000; ++i);
+		if (UART_GetIntId((LPC_UART_TypeDef*)LPC_UART1) == UART_IIR_INTID_RLS || UART_GetIntId((LPC_UART_TypeDef*)LPC_UART1) == UART_IIR_INTID_RDA){
+			vtLEDOn(0x10);
+		}
 		if(UART_CheckBusy((LPC_UART_TypeDef *)LPC_UART1)==RESET){
 			UART_SendByte((LPC_UART_TypeDef *)LPC_UART1, data);
 			++data;
-			vtLEDOn(0x40);
+			//vtLEDOn(0x40);
 		}
 	}
 		
 	
 	#endif
+	
 	
 	/* Start the scheduler. */
 	// IMPORTANT: Once you start the scheduler, any variables on the stack from main (local variables in main) can be (will be...) written over
