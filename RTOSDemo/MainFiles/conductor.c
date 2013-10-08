@@ -33,6 +33,7 @@
 
 /* The i2cTemp task. */
 static portTASK_FUNCTION_PROTO( vConductorUpdateTask, pvParameters );
+static portTASK_FUNCTION_PROTO( vConductorUpdateTaskUART, pvParameters );
 
 /*-----------------------------------------------------------*/
 // Public API
@@ -46,6 +47,16 @@ void vStartConductorTask(vtConductorStruct *params,unsigned portBASE_TYPE uxPrio
 		VT_HANDLE_FATAL_ERROR(retval);
 	}
 }
+
+void vStartConductorTask_UART(vtConductorStruct *params,unsigned portBASE_TYPE uxPriority, UARTStruct *uart){
+	/* Start the task */
+	portBASE_TYPE retval;
+	params->dev = uart;
+	if ((retval = xTaskCreate( vConductorUpdateTaskUART, ( signed char * ) "Conductor-UART", conSTACK_SIZE, (void *) uart, uxPriority, ( xTaskHandle * ) NULL )) != pdPASS) {
+		VT_HANDLE_FATAL_ERROR(retval);
+	}
+}
+
 
 // End of Public API
 /*-----------------------------------------------------------*/
@@ -103,3 +114,26 @@ static portTASK_FUNCTION( vConductorUpdateTask, pvParameters )
 	}
 }
 
+
+static portTASK_FUNCTION( vConductorUpdateTaskUART, pvParameters )
+{
+
+	// Get the parameters
+	UARTStruct *dev = (UARTStruct *)pvParameters;
+
+	UARTmsg message;
+	// Like all good tasks, this should never exit
+	for(;;)
+	{
+		// Wait for a message from an I2C operation
+		if (xQueueReceive(dev->outQ,(void *)(&message),portMAX_DELAY) != pdTRUE) {
+			VT_HANDLE_FATAL_ERROR(0);
+		}
+		vtLEDOn(0x80);
+
+		// Decide where to send the message 
+		//   This just shows going to one task/queue, but you could easily send to
+		//   other Q/tasks for other message types
+		// This isn't a state machine, it is just acting as a router for messages
+	}
+}

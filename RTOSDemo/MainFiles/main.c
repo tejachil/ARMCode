@@ -99,7 +99,7 @@ You should read the note above.
 
 #define USE_UART 1
 
-#define USE_WEB_SERVER 0
+#define USE_WEB_SERVER 1
 
 #if USE_FREERTOS_DEMO == 1
 /* Demo app includes. */
@@ -208,6 +208,7 @@ static vtLCDStruct vtLCDdata;
 
 #if USE_UART == 1
 static UARTStruct uart1;
+static vtConductorStruct conductorData_uart;
 #endif
 
 /*-----------------------------------------------------------*/
@@ -280,29 +281,14 @@ int main( void )
 	#endif
 	
 	#if USE_UART == 1
-	UART_CFG_Type uartCfg;
-	UART_FIFO_CFG_Type uargFIFOCfg;
 
-	if (initUART(&uart1, 1, mainUARTMONITOR_TASK_PRIORITY, &uartCfg, &uargFIFOCfg) != UART_INIT_SUCCESS) {
+	if (initUART(&uart1, 1, mainUARTMONITOR_TASK_PRIORITY, 19200, UART_PARITY_NONE, UART_DATABIT_8, UART_STOPBIT_1) != UART_INIT_SUCCESS) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
-	//vtLEDOn(0x80);
-
-	uint8_t data  = 0x00;
-	int i = 0;
 	
-	while(1){
-		for (i = 0; i < 10000000; ++i);
-		if (UART_GetIntId((LPC_UART_TypeDef*)LPC_UART1) == UART_IIR_INTID_RLS || UART_GetIntId((LPC_UART_TypeDef*)LPC_UART1) == UART_IIR_INTID_RDA){
-			vtLEDOn(0x10);
-		}
-		if(UART_CheckBusy((LPC_UART_TypeDef *)LPC_UART1)==RESET){
-			UART_SendByte((LPC_UART_TypeDef *)LPC_UART1, data);
-			++data;
-			//vtLEDOn(0x40);
-		}
-	}
-		
+	startTimerForUART(&uart1);
+	
+	vStartConductorTask_UART(&conductorData_uart,mainCONDUCTOR_TASK_PRIORITY,&uart1);
 	
 	#endif
 	

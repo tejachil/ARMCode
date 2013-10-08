@@ -1,6 +1,7 @@
 #ifndef CONDUCTOR_H
 #define CONDUCTOR_H
 #include "vtI2C.h"
+#include "uartDriver.h"
 #include "i2cTemp.h"
 // Structure used to pass parameters to the task
 // Do not touch...
@@ -20,4 +21,6 @@ typedef struct __ConductorStruct {
 //   i2c: pointer to the data structure for an i2c task
 //   temperature: pointer to the data structure for an LCD task (may be NULL)
 void vStartConductorTask(vtConductorStruct *conductorData,unsigned portBASE_TYPE uxPriority, vtI2CStruct *i2c,vtTempStruct *temperature);
+
+void vStartConductorTask_UART(vtConductorStruct *params,unsigned portBASE_TYPE uxPriority, UARTStruct *uart);
 #endif
