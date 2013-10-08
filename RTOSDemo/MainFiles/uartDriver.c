@@ -160,25 +160,34 @@ static __INLINE void UARTIsr(LPC_UART_TypeDef *devAddr, xQueueHandle outQ, xSema
 					++recByteCount;
 				}
 				if (recByteCount >= msgBuf.rxLen + UART_MSG_MIN_SIZE){
-					//vtLEDOn(0x04);
+					static int LEDstate = 0;
 					msgBuf.status = 1;
 					msgBuf.txLen = 0;
 					
 					(xQueueSend(outQ,(void *)(&msgBuf),portMAX_DELAY));
 					recByteCount = 0;
+					if (LEDstate == 0)	{
+						vtLEDOn(0x02);
+						LEDstate = 1;
+					}
+					else{
+						vtLEDOff(0x02);
+						LEDstate = 0;
+					}
 				}
 				break;
 		}	
 		/*xSemaphoreGiveFromISR(*binSemaphore,&xHigherPriorityTaskWoken);
 		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);*/
 	}
+	vtLEDOff(0x04);
 }
 
 // Simply pass on the information to the real interrupt handler above (have to do this to work for multiple i2c peripheral units on the LPC1768
 void UART1_IRQHandler(void) {
 	// Log the I2C status code
 	//vtITMu8(vtITMPortI2C1IntHandler,((devStaticPtr[1]->devAddr)->I2STAT & I2C_STAT_CODE_BITMASK));
-	//vtLEDOn(0x20);
+	vtLEDOn(0x04);
 	UARTIsr(devStaticPtr[1]->devAddr, devStaticPtr[1]->outQ, &(devStaticPtr[0]->binSemaphore));
 }
 
@@ -192,6 +201,15 @@ static portTASK_FUNCTION( uartMonitorTask, pvParameters ){
 		if (xQueueReceive(devPtr->inQ,(void *)(&msgBuffer),portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
+		static int LEDstate = 0;
+		if (LEDstate == 0)	{
+			vtLEDOn(0x01);
+			LEDstate = 1;
+		}
+		else{
+			vtLEDOff(0x01);
+			LEDstate = 0;
+		}
 		if(UART_CheckBusy((LPC_UART_TypeDef *)LPC_UART1)==RESET){
 			packet[0] = msgBuffer.msgType;
 			packet[1] = msgBuffer.msgID;
@@ -200,7 +218,7 @@ static portTASK_FUNCTION( uartMonitorTask, pvParameters ){
 			UART_Send(devPtr->devAddr, packet, msgBuffer.txLen + UART_MSG_MIN_SIZE, BLOCKING);
 			//UART_SendByte((LPC_UART_TypeDef *)LPC_UART1, data);
 			//++data;
-			//vtLEDOn(0x80);
+			
 		}
 		/*if (xSemaphoreTake(devPtr->binSemaphore,portMAX_DELAY) != pdTRUE) {
 			// something went wrong 
