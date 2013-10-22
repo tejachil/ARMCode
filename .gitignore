@@ -213,3 +213,7 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+*.o
+*.d
+RTOSDemo/ObjectFiles/
+RTOSDemo/RTOSDemo_WebServerELF.dep
