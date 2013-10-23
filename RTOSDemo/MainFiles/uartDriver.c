@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h> // For memcpy
 
 #include "uartDriver.h"
 
