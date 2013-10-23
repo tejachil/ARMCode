@@ -76,15 +76,61 @@ static portTASK_FUNCTION( vConductorUpdateTask, pvParameters )
 			VT_HANDLE_FATAL_ERROR(message.data_length);
 		}
 
-		// Decide where to send the message based on the message type
-		switch(message.message_type) {
-		default: {
-			// Unknown message type
-			VT_HANDLE_FATAL_ERROR(message.message_type);
-			break;
-		}
-		}
+		// Check the data length
+		if (public_message_data_size[message.message_type] == message.data_length) {
 
+			// Decide where to send the message based on the message type
+			switch(message.message_type) {
+/*
+			// Distance reading for a given sensor.
+			case PUB_MSG_T_SENS_DIST: {
+					break;
+				} // End case PUB_MSG_T_SENS_DIST
+
+			// Angle of wall to side relative to rover.
+			case PUB_MSG_T_SIDE_ANGLE: {
+					break;
+				} // End case PUB_MSG_T_SIDE_ANGLE
+
+			// Angle of wall in front relative to rover.
+			case PUB_MSG_T_FRONT_ANGLE: {
+					break;
+				} // End case PUB_MSG_T_FRONT_ANGLE
+
+			// Information about the current enclosure.
+			case PUB_MSG_T_ENC_INFO: {
+					break;
+				} // End case PUB_MSG_T_ENC_INFO
+
+			// Position of rover.
+			case PUB_MSG_T_ROV_POS: {
+					break;
+				} // End case PUB_MSG_T_ROV_POS
+
+			// Notification of new enclosure corner.
+			case PUB_MSG_T_NEW_CORNER: {
+					break;
+				} // End case PUB_MSG_T_NEW_CORNER
+
+			// Notification for webserver of new enclosure corner.
+			case PUB_MSG_T_CORNER_WEB: {
+					break;
+				} // End case PUB_MSG_T_CORNER_WEB
+*/
+			// Any other message type is unknown or should not be received on UART
+			default: {
+				// Unknown message type
+				VT_HANDLE_FATAL_ERROR(message.message_type);
+				break;
+			} // End default case
+			
+			} // End switch(message.message_type)
+
+		}
+		// Incorrect data length
+		else {
+			VT_HANDLE_FATAL_ERROR(message.data_length);
+		}
 
 	}
 }
