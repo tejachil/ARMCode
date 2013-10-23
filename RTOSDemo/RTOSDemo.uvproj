@@ -366,6 +366,11 @@
               <FileType>1</FileType>
               <FilePath>.\MainFiles/uartDriver.c</FilePath>
             </File>
+            <File>
+              <FileName>public_messages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MainFiles\public_messages.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
