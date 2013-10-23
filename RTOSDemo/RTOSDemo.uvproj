@@ -369,7 +369,7 @@
             <File>
               <FileName>public_messages.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\MainFiles\public_messages.c</FilePath>
+              <FilePath>.\MainFiles/public_messages.c</FilePath>
             </File>
           </Files>
         </Group>

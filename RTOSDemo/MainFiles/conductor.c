@@ -12,6 +12,7 @@
 /* include files. */
 #include "vtUtilities.h"
 #include "conductor.h"
+#include "public_messages.h"
 #include "uartDriver.h"
 
 /* *********************************************** */
@@ -53,23 +54,33 @@ static portTASK_FUNCTION( vConductorUpdateTask, pvParameters )
 	// Get the parameters
 	vtConductorStruct *param = (vtConductorStruct *) pvParameters;
 	// Latest received message
-	UARTmsg message;
+	public_message_t message;
 
 	// Like all good tasks, this should never exit
 	for(;;)
 	{
 		// Wait for a message from UART
-		if (uartDeQ(param->uartDevice, &message) != pdTRUE) {
+#warning "Still using the old UARTMsg type"
+		UARTmsg driver_message;
+		if (uartDeQ(param->uartDevice, &driver_message) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
 
-		// Convert the UART driver struct to a public message struct
-#warning "Need to convert message to public message type"
+		// Convert the UART driver struct to the public message struct
+		message.message_type = (public_message_type_t) driver_message.msgType;
+		message.message_count = driver_message.msgID;
+		message.data_length = driver_message.rxLen; // rxLen is actually the data length, I think
+		if (message.data_length <= PUB_MSG_MAX_DATA_SIZE) {
+			memcpy(message.data, driver_message.data, message.data_length);
+		} else {
+			VT_HANDLE_FATAL_ERROR(message.data_length);
+		}
 
 		// Decide where to send the message based on the message type
-		switch(message.msgType) {
+		switch(message.message_type) {
 		default: {
-			VT_HANDLE_FATAL_ERROR(message.msgType);
+			// Unknown message type
+			VT_HANDLE_FATAL_ERROR(message.message_type);
 			break;
 		}
 		}
