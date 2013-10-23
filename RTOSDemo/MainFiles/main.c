@@ -120,12 +120,10 @@ You should read the note above.
 // Include file for MTJ's LCD & i2cTemp tasks
 #include "vtUtilities.h"
 #include "lcdTask.h"
-#include "i2cTemp.h"
-#include "vtI2C.h"
 #include "myTimers.h"
 #include "conductor.h"
 
-#include "uartDriver.h" // Teja added these INCLUDES
+#include "uartDriver.h"
 //#include <string.h>
 
 /* syscalls initialization -- *must* occur first */
@@ -148,7 +146,6 @@ tick hook). */
 #define mainGEN_QUEUE_TASK_PRIORITY			( tskIDLE_PRIORITY)
 #define mainFLASH_TASK_PRIORITY				( tskIDLE_PRIORITY)
 #define mainLCD_TASK_PRIORITY				( tskIDLE_PRIORITY)
-#define mainI2CTEMP_TASK_PRIORITY			( tskIDLE_PRIORITY)
 #define mainUSB_TASK_PRIORITY				( tskIDLE_PRIORITY)
 #define mainI2CMONITOR_TASK_PRIORITY		( tskIDLE_PRIORITY)
 #define mainCONDUCTOR_TASK_PRIORITY			( tskIDLE_PRIORITY)
@@ -191,15 +188,6 @@ char *pcGetTaskStatusMessage( void );
 static char *pcStatusMessage = mainPASS_STATUS_MESSAGE;
 
 
-#if USE_MTJ_V4Temp_Sensor == 1
-// data structure required for one I2C task
-static vtI2CStruct vtI2C0;
-// data structure required for one temperature sensor task
-static vtTempStruct tempSensorData;
-// data structure required for conductor task
-static vtConductorStruct conductorData;
-#endif
-
 #if USE_MTJ_LCD == 1
 // data structure required for LCDtask API
 static vtLCDStruct vtLCDdata; 
@@ -207,6 +195,8 @@ static vtLCDStruct vtLCDdata;
 
 #if USE_UART == 1
 static UARTstruct wiflyUART;
+// data structure required for conductor task
+static vtConductorStruct conductorData;
 #endif
 
 /*-----------------------------------------------------------*/
@@ -251,26 +241,6 @@ int main( void )
 	//  how to use a timer and how to send messages from that timer.
 	// startTimerForLCD(&vtLCDdata);
 	#endif
-	
-	#if USE_MTJ_V4Temp_Sensor == 1
-	// MTJ: My i2cTemp demonstration task
-	// First, start up an I2C task and associate it with the I2C0 hardware on the ARM (there are 3 I2C devices, we need this one)
-	// See vtI2C.h & vtI2C.c for more details on this task and the API to access the task
-	// Initialize I2C0 for I2C0 at an I2C clock speed of 100KHz
-	if (vtI2CInit(&vtI2C0,0,mainI2CMONITOR_TASK_PRIORITY,100000) != vtI2CInitSuccess) {
-		VT_HANDLE_FATAL_ERROR(0);
-	}
-	// Now, start up the task that is going to handle the temperature sensor sampling (it will talk to the I2C task and LCD task using their APIs)
-	#if USE_MTJ_LCD == 1
-	vStarti2cTempTask(&tempSensorData,mainI2CTEMP_TASK_PRIORITY,&vtI2C0,&vtLCDdata);
-	#else
-	vStarti2cTempTask(&tempSensorData,mainI2CTEMP_TASK_PRIORITY,&vtI2C0,NULL);
-	#endif
-	// Here we set up a timer that will send messages to the Temperature sensing task.  The timer will determine how often the sensor is sampled
-	startTimerForTemperature(&tempSensorData);
-	// start up a "conductor" task that will move messages around
-	vStartConductorTask(&conductorData,mainCONDUCTOR_TASK_PRIORITY,&vtI2C0,&tempSensorData);
-	#endif
 
     /* Create the USB task. MTJ: This routine has been modified from the original example (which is not a FreeRTOS standard demo) */
 	#if USE_MTJ_USE_USB == 1
@@ -291,7 +261,10 @@ int main( void )
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 
-	#endif
+	// Start the Conductor task to route messages from UART to the correct tasks
+	vStartConductorTask(&conductorData, mainCONDUCTOR_TASK_PRIORITY, &wiflyUART);
+
+	#endif //if USE_UART == 1
 	
 	
 	/* Start the scheduler. */
