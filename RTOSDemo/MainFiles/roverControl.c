@@ -11,15 +11,17 @@
 #define roverSTACK_SIZE		(baseStack*configMINIMAL_STACK_SIZE)
 #endif
 
+static portTASK_FUNCTION_PROTO( roverControlTask, param );
+
 void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart) {
 	roverControlData->uartDevice = uart;
 
 	// Create the queue that will be used to talk to this task
-	if ((roverControl->inQ = xQueueCreate(roverControlQLen,sizeof(public_message_t))) == NULL) {
+	if ((roverControlData->inQ = xQueueCreate(roverControlQLen,sizeof(public_message_t))) == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 
-	if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) params, uxPriority, ( xTaskHandle * ) NULL ) != pdPASS) {
+	if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, uxPriority, ( xTaskHandle * ) NULL ) != pdPASS) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 }
@@ -36,7 +38,6 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 	sensorRequestMsg.msgType = PUB_MSG_T_SENS_DIST;
 	sensorRequestMsg.msgID = 0; // The count will be updated before sending each request
 	sensorRequestMsg.txLen = 0; // No data is included in the request
-	sensorRequestMsg.data = NULL; // No data is included in the request
 
 	// Request sensor data
 	// Update the count and send the request

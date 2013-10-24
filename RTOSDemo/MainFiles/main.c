@@ -150,6 +150,7 @@ tick hook). */
 #define mainI2CMONITOR_TASK_PRIORITY		( tskIDLE_PRIORITY)
 #define mainCONDUCTOR_TASK_PRIORITY			( tskIDLE_PRIORITY)
 #define mainUARTMONITOR_TASK_PRIORITY		( tskIDLE_PRIORITY)
+#define mainROVER_CONTROL_TASK_PRIORITY		( tskIDLE_PRIORITY)
 
 /* The WEB server has a larger stack as it utilises stack hungry string
 handling library calls. */
@@ -198,6 +199,11 @@ static UARTstruct wiflyUART;
 // data structure required for conductor task
 static vtConductorStruct conductorData;
 #endif
+
+#if USE_ROVER_CONTROL == 1
+// data structure for the rover control task
+static RoverControlStruct roverControlData;
+#endif //if USE_ROVER_CONTROL == 1
 
 /*-----------------------------------------------------------*/
 
@@ -265,6 +271,11 @@ int main( void )
 	vStartConductorTask(&conductorData, mainCONDUCTOR_TASK_PRIORITY, &wiflyUART);
 
 	#endif //if USE_UART == 1
+
+	// Start the rover control task
+	#if USE_ROVER_CONTROL == 1
+	startRoverControlTask(roverControlData, mainROVER_CONTROL_TASK_PRIORITY, wiflyUART);
+	#endif //if USE_ROVER_CONTROL == 1
 	
 	
 	/* Start the scheduler. */

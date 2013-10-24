@@ -8,6 +8,6 @@ typedef struct __RoverControlStruct {
 	xQueueHandle inQ;
 } RoverControlStruct;
 
-void startRoverControlTask(RoverControlStruct *uartDevice, unsigned portBASE_TYPE uxPriority, UARTstruct *uart);
+void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart);
 
 #endif

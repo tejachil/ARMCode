@@ -374,7 +374,7 @@
             <File>
               <FileName>roverControl.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\MainFiles\roverControl.c</FilePath>
+              <FilePath>.\MainFiles/roverControl.c</FilePath>
             </File>
           </Files>
         </Group>
