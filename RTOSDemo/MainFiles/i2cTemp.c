@@ -17,8 +17,10 @@
 #include "I2CTaskMsgTypes.h"
 
 #define I2C_ADDR 0x4F
-#define I2C_ADC_LOW 0x61
-#define I2C_ADC_HIGH 0x62
+#define IR1_LOW 0x61
+#define IR1_HIGH 0x62 
+#define IR2_LOW 0x63
+#define IR2_HIGH 0x64
 
 /* *********************************************** */
 // definitions and data structures that are private to this file
@@ -109,17 +111,21 @@ uint8_t getValue(vtTempMsg *Buffer)
 }
 
 // I2C commands for the temperature sensor
-	const uint8_t i2cAdcReadLow[]= {I2C_ADC_LOW};
-	const uint8_t i2cAdcReadHigh[]= {I2C_ADC_HIGH};
+	const uint8_t i2cAdcReadIR1Low[]= {IR1_LOW};
+	const uint8_t i2cAdcReadIR1High[]= {IR1_HIGH};
+	const uint8_t i2cAdcReadIR2Low[]= {IR2_LOW};
+	const uint8_t i2cAdcReadIR2High[]= {IR2_HIGH};
 // end of I2C command definitions
 
 // Definitions of the states for the FSM below
-const uint8_t fsmStateAdcReadLow = 0;
-const uint8_t fsmStateAdcReadHigh = 1;
+const uint8_t fsmStateAdcReadIR1Low = 0;
+const uint8_t fsmStateAdcReadIR1High = 1;  
+const uint8_t fsmStateAdcReadIR2Low = 2;
+const uint8_t fsmStateAdcReadIR2High = 3;
 // This is the actual task that is run
 static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 {
-	int adc = 0;
+	int ir1 = 0, ir2 = 0;
 	// Get the parameters
 	vtTempStruct *param = (vtTempStruct *) pvParameters;
 	// Get the I2C device pointer
@@ -137,7 +143,7 @@ static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 	// This task is implemented as a Finite State Machine.  The incoming messages are examined to see
 	//   whether or not the state should change.
 
-	currentState = fsmStateAdcReadLow;
+	currentState = fsmStateAdcReadIR1Low;
 	// Like all good tasks, this should never exit
 	for(;;)
 	{
@@ -154,19 +160,24 @@ static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 				// We have three transactions on i2c to read the full temperature 
 				//   we send all three requests to the I2C thread (via a Queue) -- responses come back through the conductor thread
 				// Temperature read -- use a convenient routine defined above
-				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead1,I2C_ADDR,sizeof(i2cAdcReadLow),i2cAdcReadLow,1) != pdTRUE) {
+				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead1,I2C_ADDR,sizeof(i2cAdcReadIR1Low),i2cAdcReadIR1Low,1) != pdTRUE) {
 					VT_HANDLE_FATAL_ERROR(0);
 				}
-				// Read in the read counter
-				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead2,I2C_ADDR,sizeof(i2cAdcReadHigh),i2cAdcReadHigh,1) != pdTRUE) {
+				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead2,I2C_ADDR,sizeof(i2cAdcReadIR1High),i2cAdcReadIR1High,1) != pdTRUE) {
+					VT_HANDLE_FATAL_ERROR(0);
+				}
+				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead3,I2C_ADDR,sizeof(i2cAdcReadIR2Low),i2cAdcReadIR2Low,1) != pdTRUE) {
+					VT_HANDLE_FATAL_ERROR(0);
+				}
+				if (vtI2CEnQ(devPtr,vtI2CMsgTypeTempRead4,I2C_ADDR,sizeof(i2cAdcReadIR2High),i2cAdcReadIR2High,1) != pdTRUE) {
 					VT_HANDLE_FATAL_ERROR(0);
 				}
 			break;
 		}
 		case vtI2CMsgTypeTempRead1: {
-			if (currentState == fsmStateAdcReadLow) {
-				currentState = fsmStateAdcReadHigh;
-				adc = getValue(&msgBuffer);
+			if (currentState == fsmStateAdcReadIR1Low) {
+				currentState = fsmStateAdcReadIR1High;
+				ir1 = getValue(&msgBuffer);
 			} else {
 				// unexpectedly received this message
 				VT_HANDLE_FATAL_ERROR(0);
@@ -174,12 +185,32 @@ static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 			break;
 		}
 		case vtI2CMsgTypeTempRead2: {
-			if (currentState == fsmStateAdcReadHigh) {
-				currentState = fsmStateAdcReadLow;
-				adc |= getValue(&msgBuffer) << 8;
-				printf("ADC = %d\n",adc);
+			if (currentState == fsmStateAdcReadIR1High) {
+				currentState = fsmStateAdcReadIR2Low;
+				ir1 |= getValue(&msgBuffer) << 8;
+			} else {
+				// unexpectedly received this message
+				VT_HANDLE_FATAL_ERROR(0);
+			}
+			break;
+		}
+		case vtI2CMsgTypeTempRead3: {
+			if (currentState == fsmStateAdcReadIR2Low) {
+				currentState = fsmStateAdcReadIR2High;
+				ir2 = getValue(&msgBuffer);
+			} else {
+				// unexpectedly received this message
+				VT_HANDLE_FATAL_ERROR(0);
+			}
+			break;
+		}
+		case vtI2CMsgTypeTempRead4: {
+			if (currentState == fsmStateAdcReadIR2High) {
+				currentState = fsmStateAdcReadIR1Low;
+				ir2 |= getValue(&msgBuffer) << 8;
+				//printf("ADC = %d\n",adc);
 				if (lcdData != NULL) {
-					if (SendLCDADCValue(lcdData, adc,portMAX_DELAY) != pdTRUE) {
+					if (SendLCDADCValue(lcdData, ir1, ir2, portMAX_DELAY) != pdTRUE) {
 						VT_HANDLE_FATAL_ERROR(0);
 					}
 				}
@@ -188,7 +219,7 @@ static portTASK_FUNCTION( vi2cTempUpdateTask, pvParameters )
 				VT_HANDLE_FATAL_ERROR(0);
 			}
 			break;
-		}
+			}
 		default: {
 			VT_HANDLE_FATAL_ERROR(getMsgType(&msgBuffer));
 			break;

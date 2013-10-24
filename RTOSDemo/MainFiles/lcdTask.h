@@ -55,7 +55,7 @@ portBASE_TYPE SendLCDPrintMsg(vtLCDStruct *lcdData,int length,char *pString,port
 //   ticksToBlock -- how long the routine should wait if the queue is full
 // Return:
 //   Result of the call to xQueueSend()
-portBASE_TYPE SendLCDADCValue(vtLCDStruct *lcdData, int adcValue,portTickType ticksToBlock);
+portBASE_TYPE SendLCDADCValue(vtLCDStruct *lcdData, int ir1, int ir2,portTickType ticksToBlock);
 
 /* ********************************************************************* */
 

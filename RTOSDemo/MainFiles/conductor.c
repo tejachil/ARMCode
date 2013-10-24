@@ -93,6 +93,10 @@ static portTASK_FUNCTION( vConductorUpdateTask, pvParameters )
 			SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
 			break;
 		}
+		case vtI2CMsgTypeTempRead4: {
+			SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
+			break;
+		}
 		default: {
 			VT_HANDLE_FATAL_ERROR(recvMsgType);
 			break;

@@ -100,17 +100,19 @@ portBASE_TYPE SendLCDPrintMsg(vtLCDStruct *lcdData,int length,char *pString,port
 	return(xQueueSend(lcdData->inQ,(void *) (&lcdBuffer),ticksToBlock));
 }
 
-portBASE_TYPE SendLCDADCValue(vtLCDStruct *lcdData, int adcValue,portTickType ticksToBlock)
+portBASE_TYPE SendLCDADCValue(vtLCDStruct *lcdData, int ir1, int ir2,portTickType ticksToBlock)
 {
 	if (lcdData == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 	vtLCDMsg lcdBuffer;
 	
-	lcdBuffer.length = 2;
+	lcdBuffer.length = 4;
 	lcdBuffer.msgType = LCDMsgTypeADC;
-	lcdBuffer.buf[0] = adcValue&0xFF;
-	lcdBuffer.buf[1] = adcValue>>8;
+	lcdBuffer.buf[0] = ir1&0xFF;
+	lcdBuffer.buf[1] = ir1>>8;
+	lcdBuffer.buf[2] = ir2&0xFF;
+	lcdBuffer.buf[3] = ir2>>8;
 	
 	//strncpy((char *)lcdBuffer.buf,pString,vtLCDMaxLen);
 	return(xQueueSend(lcdData->inQ,(void *) (&lcdBuffer),ticksToBlock));
@@ -370,6 +372,14 @@ static portTASK_FUNCTION( vLCDUpdateTask, pvParameters )
 			double distance = 4.5348*pow(adcValue*3.3/1024,-1.138);
 			sprintf(lcdBuffer,"Dis %d.%d",(int)(distance),(int)((distance -(int)(distance))*1000));
 			GLCD_DisplayString(2,0,1,(unsigned char *)lcdBuffer);
+
+			adcValue = msgBuffer.buf[2]|(msgBuffer.buf[3]<<8);
+			sprintf(lcdBuffer,"ADC %d",adcValue);
+			GLCD_DisplayString(4,0,1,(unsigned char *)lcdBuffer);
+			
+			distance = 4.5348*pow(adcValue*3.3/1024,-1.138);
+			sprintf(lcdBuffer,"Dis %d.%d",(int)(distance),(int)((distance -(int)(distance))*1000));
+			GLCD_DisplayString(5,0,1,(unsigned char *)lcdBuffer);
 			if (xLCD >= LCD_WIDTH){
 				xLCD = 0;
 				GLCD_Clear(screenColor);
