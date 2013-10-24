@@ -361,16 +361,6 @@
               <FileType>1</FileType>
               <FilePath>.\MainFiles/conductor.c</FilePath>
             </File>
-            <File>
-              <FileName>uartDriver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\MainFiles/uartDriver.c</FilePath>
-            </File>
-            <File>
-              <FileName>public_messages.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\MainFiles/public_messages.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -604,11 +594,6 @@
               <FileName>lpc17xx_ssp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../NXPDrivers/source/lpc17xx_ssp.c</FilePath>
-            </File>
-            <File>
-              <FileName>lpc17xx_uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../NXPDrivers/source/lpc17xx_uart.c</FilePath>
             </File>
           </Files>
         </Group>
