@@ -2,9 +2,11 @@
 #define CONDUCTOR_H
 #include "vtI2C.h"
 #include "uartDriver.h"
+#include "roverControl.h"
 // Structure used to pass parameters to the task
 typedef struct __ConductorStruct {
 	UARTstruct *uartDevice;
+	RoverControlStruct *roverControlTaskData;
 } vtConductorStruct;
 
 // Public API
@@ -17,6 +19,6 @@ typedef struct __ConductorStruct {
 //   conductorData: Data structure used by the task
 //   uxPriority -- the priority you want this task to be run at
 //   uart: pointer to the data structure for a UART task
-void vStartConductorTask(vtConductorStruct *conductorData,unsigned portBASE_TYPE uxPriority, UARTstruct *uart);
+void vStartConductorTask(vtConductorStruct *conductorData,unsigned portBASE_TYPE uxPriority);
 
 #endif //ifndef CONDUCTOR_H

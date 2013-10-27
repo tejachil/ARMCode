@@ -35,11 +35,10 @@ static portTASK_FUNCTION_PROTO( vConductorUpdateTask, pvParameters );
 
 /*-----------------------------------------------------------*/
 // Public API
-void vStartConductorTask(vtConductorStruct *conductorData,unsigned portBASE_TYPE uxPriority, UARTstruct *uart)
+void vStartConductorTask(vtConductorStruct *conductorData,unsigned portBASE_TYPE uxPriority)
 {
 	/* Start the task */
 	portBASE_TYPE retval;
-	conductorData->uartDevice = uart;
 	if ((retval = xTaskCreate( vConductorUpdateTask, ( signed char * ) "UART Conductor", conSTACK_SIZE, (void *) conductorData, uxPriority, ( xTaskHandle * ) NULL )) != pdPASS) {
 		VT_HANDLE_FATAL_ERROR(retval);
 	}
@@ -81,42 +80,13 @@ static portTASK_FUNCTION( vConductorUpdateTask, pvParameters )
 
 			// Decide where to send the message based on the message type
 			switch(message.message_type) {
-/*
 			// Distance reading for a given sensor.
 			case PUB_MSG_T_SENS_DIST: {
-					break;
-				} // End case PUB_MSG_T_SENS_DIST
+				// Send the message to the Rover Control tasl
+				xQueueSendToBack(param->roverControlTaskData->inQ, &message, portMAX_DELAY);
+				break;
+			} // End case PUB_MSG_T_SENS_DIST
 
-			// Angle of wall to side relative to rover.
-			case PUB_MSG_T_SIDE_ANGLE: {
-					break;
-				} // End case PUB_MSG_T_SIDE_ANGLE
-
-			// Angle of wall in front relative to rover.
-			case PUB_MSG_T_FRONT_ANGLE: {
-					break;
-				} // End case PUB_MSG_T_FRONT_ANGLE
-
-			// Information about the current enclosure.
-			case PUB_MSG_T_ENC_INFO: {
-					break;
-				} // End case PUB_MSG_T_ENC_INFO
-
-			// Position of rover.
-			case PUB_MSG_T_ROV_POS: {
-					break;
-				} // End case PUB_MSG_T_ROV_POS
-
-			// Notification of new enclosure corner.
-			case PUB_MSG_T_NEW_CORNER: {
-					break;
-				} // End case PUB_MSG_T_NEW_CORNER
-
-			// Notification for webserver of new enclosure corner.
-			case PUB_MSG_T_CORNER_WEB: {
-					break;
-				} // End case PUB_MSG_T_CORNER_WEB
-*/
 			// Any other message type is unknown or should not be received on UART
 			default: {
 				// Unknown message type

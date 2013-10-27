@@ -266,15 +266,19 @@ int main( void )
     if (initUART(&wiflyUART, 1, mainUARTMONITOR_TASK_PRIORITY, 19200, UART_PARITY_NONE, UART_DATABIT_8, UART_STOPBIT_1) != UART_INIT_SUCCESS) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
-
+/*
 	const char message[12] = "hello";
 	if (uartEnQ(&wiflyUART, 0x41, 0x42, sizeof(message) , (uint8_t *)message) != pdTRUE) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
-
+*/
 	// Start the Conductor task to route messages from UART to the correct tasks
-	vStartConductorTask(&conductorData, mainCONDUCTOR_TASK_PRIORITY, &wiflyUART);
-
+	// MUST BE STARTED AFTER ALL OTHER TASKS
+	conductorData.uartDevice = &wiflyUART;
+	#if USE_ROVER_CONTROL == 1
+	conductorData.roverControlTaskData = &roverControlData;
+	#endif
+	vStartConductorTask(&conductorData, mainCONDUCTOR_TASK_PRIORITY);
 	#endif //if USE_UART == 1
 	
 	
