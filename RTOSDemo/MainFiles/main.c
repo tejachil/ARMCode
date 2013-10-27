@@ -101,6 +101,8 @@ You should read the note above.
 
 #define USE_WEB_SERVER 0
 
+#define USE_ROVER_CONTROL (1)
+
 #if USE_FREERTOS_DEMO == 1
 /* Demo app includes. */
 #include "BlockQ.h"
@@ -122,6 +124,7 @@ You should read the note above.
 #include "lcdTask.h"
 #include "myTimers.h"
 #include "conductor.h"
+#include "roverControl.h"
 
 #include "uartDriver.h"
 //#include <string.h>
@@ -253,6 +256,11 @@ int main( void )
 	initUSB();  // MTJ: This is my routine used to make sure we can do printf() with USB
     xTaskCreate( vUSBTask, ( signed char * ) "USB", configMINIMAL_STACK_SIZE, ( void * ) NULL, mainUSB_TASK_PRIORITY, NULL );
 	#endif
+
+	// Start the rover control task
+	#if USE_ROVER_CONTROL == 1
+	startRoverControlTask(&roverControlData, mainROVER_CONTROL_TASK_PRIORITY, &wiflyUART);
+	#endif //if USE_ROVER_CONTROL == 1
 	
 	#if USE_UART == 1
     if (initUART(&wiflyUART, 1, mainUARTMONITOR_TASK_PRIORITY, 19200, UART_PARITY_NONE, UART_DATABIT_8, UART_STOPBIT_1) != UART_INIT_SUCCESS) {
@@ -268,11 +276,6 @@ int main( void )
 	vStartConductorTask(&conductorData, mainCONDUCTOR_TASK_PRIORITY, &wiflyUART);
 
 	#endif //if USE_UART == 1
-
-	// Start the rover control task
-	#if USE_ROVER_CONTROL == 1
-	startRoverControlTask(roverControlData, mainROVER_CONTROL_TASK_PRIORITY, wiflyUART);
-	#endif //if USE_ROVER_CONTROL == 1
 	
 	
 	/* Start the scheduler. */

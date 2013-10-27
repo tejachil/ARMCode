@@ -2,6 +2,8 @@
 #include "public_messages.h"
 #include "uartDriver.h"
 
+#include <math.h>
+
 #define roverControlQLen (10)
 
 #define baseStack 2
@@ -12,6 +14,12 @@
 #endif
 
 static portTASK_FUNCTION_PROTO( roverControlTask, param );
+
+// defined functions for sensors calculations
+void readNewMsg(RoverControlStruct *roverControlData, public_message_t *receivedMsg);
+void convertToDistance(RoverControlStruct *roverControlData);
+void checkSensorsRange(RoverControlStruct *roverControlData);
+void findAngles(RoverControlStruct *roverControlData);
 
 void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart) {
 	roverControlData->uartDevice = uart;
@@ -63,25 +71,21 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 		// See public_messages.h for the structure of receivedMsg (it is type "public_message_t").
 
 		//read a new message
-		readNewMsg(roverControlData, receivedMsg);
+		readNewMsg(roverControlData, &receivedMsg);
 		convertToDistance(roverControlData);
 		checkSensorsRange(roverControlData);
 		findAngles(roverControlData);
 	}
 }
 
-void readNewMsg(RoverControlStruct *roverControlData, public_message_t receivedMsg){
-	//check if there are exactly 12 bytes in the receivedMsg
-	if(receivedMsg.data_length != 12)
-		return;
-
+void readNewMsg(RoverControlStruct *roverControlData, public_message_t *receivedMsg){
 	//assign received values
-	roverControlData->leftShortSensor = receivedMsg[1] << 8 | receivedMsg[0];
-	roverControlData->rightShortSensor = receivedMsg[3] << 8 | receivedMsg[2];
-	roverControlData->leftMediumSensor = receivedMsg[5] << 8 | receivedMsg[4];
-	roverControlData->rightMediumSensor = receivedMsg[7] << 8 | receivedMsg[6];
-	roverControlData->leftLongSensor = receivedMsg[9] << 8 | receivedMsg[8];
-	roverControlData->rightLongSensor = receivedMsg[11] << 8 | receivedMsg[10];
+	roverControlData->leftShortSensor = receivedMsg->data[1] << 8 | receivedMsg->data[0];
+	roverControlData->rightShortSensor = receivedMsg->data[3] << 8 | receivedMsg->data[2];
+	roverControlData->leftMediumSensor = receivedMsg->data[5] << 8 | receivedMsg->data[4];
+	roverControlData->rightMediumSensor = receivedMsg->data[7] << 8 | receivedMsg->data[6];
+	roverControlData->leftLongSensor = receivedMsg->data[9] << 8 | receivedMsg->data[8];
+	roverControlData->rightLongSensor = receivedMsg->data[11] << 8 | receivedMsg->data[10];
 }
 
 void convertToDistance(RoverControlStruct *roverControlData){
@@ -97,8 +101,8 @@ void checkSensorsRange(RoverControlStruct *roverControlData){
 void findAngles(RoverControlStruct *roverControlData){
 	//TODO: find if sensors are in range
 	if(roverControlData->leftShortSensor > roverControlData->rightShortSensor){
-    	roverControlData->shortSensorAngle = atanf(DISTANCE_BETWEEN_IR/(roverControlData->leftShortSensor-roverControlData->rightShortSensor)) * 180/PI;
+    	roverControlData->shortSensorAngle = atanf(DISTANCE_BETWEEN_IR/(roverControlData->leftShortSensor-roverControlData->rightShortSensor)) * 180/M_PI;
 	}else{
-	    roverControlData->shortSensorAngle = atan((roverControlData->rightShortSensor-roverControlData->leftShortSensor)/DISTANCE_BETWEEN_IR) * 180/PI;
+	    roverControlData->shortSensorAngle = atan((roverControlData->rightShortSensor-roverControlData->leftShortSensor)/DISTANCE_BETWEEN_IR) * 180/M_PI;
 	}
 }
