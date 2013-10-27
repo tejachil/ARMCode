@@ -61,5 +61,44 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 
 		// 3. Process message received in step 1, contained in receivedMsg.
 		// See public_messages.h for the structure of receivedMsg (it is type "public_message_t").
+
+		//read a new message
+		readNewMsg(roverControlData, receivedMsg);
+		convertToDistance(roverControlData);
+		checkSensorsRange(roverControlData);
+		findAngles(roverControlData);
+	}
+}
+
+void readNewMsg(RoverControlStruct *roverControlData, public_message_t receivedMsg){
+	//check if there are exactly 12 bytes in the receivedMsg
+	if(receivedMsg.data_length != 12)
+		return;
+
+	//assign received values
+	roverControlData->leftShortSensor = receivedMsg[1] << 8 | receivedMsg[0];
+	roverControlData->rightShortSensor = receivedMsg[3] << 8 | receivedMsg[2];
+	roverControlData->leftMediumSensor = receivedMsg[5] << 8 | receivedMsg[4];
+	roverControlData->rightMediumSensor = receivedMsg[7] << 8 | receivedMsg[6];
+	roverControlData->leftLongSensor = receivedMsg[9] << 8 | receivedMsg[8];
+	roverControlData->rightLongSensor = receivedMsg[11] << 8 | receivedMsg[10];
+}
+
+void convertToDistance(RoverControlStruct *roverControlData){
+	roverControlData->leftShortSensor = 12317*pow(roverControlData->leftShortSensor,-1.337);
+    roverControlData->rightShortSensor = 12317*pow(roverControlData->rightShortSensor,-1.337);
+    //TODO: convert other sensors
+}
+
+void checkSensorsRange(RoverControlStruct *roverControlData){
+	//TODO: find if sensors are in range
+}
+
+void findAngles(RoverControlStruct *roverControlData){
+	//TODO: find if sensors are in range
+	if(roverControlData->leftShortSensor > roverControlData->rightShortSensor){
+    	roverControlData->shortSensorAngle = atanf(DISTANCE_BETWEEN_IR/(roverControlData->leftShortSensor-roverControlData->rightShortSensor)) * 180/PI;
+	}else{
+	    roverControlData->shortSensorAngle = atan((roverControlData->rightShortSensor-roverControlData->leftShortSensor)/DISTANCE_BETWEEN_IR) * 180/PI;
 	}
 }

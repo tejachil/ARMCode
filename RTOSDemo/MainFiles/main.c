@@ -384,11 +384,11 @@ void vConfigureTimerForRunTimeStats( void )
 {
 const unsigned long TCR_COUNT_RESET = 2, CTCR_CTM_TIMER = 0x00, TCR_COUNT_ENABLE = 0x01;
 
-	/* This function configures a timer that is used as the time base when
+	/*This function configures a timer that is used as the time base when
 	collecting run time statistical information - basically the percentage
 	of CPU time that each task is utilising.  It is called automatically when
 	the scheduler is started (assuming configGENERATE_RUN_TIME_STATS is set
-	to 1). */
+	to 1).*/
 
 	/* Power up and feed the timer. */
 	SC->PCONP |= 0x02UL;
