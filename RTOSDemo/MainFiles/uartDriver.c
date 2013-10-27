@@ -94,11 +94,11 @@ portBASE_TYPE uartEnQ(UARTstruct *dev,uint8_t msgType, uint8_t msgID, uint8_t tx
 	
 	memcpy(msgBuf.data, txBuf, txLen);
 	
-	return(xQueueSend(dev->inQ,(void *)(&msgBuf),portMAX_DELAY));
+	return(xQueueSend(dev->inQ, &msgBuf,portMAX_DELAY));
 }
 
 portBASE_TYPE uartDeQ(UARTstruct *dev, UARTmsg *message){
-	if (xQueueReceive(dev->outQ,(void *) (&message),portMAX_DELAY) != pdTRUE)
+	if (xQueueReceive(dev->outQ, message,portMAX_DELAY) != pdTRUE)
 		return(pdFALSE);
 	return(pdTRUE);
 }
@@ -108,6 +108,8 @@ portBASE_TYPE uartDeQ(UARTstruct *dev, UARTmsg *message){
 static __INLINE void UART_ISR(LPC_UART_TypeDef *devAddr, xQueueHandle outQ) {
     static int recByteCount = 0;
 	static UARTmsg msgBuf;
+	portBASE_TYPE higherPriorityWasWoken = pdFALSE;
+
     if ((UART_GetIntId((LPC_UART_TypeDef*)devAddr)&UART_IIR_INTID_MASK) == UART_IIR_INTID_RDA){
 		switch(recByteCount){
 			case 0:
@@ -132,11 +134,17 @@ static __INLINE void UART_ISR(LPC_UART_TypeDef *devAddr, xQueueHandle outQ) {
 					msgBuf.status = 1;
 					msgBuf.txLen = 0;
 					
-					(xQueueSend(outQ,(void *)(&msgBuf),portMAX_DELAY));
+					if (pdTRUE != xQueueSendToBackFromISR(outQ, &msgBuf, &higherPriorityWasWoken)) {
+						VT_HANDLE_FATAL_ERROR(0);
+					}
 					recByteCount = 0;
 				}
 				break;
 		}
+	}
+
+	if (pdTRUE == higherPriorityWasWoken) {
+		taskYIELD();
 	}
 }
 
