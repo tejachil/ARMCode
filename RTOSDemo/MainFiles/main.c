@@ -255,15 +255,12 @@ int main( void )
 	#endif
 	
 	#if USE_UART == 1
-	vtLEDOn(0x80);
     if (initUART(&wiflyUART, 1, mainUARTMONITOR_TASK_PRIORITY, 19200, UART_PARITY_NONE, UART_DATABIT_8, UART_STOPBIT_1) != UART_INIT_SUCCESS) {
-		vtLEDOn(0x40);
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 
 	const char message[12] = "hello";
 	if (uartEnQ(&wiflyUART, 0x41, 0x42, sizeof(message) , (uint8_t *)message) != pdTRUE) {
-		vtLEDOn(0x20);
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 
