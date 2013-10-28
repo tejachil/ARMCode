@@ -60,6 +60,7 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 		if (xQueueReceive(roverControlData->inQ, (void *) &receivedMsg, portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
+		vtLEDToggle(0x01);
 
 		// 2. Request new sensor data.
 		// Update the count and send the request
