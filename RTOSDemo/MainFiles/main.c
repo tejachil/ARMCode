@@ -97,9 +97,9 @@ You should read the note above.
 // Define whether to use my USB task
 #define USE_MTJ_USE_USB 0
 
-#define USE_UART 1
+#define USE_UART 0
 
-#define USE_WEB_SERVER 0
+#define USE_WEB_SERVER 1
 
 #if USE_FREERTOS_DEMO == 1
 /* Demo app includes. */

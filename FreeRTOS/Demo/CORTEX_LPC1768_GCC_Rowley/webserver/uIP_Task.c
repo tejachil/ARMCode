@@ -252,8 +252,22 @@ char *c;
 extern void vParTestSetLEDState( long lState );
 
 	/* Process the form input sent by the IO page of the served HTML. */
-
-	c = strstr( pcInputString, "?" );
+	c = strstr( pcInputString, "index.html?" );
+    if( c )
+    {
+    	//c = strstr( pcInputString, "index.html?" ); 
+		/* Turn the FIO1 LED's on or off in accordance with the check box status. */
+		if (strstr( c, "act=Start" ) != NULL )
+		{
+			vParTestSetLEDState( pdTRUE ); // Add the task for when the Start button is pressed
+		}
+		else if (strstr( c, "act=Stop" ) != NULL )
+		{
+			vParTestSetLEDState( pdFALSE ); // Add the task for when the Stop button is pressed
+		}
+    }	
+	
+	c = strstr( pcInputString, "io.shtml?" );
     if( c )
     {
 		/* Turn the FIO1 LED's on or off in accordance with the check box status. */
