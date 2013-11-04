@@ -211,7 +211,7 @@ static RoverControlStruct roverControlData;
 /*-----------------------------------------------------------*/
 
 int main( void )
-	{
+		{
 	/* MTJ: initialize syscalls -- *must* be first */
 	// syscalls.c contains the files upon which the standard (and portable) C libraries rely 
 	init_syscalls();

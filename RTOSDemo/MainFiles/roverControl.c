@@ -15,13 +15,17 @@
 
 static portTASK_FUNCTION_PROTO( roverControlTask, param );
 
-// defined functions for sensors calculations
+// functions for sensors calculations
 void readNewMsg(RoverControlStruct *roverControlData, public_message_t *receivedMsg);
 void averageValues(RoverControlStruct *roverControlData);
 void convertToDistance(RoverControlStruct *roverControlData);
 void checkSensorsRange(RoverControlStruct *roverControlData);
 void findAngles(RoverControlStruct *roverControlData);
-void isRoverParallelToWall(RoverControlStruct *roverControlData);
+int isRoverParallelToWall(RoverControlStruct *roverControlData);
+// functinos for controlling rover
+void moveRover(RoverControlStruct *roverControlData);
+void stopRover(RoverControlStruct *roverControlData);
+//helper functions
 void printFloat(char* buf, float number, int newLine);
 
 void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart) {
@@ -44,6 +48,7 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 	public_message_t receivedMsg;
 
 	//initializing varablies
+	roverControlData->state = INIT;
 	roverControlData->samplingCounter = 0;
 
 	// Sensor data request message
@@ -86,10 +91,33 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 		findAngles(roverControlData);
 		printFloat("Left:", roverControlData->sensorDistance[LEFT_SHORT_SENSOR], 0);
 		printFloat("Right:", roverControlData->sensorDistance[RIGHT_SHORT_SENSOR], 0);
+		printFloat("LeftMedium:", roverControlData->sensorDistance[LEFT_MEDIUM_SENSOR], 0);
+		printFloat("RightMedium:", roverControlData->sensorDistance[RIGHT_MEDIUM_SENSOR], 0);
 		printFloat("Angle:", roverControlData->shortSensorAngle, 1);
 
-		isRoverParallelToWall(roverControlData);
-		//Switch
+		switch(roverControlData->state){
+			case INIT:
+				//send command to move rover
+				moveRover(roverControlData);
+				roverControlData->state = TRAVERSAL;
+				break;
+			case TRAVERSAL:
+				if(isRoverParallelToWall(roverControlData) == 0){
+					//send command to stop
+					printf("move to stop # ");
+					stopRover(roverControlData);
+					roverControlData->state = STOP;
+				}
+				break;
+			case STOP:
+				if(isRoverParallelToWall(roverControlData) == 1){
+					//send command to move
+					printf("stop to move # ");
+					moveRover(roverControlData);
+					roverControlData->state = TRAVERSAL;
+				}
+				break;
+		}
 	}
 }
 
@@ -118,6 +146,9 @@ void averageValues(RoverControlStruct *roverControlData){
 void convertToDistance(RoverControlStruct *roverControlData){
 	roverControlData->sensorDistance[LEFT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[LEFT_SHORT_SENSOR],-1.337);
     roverControlData->sensorDistance[RIGHT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[RIGHT_SHORT_SENSOR],-1.337);
+    roverControlData->sensorDistance[LEFT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[LEFT_MEDIUM_SENSOR],-1.099);
+    roverControlData->sensorDistance[RIGHT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[RIGHT_MEDIUM_SENSOR],-1.099);
+    
     //TODO: convert other sensors
 }
 
@@ -134,19 +165,19 @@ void findAngles(RoverControlStruct *roverControlData){
 	}
 }
 
-void isRoverParallelToWall(RoverControlStruct *roverControlData){
+int isRoverParallelToWall(RoverControlStruct *roverControlData){
 	//float difference = roverControlData->sensorDistance[LEFT_SHORT_SENSOR] - roverControlData->sensorDistance[RIGHT_SHORT_SENSOR];
 	if(roverControlData->sensorDistance[LEFT_SHORT_SENSOR] > (roverControlData->sensorDistance[RIGHT_SHORT_SENSOR]+1)
 	|| roverControlData->sensorDistance[RIGHT_SHORT_SENSOR] > (roverControlData->sensorDistance[LEFT_SHORT_SENSOR]+1)){
 		//not parallel
 		vtLEDOff(0x04);
+		return 0;
 	}
 	else{
 		//parallel 
 		vtLEDOn(0x04);
+		return 1;
 	}
-
-	//printf("difference:%d , ", difference);
 }
 
 void printFloat(char* buf, float number, int newLine){
@@ -155,4 +186,46 @@ void printFloat(char* buf, float number, int newLine){
 	printf("%s %d.%d, ",buf, intPart,decimalPart);
 	if(newLine)
 		printf("\n");
+}
+
+void moveRover(RoverControlStruct *roverControlData){
+	UARTmsg roverRequestMsg;
+	portBASE_TYPE result;
+	roverRequestMsg.msgType = PUB_MSG_T_MOV_CMD;
+	roverRequestMsg.msgID = 0; // The count will be updated before sending each request
+	roverRequestMsg.txLen = public_message_data_size[PUB_MSG_T_MOV_CMD];
+	roverRequestMsg.data[0] = 0x55; // move
+	roverRequestMsg.data[1] = 0x00;
+
+	roverRequestMsg.msgID = public_message_get_count(PUB_MSG_T_MOV_CMD);
+	result = uartEnQ(roverControlData->uartDevice, roverRequestMsg.msgType, roverRequestMsg.msgID, roverRequestMsg.txLen,
+		roverRequestMsg.data);
+
+	if(result == pdTRUE){
+		printf(" success\n");
+	}
+	else if (result == pdFALSE){
+		printf(" failure\n");
+	}
+}
+
+void stopRover(RoverControlStruct *roverControlData){
+	UARTmsg roverRequestMsg;
+	portBASE_TYPE result;
+	roverRequestMsg.msgType = PUB_MSG_T_MOV_CMD;
+	roverRequestMsg.msgID = 0; // The count will be updated before sending each request
+	roverRequestMsg.txLen = public_message_data_size[PUB_MSG_T_MOV_CMD];
+	roverRequestMsg.data[0] = 0xAA; // stop
+	roverRequestMsg.data[1] = 0x00;
+
+	roverRequestMsg.msgID = public_message_get_count(PUB_MSG_T_MOV_CMD);
+	result = uartEnQ(roverControlData->uartDevice, roverRequestMsg.msgType, roverRequestMsg.msgID, roverRequestMsg.txLen,
+		roverRequestMsg.data);
+
+	if(result == pdTRUE){
+		printf(" success\n");
+	}
+	else if (result == pdFALSE){
+		printf(" failure\n");
+	}
 }

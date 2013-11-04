@@ -18,19 +18,17 @@
 #define LEFT_LONG_SENSOR 4
 #define RIGHT_LONG_SENSOR 5
 
+#define INIT 0
+#define TRAVERSAL 1
+#define STOP	  2
+
 typedef struct __RoverControlStruct {
 	UARTstruct *uartDevice;
 	xQueueHandle inQ;
 	//define average value of sensors distance
 	float sensorDistance[NUMBER_OF_SENSORS];
 	float sensorDistanceSamples[NUMBER_OF_SENSORS][NUMBER_OF_SAMPLES];
-	//define samples values for sensors
-	/*float leftShortSensorSamples[NUMBER_OF_SAMPLES];
-	float rightShortSensor[NUMBER_OF_SAMPLES];
-	float leftMediumSensor[NUMBER_OF_SAMPLES];
-	float rightMediumSensor[NUMBER_OF_SAMPLES];
-	float leftLongSensor[NUMBER_OF_SAMPLES];
-	float rightLongSensor[NUMBER_OF_SAMPLES];*/
+	int state;
 	//counter for sampling
 	int samplingCounter;
 	//define angles
