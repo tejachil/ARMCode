@@ -8,6 +8,7 @@
 #define DISTANCE_BETWEEN_IR 		7
 #define PARALLEL_THRESHOLD 			2
 #define SIDE_SENSOR_RANGE 			15
+#define FRONT_STOP_DISTANCE			4
 
 //number of things
 #define NUMBER_OF_SAMPLES 			5

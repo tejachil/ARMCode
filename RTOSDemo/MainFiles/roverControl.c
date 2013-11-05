@@ -84,33 +84,35 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 			case INIT:
 				//send command to move rover
 				moveRover(roverControlData);
-				roverControlData->state = TRAVERSAL;
 				break;
 			case TRAVERSAL:
-				if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
+				if(isFrontCloseToWall(roverControlData) == 1){
+					stopRover(roverControlData);
+				}
+				else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
 					//fix to Left
 					fixRover(roverControlData, FIX_FRONT_LEFT);
-					roverControlData->state = FIX;
 				}
 				else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_RIGHT){
 					//fix to Right
 					fixRover(roverControlData, FIX_FRONT_RIGHT);
-					roverControlData->state = FIX;
 				}
 				break;
 			case FIX:
-				if(isRoverParallelToWall(roverControlData) == PARALLEL){
+				if(isFrontCloseToWall(roverControlData) == 1){
+					stopRover(roverControlData);
+				}
+				else if(isRoverParallelToWall(roverControlData) == PARALLEL){
+					moveRover(roverControlData);
+				}
+				break;
+			case STOP:
+				//if(isRoverParallelToWall(roverControlData) == PARALLEL && isSensorInRange(roverControlData) == 1){
+				if(isFrontCloseToWall(roverControlData) == 0){
 					//send command to move
 					moveRover(roverControlData);
-					roverControlData->state = TRAVERSAL;
 				}
-			/*case STOP:
-				if(isRoverParallelToWall(roverControlData) == PARALLEL && isSensorInRange(roverControlData) == 1){
-					//send command to move
-					moveRover(roverControlData);
-					roverControlData->state = TRAVERSAL;
-				}
-				break;*/
+				break;
 		}
 	}
 }

@@ -3,18 +3,21 @@
 void sendToRover(RoverControlStruct *roverControlData, public_message_type_t msg_type, uint8_t cmd);
 
 void moveRover(RoverControlStruct *roverControlData){
-	sendToRover(roverControlData, PUB_MSG_T_MOV_CMD, 0x55);
+	roverControlData->state = TRAVERSAL;
+	sendToRover(roverControlData, PUB_MSG_T_MOV_CMD, MOV_CMD_GO);
 }
 
 void stopRover(RoverControlStruct *roverControlData){
-	sendToRover(roverControlData, PUB_MSG_T_MOV_CMD, 0xAA);
+	roverControlData->state = STOP;
+	sendToRover(roverControlData, PUB_MSG_T_MOV_CMD, MOV_CMD_STOP);
 }
 
 void fixRover(RoverControlStruct *roverControlData, int fixDir){
+	roverControlData->state = FIX;
 	if(fixDir == FIX_FRONT_LEFT)
-		sendToRover(roverControlData, PUB_MSG_T_FIX_CMD, 0x5A);
+		sendToRover(roverControlData, PUB_MSG_T_FIX_CMD, FIX_CMD_LEFT);
 	else if(fixDir == FIX_FRONT_RIGHT)
-		sendToRover(roverControlData, PUB_MSG_T_FIX_CMD, 0xA5);
+		sendToRover(roverControlData, PUB_MSG_T_FIX_CMD, FIX_CMD_RIGHT);
 }
 
 void sendToRover(RoverControlStruct *roverControlData, public_message_type_t msg_type, uint8_t cmd){

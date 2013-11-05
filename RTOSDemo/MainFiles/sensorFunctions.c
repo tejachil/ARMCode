@@ -61,6 +61,18 @@ int isRoverParallelToWall(RoverControlStruct *roverControlData){
 	else{
 		vtLEDOn(0x04);
 		return PARALLEL;
+	}	
+}
+
+int isFrontCloseToWall(RoverControlStruct *roverControlData){
+	if(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] < FRONT_STOP_DISTANCE
+	|| roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] < FRONT_STOP_DISTANCE){
+		vtLEDOn(0x08);
+		return 1;
+	}
+	else{
+		vtLEDOff(0x08);
+		return 0;
 	}
 }
 
