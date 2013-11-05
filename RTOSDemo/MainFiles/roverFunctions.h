@@ -1,8 +1,8 @@
 #ifndef ROVERFUNCTIONS_H
 #define ROVERFUNCTIONS_H
-#include "roverControl.h"
+#include "roverHeader.h"
 
-void moveRover(RoverControlStruct *roevrControlData);
+void moveRover(RoverControlStruct *roverControlData);
 void stopRover(RoverControlStruct *roverControlData);
 
 #endif

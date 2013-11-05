@@ -1,7 +1,7 @@
 #ifndef SENSORFUNCTIONS_H
 #define SENSORFUNCTIONS_H
 
-#include "roverControl.h"
+#include "roverHeader.h"
 
 void readNewMsg(RoverControlStruct *roverControlData, public_message_t *receivedMsg);
 void averageValues(RoverControlStruct *roverControlData);

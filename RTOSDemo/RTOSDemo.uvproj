@@ -376,6 +376,16 @@
               <FileType>1</FileType>
               <FilePath>.\MainFiles/roverControl.c</FilePath>
             </File>
+            <File>
+              <FileName>roverFunctions.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MainFiles/roverFunctions.c</FilePath>
+            </File>
+            <File>
+              <FileName>sensorFunctions.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MainFiles/sensorFunctions.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

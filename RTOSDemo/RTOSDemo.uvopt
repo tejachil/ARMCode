@@ -193,7 +193,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -210,7 +210,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>1</aSer4>
+        <aSer4>0</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -309,10 +309,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>34</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>210</TopLine>
-      <CurrentLine>217</CurrentLine>
+      <TopLine>424</TopLine>
+      <CurrentLine>427</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\MainFiles/main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -421,10 +421,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>16</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>1</TopLine>
-      <CurrentLine>1</CurrentLine>
+      <CurrentLine>7</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\MainFiles/public_messages.c</PathWithFileName>
       <FilenameWithoutPath>public_messages.c</FilenameWithoutPath>
@@ -437,11 +437,39 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>211</TopLine>
-      <CurrentLine>220</CurrentLine>
+      <TopLine>112</TopLine>
+      <CurrentLine>112</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\MainFiles/roverControl.c</PathWithFileName>
       <FilenameWithoutPath>roverControl.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>86</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>1</TopLine>
+      <CurrentLine>5</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\MainFiles/roverFunctions.c</PathWithFileName>
+      <FilenameWithoutPath>roverFunctions.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>0</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>35</TopLine>
+      <CurrentLine>41</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\MainFiles/sensorFunctions.c</PathWithFileName>
+      <FilenameWithoutPath>sensorFunctions.c</FilenameWithoutPath>
     </File>
   </Group>
 
@@ -1011,90 +1039,5 @@
       <FilenameWithoutPath>vtI2C.c</FilenameWithoutPath>
     </File>
   </Group>
-
-  <AlienFiles>
-    <PathWithFilename>C:\Users\ECE4534\Documents\GitHub\ARMCode\SystemFiles\core_cm3.h</PathWithFilename>
-    <TopLine>1169</TopLine>
-    <CurrentLine>1173</CurrentLine>
-    <Constant>0</Constant>
-    <WindowPosition>
-      <length>0</length>
-      <flags>0</flags>
-      <showCmd>0</showCmd>
-      <MinPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MinPosition>
-      <MaxPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MaxPosition>
-      <NormalPosition>
-        <Top>0</Top>
-        <Left>0</Left>
-        <Right>0</Right>
-        <Bottom>0</Bottom>
-      </NormalPosition>
-    </WindowPosition>
-  </AlienFiles>
-
-  <MDIGroups>
-    <Orientation>1</Orientation>
-    <ActiveMDIGroup>0</ActiveMDIGroup>
-    <MDIGroup>
-      <Size>100</Size>
-      <ActiveTab>0</ActiveTab>
-      <Documents>
-        <Doc>
-          <Name>.\MainFiles/main.c</Name>
-          <ColumnNumber>34</ColumnNumber>
-          <TopLine>210</TopLine>
-          <CurrentLine>217</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>.\MainFiles/public_messages.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>1</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>.\MainFiles/roverControl.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>211</TopLine>
-          <CurrentLine>220</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>.\MainFiles/uartDriver.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>148</TopLine>
-          <CurrentLine>152</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>../NXPDrivers/source/lpc17xx_uart.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>776</TopLine>
-          <CurrentLine>776</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>../vtCode/vtUtilities.c</Name>
-          <ColumnNumber>37</ColumnNumber>
-          <TopLine>135</TopLine>
-          <CurrentLine>143</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>C:\Users\ECE4534\Documents\GitHub\ARMCode\SYSTEMFILES\CORE_CM3.H</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>1169</TopLine>
-          <CurrentLine>1173</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>../FreeRTOS/Source/tasks.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>1532</TopLine>
-          <CurrentLine>1532</CurrentLine>
-        </Doc>
-      </Documents>
-    </MDIGroup>
-  </MDIGroups>
 
 </ProjectOpt>

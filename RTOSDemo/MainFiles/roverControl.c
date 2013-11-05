@@ -1,9 +1,6 @@
 #include "roverControl.h"
 #include "sensorFunctions.h"
 #include "roverFunctions.h"
-#include "public_messages.h"
-#include "uartDriver.h"
-
 #include <math.h>
 
 #define roverControlQLen (10)
