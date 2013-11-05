@@ -32,8 +32,12 @@ void convertToDistance(RoverControlStruct *roverControlData){
     //TODO: convert other sensors
 }
 
-void checkSensorsRange(RoverControlStruct *roverControlData){
-	//TODO: find if sensors are in range
+//check short range only
+int isSensorInRange(RoverControlStruct *roverControlData){
+	if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < SIDE_SENSOR_RANGE || roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < SIDE_SENSOR_RANGE)
+		return 1; // in range
+	else
+		return 0;
 }
 
 void findAngles(RoverControlStruct *roverControlData){
@@ -46,17 +50,17 @@ void findAngles(RoverControlStruct *roverControlData){
 }
 
 int isRoverParallelToWall(RoverControlStruct *roverControlData){
-	//float difference = roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR];
-	if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]+1)
-	|| roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]+1)){
-		//not parallel
+	if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]+PARALLEL_THRESHOLD)){
 		vtLEDOff(0x04);
-		return 0;
+		return FIX_FRONT_RIGHT;
+	}
+	else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]+PARALLEL_THRESHOLD)){
+		vtLEDOff(0x04);
+		return FIX_FRONT_LEFT;
 	}
 	else{
-		//parallel 
 		vtLEDOn(0x04);
-		return 1;
+		return PARALLEL;
 	}
 }
 

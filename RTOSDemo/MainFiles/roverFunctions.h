@@ -4,5 +4,6 @@
 
 void moveRover(RoverControlStruct *roverControlData);
 void stopRover(RoverControlStruct *roverControlData);
+void fixRover(RoverControlStruct *roverControlData, int fixDir);
 
 #endif

@@ -73,7 +73,6 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 		readNewMsg(roverControlData, &receivedMsg);
 		averageValues(roverControlData);
 		convertToDistance(roverControlData);
-		checkSensorsRange(roverControlData);
 		findAngles(roverControlData);
 		printFloat("SiRear:", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR], 0);
 		printFloat("SiFront:", roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR], 0);
@@ -88,21 +87,30 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 				roverControlData->state = TRAVERSAL;
 				break;
 			case TRAVERSAL:
-				if(isRoverParallelToWall(roverControlData) == 0){
-					//send command to stop
-					printf("move to stop # ");
-					stopRover(roverControlData);
-					roverControlData->state = STOP;
+				if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
+					//fix to Left
+					fixRover(roverControlData, FIX_FRONT_LEFT);
+					roverControlData->state = FIX;
+				}
+				else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_RIGHT){
+					//fix to Right
+					fixRover(roverControlData, FIX_FRONT_RIGHT);
+					roverControlData->state = FIX;
 				}
 				break;
-			case STOP:
-				if(isRoverParallelToWall(roverControlData) == 1){
+			case FIX:
+				if(isRoverParallelToWall(roverControlData) == PARALLEL){
 					//send command to move
-					printf("stop to move # ");
 					moveRover(roverControlData);
 					roverControlData->state = TRAVERSAL;
 				}
-				break;
+			/*case STOP:
+				if(isRoverParallelToWall(roverControlData) == PARALLEL && isSensorInRange(roverControlData) == 1){
+					//send command to move
+					moveRover(roverControlData);
+					roverControlData->state = TRAVERSAL;
+				}
+				break;*/
 		}
 	}
 }
