@@ -18,6 +18,7 @@
 #define LEFT_LONG_SENSOR 4
 #define RIGHT_LONG_SENSOR 5
 
+//State machine
 #define INIT 0
 #define TRAVERSAL 1
 #define STOP	  2
