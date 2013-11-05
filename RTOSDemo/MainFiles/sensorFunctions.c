@@ -24,10 +24,10 @@ void averageValues(RoverControlStruct *roverControlData){
 }
 
 void convertToDistance(RoverControlStruct *roverControlData){
-	roverControlData->sensorDistance[LEFT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[LEFT_SHORT_SENSOR],-1.337);
-    roverControlData->sensorDistance[RIGHT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[RIGHT_SHORT_SENSOR],-1.337);
-    roverControlData->sensorDistance[LEFT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[LEFT_MEDIUM_SENSOR],-1.099);
-    roverControlData->sensorDistance[RIGHT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[RIGHT_MEDIUM_SENSOR],-1.099);
+	roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR],-1.337);
+    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.337);
+    roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-1.099);
+    roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.099);
     
     //TODO: convert other sensors
 }
@@ -38,17 +38,17 @@ void checkSensorsRange(RoverControlStruct *roverControlData){
 
 void findAngles(RoverControlStruct *roverControlData){
 	//TODO: find angle between sensors
-	if(roverControlData->sensorDistance[LEFT_SHORT_SENSOR] > roverControlData->sensorDistance[RIGHT_SHORT_SENSOR]){
-    	roverControlData->shortSensorAngle = atanf(DISTANCE_BETWEEN_IR/(roverControlData->sensorDistance[LEFT_SHORT_SENSOR]-roverControlData->sensorDistance[RIGHT_SHORT_SENSOR])) * 180/M_PI;
+	if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]){
+    	roverControlData->shortSensorAngle = atanf(DISTANCE_BETWEEN_IR/(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])) * 180/M_PI;
 	}else{
-	    roverControlData->shortSensorAngle = atan((roverControlData->sensorDistance[RIGHT_SHORT_SENSOR]-roverControlData->sensorDistance[LEFT_SHORT_SENSOR])/DISTANCE_BETWEEN_IR) * 180/M_PI;
+	    roverControlData->shortSensorAngle = atan((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_IR) * 180/M_PI;
 	}
 }
 
 int isRoverParallelToWall(RoverControlStruct *roverControlData){
-	//float difference = roverControlData->sensorDistance[LEFT_SHORT_SENSOR] - roverControlData->sensorDistance[RIGHT_SHORT_SENSOR];
-	if(roverControlData->sensorDistance[LEFT_SHORT_SENSOR] > (roverControlData->sensorDistance[RIGHT_SHORT_SENSOR]+1)
-	|| roverControlData->sensorDistance[RIGHT_SHORT_SENSOR] > (roverControlData->sensorDistance[LEFT_SHORT_SENSOR]+1)){
+	//float difference = roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR];
+	if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]+1)
+	|| roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]+1)){
 		//not parallel
 		vtLEDOff(0x04);
 		return 0;

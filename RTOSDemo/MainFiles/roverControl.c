@@ -75,10 +75,10 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 		convertToDistance(roverControlData);
 		checkSensorsRange(roverControlData);
 		findAngles(roverControlData);
-		printFloat("Left:", roverControlData->sensorDistance[LEFT_SHORT_SENSOR], 0);
-		printFloat("Right:", roverControlData->sensorDistance[RIGHT_SHORT_SENSOR], 0);
-		printFloat("LeftMedium:", roverControlData->sensorDistance[LEFT_MEDIUM_SENSOR], 0);
-		printFloat("RightMedium:", roverControlData->sensorDistance[RIGHT_MEDIUM_SENSOR], 0);
+		printFloat("SiRear:", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR], 0);
+		printFloat("SiFront:", roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR], 0);
+		printFloat("FroLeft:", roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
+		printFloat("FroRight:", roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR], 0);
 		printFloat("Angle:", roverControlData->shortSensorAngle, 1);
 
 		switch(roverControlData->state){
