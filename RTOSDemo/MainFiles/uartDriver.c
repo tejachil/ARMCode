@@ -159,16 +159,18 @@ static portTASK_FUNCTION( uartMonitorTask, pvParameters ){
 	UARTmsg msgBuffer;
 	uint8_t packet[UART_MSG_MAX_SIZE];
 	for (;;){
-		if (xQueueReceive(devPtr->inQ,(void *)(&msgBuffer),portMAX_DELAY) != pdTRUE) {
-			VT_HANDLE_FATAL_ERROR(0);
-		}
 		if(UART_CheckBusy((LPC_UART_TypeDef *)LPC_UART1)==RESET){
+			if (xQueueReceive(devPtr->inQ,(void *)(&msgBuffer),portMAX_DELAY) != pdTRUE) {
+				VT_HANDLE_FATAL_ERROR(0);
+			}
 			packet[0] = msgBuffer.msgType;
 			packet[1] = msgBuffer.msgID;
 			packet[2] = msgBuffer.txLen;
 			memcpy(&packet[3], msgBuffer.data, msgBuffer.txLen);
-			UART_Send(devPtr->devAddr, packet, msgBuffer.txLen + UART_MSG_MIN_SIZE, BLOCKING);
-			
+			UART_Send(devPtr->devAddr, packet, msgBuffer.txLen + UART_MSG_MIN_SIZE, NONE_BLOCKING);
+		}
+		else{
+			taskYIELD();
 		}
 	}
 }
