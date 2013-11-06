@@ -1,5 +1,6 @@
 #include "sensorFunctions.h"
 #include <math.h>
+#include <stdio.h> //for printf()
 
 void readNewMsg(RoverControlStruct *roverControlData, public_message_t *receivedMsg){
 	int i=0;
