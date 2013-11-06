@@ -11,10 +11,9 @@
 
 /* include files. */
 #include "vtUtilities.h"
-#include "vtI2C.h"
-#include "i2cTemp.h"
-#include "I2CTaskMsgTypes.h"
 #include "conductor.h"
+#include "public_messages.h"
+#include "uartDriver.h"
 
 /* *********************************************** */
 // definitions and data structures that are private to this file
@@ -36,13 +35,11 @@ static portTASK_FUNCTION_PROTO( vConductorUpdateTask, pvParameters );
 
 /*-----------------------------------------------------------*/
 // Public API
-void vStartConductorTask(vtConductorStruct *params,unsigned portBASE_TYPE uxPriority, vtI2CStruct *i2c,vtTempStruct *temperature)
+void vStartConductorTask(vtConductorStruct *conductorData,unsigned portBASE_TYPE uxPriority)
 {
 	/* Start the task */
 	portBASE_TYPE retval;
-	params->dev = i2c;
-	params->tempData = temperature;
-	if ((retval = xTaskCreate( vConductorUpdateTask, ( signed char * ) "Conductor", conSTACK_SIZE, (void *) params, uxPriority, ( xTaskHandle * ) NULL )) != pdPASS) {
+	if ((retval = xTaskCreate( vConductorUpdateTask, ( signed char * ) "UART Conductor", conSTACK_SIZE, (void *) conductorData, uxPriority, ( xTaskHandle * ) NULL )) != pdPASS) {
 		VT_HANDLE_FATAL_ERROR(retval);
 	}
 }
@@ -53,52 +50,57 @@ void vStartConductorTask(vtConductorStruct *params,unsigned portBASE_TYPE uxPrio
 // This is the actual task that is run
 static portTASK_FUNCTION( vConductorUpdateTask, pvParameters )
 {
-	uint8_t rxLen, status;
-	uint8_t Buffer[vtI2CMLen];
-	uint8_t *valPtr = &(Buffer[0]);
 	// Get the parameters
 	vtConductorStruct *param = (vtConductorStruct *) pvParameters;
-	// Get the I2C device pointer
-	vtI2CStruct *devPtr = param->dev;
-	// Get the LCD information pointer
-	vtTempStruct *tempData = param->tempData;
-	uint8_t recvMsgType;
+	// Latest received message
+	public_message_t message;
 
 	// Like all good tasks, this should never exit
 	for(;;)
 	{
-		// Wait for a message from an I2C operation
-		if (vtI2CDeQ(devPtr,vtI2CMLen,Buffer,&rxLen,&recvMsgType,&status) != pdTRUE) {
+		// Wait for a message from UART
+#warning "Still using the old UARTMsg type"
+		UARTmsg driver_message;
+		if (uartDeQ(param->uartDevice, &driver_message) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
 
-		// Decide where to send the message 
-		//   This just shows going to one task/queue, but you could easily send to
-		//   other Q/tasks for other message types
-		// This isn't a state machine, it is just acting as a router for messages
-		switch(recvMsgType) {
-		case vtI2CMsgTypeTempInit: {
-			SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
-			break;
-		}
-		case vtI2CMsgTypeTempRead1: {
-			SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
-			break;
-		}
-		case vtI2CMsgTypeTempRead2: {
-			SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
-			break;
-		}
-		case vtI2CMsgTypeTempRead3: {
-			SendTempValueMsg(tempData,recvMsgType,(*valPtr),portMAX_DELAY);
-			break;
-		}
-		default: {
-			VT_HANDLE_FATAL_ERROR(recvMsgType);
-			break;
-		}
+		// Convert the UART driver struct to the public message struct
+		message.message_type = (public_message_type_t) driver_message.msgType;
+		message.message_count = driver_message.msgID;
+		message.data_length = driver_message.rxLen; // rxLen is actually the data length, I think
+		if (message.data_length <= PUB_MSG_MAX_DATA_SIZE) {
+			memcpy(message.data, driver_message.data, message.data_length);
+		} else {
+			VT_HANDLE_FATAL_ERROR(message.data_length);
 		}
 
+		// Check the data length
+		if (public_message_data_size[message.message_type] == message.data_length) {
+
+			// Decide where to send the message based on the message type
+			switch(message.message_type) {
+			// Distance reading for a given sensor.
+			case PUB_MSG_T_SENS_DIST: {
+				// Send the message to the Rover Control tasl
+				xQueueSendToBack(param->roverControlTaskData->inQ, &message, portMAX_DELAY);
+				break;
+			} // End case PUB_MSG_T_SENS_DIST
+
+			// Any other message type is unknown or should not be received on UART
+			default: {
+				// Unknown message type
+				VT_HANDLE_FATAL_ERROR(message.message_type);
+				break;
+			} // End default case
+			
+			} // End switch(message.message_type)
+
+		}
+		// Incorrect data length
+		else {
+			VT_HANDLE_FATAL_ERROR(message.data_length);
+		}
 
 	}
 }

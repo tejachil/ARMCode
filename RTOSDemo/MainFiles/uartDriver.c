@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h> // For memcpy
 
 #include "uartDriver.h"
 
@@ -93,11 +94,11 @@ portBASE_TYPE uartEnQ(UARTstruct *dev,uint8_t msgType, uint8_t msgID, uint8_t tx
 	
 	memcpy(msgBuf.data, txBuf, txLen);
 	
-	return(xQueueSend(dev->inQ,(void *)(&msgBuf),portMAX_DELAY));
+	return(xQueueSend(dev->inQ, &msgBuf,portMAX_DELAY));
 }
 
 portBASE_TYPE uartDeQ(UARTstruct *dev, UARTmsg *message){
-	if (xQueueReceive(dev->outQ,(void *) (&message),portMAX_DELAY) != pdTRUE)
+	if (xQueueReceive(dev->outQ, message,portMAX_DELAY) != pdTRUE)
 		return(pdFALSE);
 	return(pdTRUE);
 }
@@ -107,6 +108,8 @@ portBASE_TYPE uartDeQ(UARTstruct *dev, UARTmsg *message){
 static __INLINE void UART_ISR(LPC_UART_TypeDef *devAddr, xQueueHandle outQ) {
     static int recByteCount = 0;
 	static UARTmsg msgBuf;
+	portBASE_TYPE higherPriorityWasWoken = pdFALSE;
+
     if ((UART_GetIntId((LPC_UART_TypeDef*)devAddr)&UART_IIR_INTID_MASK) == UART_IIR_INTID_RDA){
 		switch(recByteCount){
 			case 0:
@@ -131,11 +134,17 @@ static __INLINE void UART_ISR(LPC_UART_TypeDef *devAddr, xQueueHandle outQ) {
 					msgBuf.status = 1;
 					msgBuf.txLen = 0;
 					
-					(xQueueSend(outQ,(void *)(&msgBuf),portMAX_DELAY));
+					if (pdTRUE != xQueueSendToBackFromISR(outQ, &msgBuf, &higherPriorityWasWoken)) {
+						VT_HANDLE_FATAL_ERROR(0);
+					}
 					recByteCount = 0;
 				}
 				break;
 		}
+	}
+
+	if (pdTRUE == higherPriorityWasWoken) {
+		taskYIELD();
 	}
 }
 
@@ -150,16 +159,18 @@ static portTASK_FUNCTION( uartMonitorTask, pvParameters ){
 	UARTmsg msgBuffer;
 	uint8_t packet[UART_MSG_MAX_SIZE];
 	for (;;){
-		if (xQueueReceive(devPtr->inQ,(void *)(&msgBuffer),portMAX_DELAY) != pdTRUE) {
-			VT_HANDLE_FATAL_ERROR(0);
-		}
 		if(UART_CheckBusy((LPC_UART_TypeDef *)LPC_UART1)==RESET){
+			if (xQueueReceive(devPtr->inQ,(void *)(&msgBuffer),portMAX_DELAY) != pdTRUE) {
+				VT_HANDLE_FATAL_ERROR(0);
+			}
 			packet[0] = msgBuffer.msgType;
 			packet[1] = msgBuffer.msgID;
 			packet[2] = msgBuffer.txLen;
 			memcpy(&packet[3], msgBuffer.data, msgBuffer.txLen);
-			UART_Send(devPtr->devAddr, packet, msgBuffer.txLen + UART_MSG_MIN_SIZE, BLOCKING);
-			
+			UART_Send(devPtr->devAddr, packet, msgBuffer.txLen + UART_MSG_MIN_SIZE, NONE_BLOCKING);
+		}
+		else{
+			taskYIELD();
 		}
 	}
 }

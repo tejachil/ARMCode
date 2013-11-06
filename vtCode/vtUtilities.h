@@ -153,4 +153,8 @@ void vtHandleFatalError(int,int,char []);
 void vtInitLED();
 void vtLEDOff(uint8_t mask);
 void vtLEDOn(uint8_t mask);
+#define vtLEDToggle(_mask) {\
+    static uint8_t _state = 1;\
+    if(1 == (_state)) {vtLEDOn(_mask); _state = 0;}\
+    else {vtLEDOff(_mask); _state = 1;} }
 #endif

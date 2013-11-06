@@ -366,6 +366,26 @@
               <FileType>1</FileType>
               <FilePath>.\MainFiles/uartDriver.c</FilePath>
             </File>
+            <File>
+              <FileName>public_messages.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MainFiles/public_messages.c</FilePath>
+            </File>
+            <File>
+              <FileName>roverControl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MainFiles/roverControl.c</FilePath>
+            </File>
+            <File>
+              <FileName>roverFunctions.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MainFiles/roverFunctions.c</FilePath>
+            </File>
+            <File>
+              <FileName>sensorFunctions.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MainFiles/sensorFunctions.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -101,6 +101,8 @@ You should read the note above.
 
 #define USE_WEB_SERVER 1
 
+#define USE_ROVER_CONTROL (1)
+
 #if USE_FREERTOS_DEMO == 1
 /* Demo app includes. */
 #include "BlockQ.h"
@@ -120,12 +122,11 @@ You should read the note above.
 // Include file for MTJ's LCD & i2cTemp tasks
 #include "vtUtilities.h"
 #include "lcdTask.h"
-#include "i2cTemp.h"
-#include "vtI2C.h"
 #include "myTimers.h"
 #include "conductor.h"
+#include "roverControl.h"
 
-#include "uartDriver.h" // Teja added these INCLUDES
+#include "uartDriver.h"
 //#include <string.h>
 
 /* syscalls initialization -- *must* occur first */
@@ -148,11 +149,11 @@ tick hook). */
 #define mainGEN_QUEUE_TASK_PRIORITY			( tskIDLE_PRIORITY)
 #define mainFLASH_TASK_PRIORITY				( tskIDLE_PRIORITY)
 #define mainLCD_TASK_PRIORITY				( tskIDLE_PRIORITY)
-#define mainI2CTEMP_TASK_PRIORITY			( tskIDLE_PRIORITY)
 #define mainUSB_TASK_PRIORITY				( tskIDLE_PRIORITY)
 #define mainI2CMONITOR_TASK_PRIORITY		( tskIDLE_PRIORITY)
 #define mainCONDUCTOR_TASK_PRIORITY			( tskIDLE_PRIORITY)
 #define mainUARTMONITOR_TASK_PRIORITY		( tskIDLE_PRIORITY)
+#define mainROVER_CONTROL_TASK_PRIORITY		( tskIDLE_PRIORITY)
 
 /* The WEB server has a larger stack as it utilises stack hungry string
 handling library calls. */
@@ -191,15 +192,6 @@ char *pcGetTaskStatusMessage( void );
 static char *pcStatusMessage = mainPASS_STATUS_MESSAGE;
 
 
-#if USE_MTJ_V4Temp_Sensor == 1
-// data structure required for one I2C task
-static vtI2CStruct vtI2C0;
-// data structure required for one temperature sensor task
-static vtTempStruct tempSensorData;
-// data structure required for conductor task
-static vtConductorStruct conductorData;
-#endif
-
 #if USE_MTJ_LCD == 1
 // data structure required for LCDtask API
 static vtLCDStruct vtLCDdata; 
@@ -207,12 +199,19 @@ static vtLCDStruct vtLCDdata;
 
 #if USE_UART == 1
 static UARTstruct wiflyUART;
+// data structure required for conductor task
+static vtConductorStruct conductorData;
 #endif
+
+#if USE_ROVER_CONTROL == 1
+// data structure for the rover control task
+static RoverControlStruct roverControlData;
+#endif //if USE_ROVER_CONTROL == 1
 
 /*-----------------------------------------------------------*/
 
 int main( void )
-{
+		{
 	/* MTJ: initialize syscalls -- *must* be first */
 	// syscalls.c contains the files upon which the standard (and portable) C libraries rely 
 	init_syscalls();
@@ -251,47 +250,36 @@ int main( void )
 	//  how to use a timer and how to send messages from that timer.
 	// startTimerForLCD(&vtLCDdata);
 	#endif
-	
-	#if USE_MTJ_V4Temp_Sensor == 1
-	// MTJ: My i2cTemp demonstration task
-	// First, start up an I2C task and associate it with the I2C0 hardware on the ARM (there are 3 I2C devices, we need this one)
-	// See vtI2C.h & vtI2C.c for more details on this task and the API to access the task
-	// Initialize I2C0 for I2C0 at an I2C clock speed of 100KHz
-	if (vtI2CInit(&vtI2C0,0,mainI2CMONITOR_TASK_PRIORITY,100000) != vtI2CInitSuccess) {
-		VT_HANDLE_FATAL_ERROR(0);
-	}
-	// Now, start up the task that is going to handle the temperature sensor sampling (it will talk to the I2C task and LCD task using their APIs)
-	#if USE_MTJ_LCD == 1
-	vStarti2cTempTask(&tempSensorData,mainI2CTEMP_TASK_PRIORITY,&vtI2C0,&vtLCDdata);
-	#else
-	vStarti2cTempTask(&tempSensorData,mainI2CTEMP_TASK_PRIORITY,&vtI2C0,NULL);
-	#endif
-	// Here we set up a timer that will send messages to the Temperature sensing task.  The timer will determine how often the sensor is sampled
-	startTimerForTemperature(&tempSensorData);
-	// start up a "conductor" task that will move messages around
-	vStartConductorTask(&conductorData,mainCONDUCTOR_TASK_PRIORITY,&vtI2C0,&tempSensorData);
-	#endif
 
     /* Create the USB task. MTJ: This routine has been modified from the original example (which is not a FreeRTOS standard demo) */
 	#if USE_MTJ_USE_USB == 1
 	initUSB();  // MTJ: This is my routine used to make sure we can do printf() with USB
     xTaskCreate( vUSBTask, ( signed char * ) "USB", configMINIMAL_STACK_SIZE, ( void * ) NULL, mainUSB_TASK_PRIORITY, NULL );
 	#endif
+
+	// Start the rover control task
+	#if USE_ROVER_CONTROL == 1
+	startRoverControlTask(&roverControlData, mainROVER_CONTROL_TASK_PRIORITY, &wiflyUART);
+	#endif //if USE_ROVER_CONTROL == 1
 	
 	#if USE_UART == 1
-	vtLEDOn(0x80);
     if (initUART(&wiflyUART, 1, mainUARTMONITOR_TASK_PRIORITY, 19200, UART_PARITY_NONE, UART_DATABIT_8, UART_STOPBIT_1) != UART_INIT_SUCCESS) {
-		vtLEDOn(0x40);
 		VT_HANDLE_FATAL_ERROR(0);
 	}
-
+/*
 	const char message[12] = "hello";
 	if (uartEnQ(&wiflyUART, 0x41, 0x42, sizeof(message) , (uint8_t *)message) != pdTRUE) {
-		vtLEDOn(0x20);
 		VT_HANDLE_FATAL_ERROR(0);
 	}
-
+*/
+	// Start the Conductor task to route messages from UART to the correct tasks
+	// MUST BE STARTED AFTER ALL OTHER TASKS
+	conductorData.uartDevice = &wiflyUART;
+	#if USE_ROVER_CONTROL == 1
+	conductorData.roverControlTaskData = &roverControlData;
 	#endif
+	vStartConductorTask(&conductorData, mainCONDUCTOR_TASK_PRIORITY);
+	#endif //if USE_UART == 1
 	
 	
 	/* Start the scheduler. */
@@ -403,11 +391,11 @@ void vConfigureTimerForRunTimeStats( void )
 {
 const unsigned long TCR_COUNT_RESET = 2, CTCR_CTM_TIMER = 0x00, TCR_COUNT_ENABLE = 0x01;
 
-	/* This function configures a timer that is used as the time base when
+	/*This function configures a timer that is used as the time base when
 	collecting run time statistical information - basically the percentage
 	of CPU time that each task is utilising.  It is called automatically when
 	the scheduler is started (assuming configGENERATE_RUN_TIME_STATS is set
-	to 1). */
+	to 1).*/
 
 	/* Power up and feed the timer. */
 	SC->PCONP |= 0x02UL;
