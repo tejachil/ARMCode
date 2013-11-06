@@ -87,7 +87,7 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 				break;
 			case TRAVERSAL:
 				if(isFrontCloseToWall(roverControlData) == 1){
-					stopRover(roverControlData);
+					turnRover(roverControlData);
 				}
 				else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
 					//fix to Left
@@ -100,19 +100,24 @@ static portTASK_FUNCTION( roverControlTask, param ) {
 				break;
 			case FIX:
 				if(isFrontCloseToWall(roverControlData) == 1){
-					stopRover(roverControlData);
+					turnRover(roverControlData);
 				}
 				else if(isRoverParallelToWall(roverControlData) == PARALLEL){
 					moveRover(roverControlData);
 				}
 				break;
-			case STOP:
+			case TURN:
+				if(isFrontCloseToWall(roverControlData) == 0 && isRoverParallelToWall(roverControlData) == PARALLEL){
+					moveRover(roverControlData);
+				}
+				break;
+			/*case STOP:
 				//if(isRoverParallelToWall(roverControlData) == PARALLEL && isSensorInRange(roverControlData) == 1){
 				if(isFrontCloseToWall(roverControlData) == 0){
 					//send command to move
 					moveRover(roverControlData);
 				}
-				break;
+				break;*/
 		}
 	}
 }

@@ -5,10 +5,10 @@
 #include "public_messages.h"
 
 //constant values
-#define DISTANCE_BETWEEN_IR 		7
-#define PARALLEL_THRESHOLD 			2
+#define DISTANCE_BETWEEN_IR 		6.5
+#define PARALLEL_THRESHOLD 			0.6
 #define SIDE_SENSOR_RANGE 			15
-#define FRONT_STOP_DISTANCE			4
+#define FRONT_STOP_DISTANCE			6
 
 //number of things
 #define NUMBER_OF_SAMPLES 			5
@@ -26,7 +26,8 @@
 #define INIT 						0
 #define TRAVERSAL 					1
 #define FIX 						2
-#define STOP	  					3
+#define TURN						3
+#define STOP	  					4
 
 //parallel states
 #define PARALLEL 					0

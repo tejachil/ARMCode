@@ -12,12 +12,18 @@ void stopRover(RoverControlStruct *roverControlData){
 	sendToRover(roverControlData, PUB_MSG_T_MOV_CMD, MOV_CMD_STOP);
 }
 
+void turnRover(RoverControlStruct *roverControlData){
+	roverControlData->state = TURN;
+	//TODO: change this to turn later
+	sendToRover(roverControlData, PUB_MSG_T_FIX_CMD, FIX_CMD_LEFT);
+}
+
 void fixRover(RoverControlStruct *roverControlData, int fixDir){
 	roverControlData->state = FIX;
 	if(fixDir == FIX_FRONT_LEFT)
-		sendToRover(roverControlData, PUB_MSG_T_FIX_CMD, FIX_CMD_LEFT);
-	else if(fixDir == FIX_FRONT_RIGHT)
 		sendToRover(roverControlData, PUB_MSG_T_FIX_CMD, FIX_CMD_RIGHT);
+	else if(fixDir == FIX_FRONT_RIGHT)
+		sendToRover(roverControlData, PUB_MSG_T_FIX_CMD, FIX_CMD_LEFT);
 }
 
 void sendToRover(RoverControlStruct *roverControlData, public_message_type_t msg_type, uint8_t cmd){
