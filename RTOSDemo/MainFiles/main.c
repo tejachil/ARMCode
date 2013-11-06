@@ -239,7 +239,7 @@ int main( void )
 	#if USE_WEB_SERVER == 1
 	// Not a standard demo -- but also not one of mine (MTJ)
 	/* Create the uIP task.  The WEB server runs in this task. */
-    xTaskCreate( vuIP_Task, ( signed char * ) "uIP", mainBASIC_WEB_STACK_SIZE, ( void * ) NULL, mainUIP_TASK_PRIORITY, NULL );
+    xTaskCreate( vuIP_Task, ( signed char * ) "uIP", mainBASIC_WEB_STACK_SIZE, ( void * ) &roverControlData, mainUIP_TASK_PRIORITY, NULL ); // Teja changed from null to roverControlData
 	#endif
 
 	#if USE_MTJ_LCD == 1

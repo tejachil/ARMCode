@@ -70,6 +70,7 @@
 #include "EthDev_LPC17xx.h"
 #include "EthDev.h"
 #include "ParTest.h"
+#include "roverControl.h"
 
 /*-----------------------------------------------------------*/
 
@@ -88,6 +89,9 @@
  * Setup the MAC address in the MAC itself, and in the uIP stack.
  */
 static void prvSetMACAddress( void );
+
+//Teja added this:
+RoverControlStruct *roverControlData;
 
 /*
  * Port functions required by the uIP stack.
@@ -121,7 +125,8 @@ uip_ipaddr_t xIPAddr;
 struct timer periodic_timer, arp_timer;
 extern void ( vEMAC_ISR_Wrapper )( void );
 
-	( void ) pvParameters;
+	//( void ) pvParameters;
+	roverControlData = (RoverControlStruct *) pvParameters; // Teja added this
 
 	/* Initialise the uIP stack. */
 	timer_set( &periodic_timer, configTICK_RATE_HZ / 2 );
@@ -257,13 +262,19 @@ extern void vParTestSetLEDState( long lState );
     {
     	//c = strstr( pcInputString, "index.html?" ); 
 		/* Turn the FIO1 LED's on or off in accordance with the check box status. */
+		static xTaskHandle roverTaskHandle;
 		if (strstr( c, "act=Start" ) != NULL )
 		{
-			vParTestSetLEDState( pdTRUE ); // Add the task for when the Start button is pressed
+			if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, tskIDLE_PRIORITY, ( xTaskHandle * ) &roverTaskHandle ) != pdPASS) {
+				VT_HANDLE_FATAL_ERROR(0);
+			}
+			//vParTestSetLEDState( pdTRUE ); // Add the task for when the Start button is pressed
 		}
 		else if (strstr( c, "act=Stop" ) != NULL )
 		{
-			vParTestSetLEDState( pdFALSE ); // Add the task for when the Stop button is pressed
+			stopRover(roverControlData);
+			vTaskDelete(roverTaskHandle);
+			//vParTestSetLEDState( pdFALSE ); // Add the task for when the Stop button is pressed
 		}
     }	
 	

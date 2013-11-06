@@ -5,15 +5,6 @@
 
 #define roverControlQLen (10)
 
-#define baseStack 2
-#if PRINTF_VERSION == 1
-#define roverSTACK_SIZE		((baseStack+5)*configMINIMAL_STACK_SIZE)
-#else
-#define roverSTACK_SIZE		(baseStack*configMINIMAL_STACK_SIZE)
-#endif
-
-static portTASK_FUNCTION_PROTO( roverControlTask, param );
-
 void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart) {
 	roverControlData->uartDevice = uart;
 
@@ -22,12 +13,12 @@ void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBA
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 
-	if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, uxPriority, ( xTaskHandle * ) NULL ) != pdPASS) {
+	/*if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, uxPriority, ( xTaskHandle * ) NULL ) != pdPASS) {
 		VT_HANDLE_FATAL_ERROR(0);
-	}
+	}*/ // Teja moved this to the webserver
 }
 
-static portTASK_FUNCTION( roverControlTask, param ) {
+void roverControlTask( void *param ){
 	// Get the parameters
 	RoverControlStruct *roverControlData = (RoverControlStruct *) param;
 	// Variable to hold received messages
