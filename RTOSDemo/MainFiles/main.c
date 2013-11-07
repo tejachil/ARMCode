@@ -125,7 +125,7 @@ You should read the note above.
 #include "myTimers.h"
 #include "conductor.h"
 #include "roverControl.h"
-
+#include "roverMap.h"
 #include "uartDriver.h"
 //#include <string.h>
 
@@ -206,12 +206,13 @@ static vtConductorStruct conductorData;
 #if USE_ROVER_CONTROL == 1
 // data structure for the rover control task
 static RoverControlStruct roverControlData;
+static RoverMapStruct roverMapStruct;
 #endif //if USE_ROVER_CONTROL == 1
 
 /*-----------------------------------------------------------*/
 
-int main( void )
-		{
+int main( void ){
+	
 	/* MTJ: initialize syscalls -- *must* be first */
 	// syscalls.c contains the files upon which the standard (and portable) C libraries rely 
 	init_syscalls();
@@ -259,7 +260,9 @@ int main( void )
 
 	// Start the rover control task
 	#if USE_ROVER_CONTROL == 1
-	startRoverControlTask(&roverControlData, mainROVER_CONTROL_TASK_PRIORITY, &wiflyUART);
+	startRoverMapping(&roverMapStruct, mainROVER_CONTROL_TASK_PRIORITY);
+	startRoverControlTask(&roverControlData, mainROVER_CONTROL_TASK_PRIORITY, &wiflyUART, &roverMapStruct);
+	vtLEDOn(0x80);
 	#endif //if USE_ROVER_CONTROL == 1
 	
 	#if USE_UART == 1

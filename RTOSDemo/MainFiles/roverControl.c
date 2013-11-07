@@ -5,8 +5,12 @@
 
 #define roverControlQLen (10)
 
-void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart) {
+static RoverMapStruct *roverMap;
+
+void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct) {
 	roverControlData->uartDevice = uart;
+
+	roverMap = roverMapStruct;
 
 	// Create the queue that will be used to talk to this task
 	if ((roverControlData->inQ = xQueueCreate(roverControlQLen,sizeof(public_message_t))) == NULL) {

@@ -1,9 +1,11 @@
-#ifndef ROVERCONTROL_H
-#define ROVERCONTROL_H
+#ifndef ROVERCONTROL_H_
+#define ROVERCONTROL_H_
 
 #include "roverHeader.h"
+#include "roverMap.h"
 
 #define baseStack 2
+
 #if PRINTF_VERSION == 1
 #define roverSTACK_SIZE		((baseStack+5)*configMINIMAL_STACK_SIZE)
 #else
@@ -13,6 +15,6 @@
 //static portTASK_FUNCTION_PROTO( roverControlTask, param );
 void roverControlTask( void *param );
 
-void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart);
+void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct);
 
 #endif

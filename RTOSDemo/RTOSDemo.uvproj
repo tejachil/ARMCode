@@ -386,6 +386,11 @@
               <FileType>1</FileType>
               <FilePath>.\MainFiles/sensorFunctions.c</FilePath>
             </File>
+            <File>
+              <FileName>roverMap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MainFiles/roverMap.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

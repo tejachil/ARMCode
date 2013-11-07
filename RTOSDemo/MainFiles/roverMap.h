@@ -1,0 +1,35 @@
+#ifndef ROVERMAP_H_
+#define ROVERMAP_H_
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "projdefs.h"
+#include "semphr.h"
+#include "vtUtilities.h"
+
+#define MAXIMUM_CORNERS	10
+#define ROVERMAP_QLEN	10
+
+#define baseStack 2
+
+#if PRINTF_VERSION == 1
+#define mapSTACK_SIZE		((baseStack+5)*configMINIMAL_STACK_SIZE)
+#else
+#define mapSTACK_SIZE		(baseStack*configMINIMAL_STACK_SIZE)
+#endif
+
+typedef struct __RoverMapStruct {
+	xQueueHandle inQ;
+	xQueueHandle outQ;
+} RoverMapStruct;
+
+typedef struct __MapCornerStruct {
+	double angleCorner;
+	double distFromSide;
+	double distTraveled;
+} MapCorner;
+
+void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority);
+
+
+#endif
