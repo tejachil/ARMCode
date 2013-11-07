@@ -6,6 +6,7 @@
 #include "projdefs.h"
 #include "semphr.h"
 #include "vtUtilities.h"
+#include "LCDtask.h"
 
 #define MAXIMUM_CORNERS	10
 #define ROVERMAP_QLEN	10
@@ -29,7 +30,7 @@ typedef struct __MapCornerStruct {
 	double distSide;
 } MapCorner;
 
-void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority);
+void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, vtLCDStruct *lcd);
 
 
 #endif

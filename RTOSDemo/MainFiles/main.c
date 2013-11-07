@@ -90,7 +90,7 @@ You should read the note above.
    unless the files are actually removed from the project */
 #define USE_FREERTOS_DEMO 0
 // Define whether or not to use my LCD task
-#define USE_MTJ_LCD 0
+#define USE_MTJ_LCD 1
 // Define whether to use my temperature sensor read task (the sensor is on the PIC v4 demo board, so if that isn't connected
 //   then this should be off
 #define USE_MTJ_V4Temp_Sensor 0
@@ -260,7 +260,7 @@ int main( void ){
 
 	// Start the rover control task
 	#if USE_ROVER_CONTROL == 1
-	startRoverMapping(&roverMapStruct, mainROVER_CONTROL_TASK_PRIORITY);
+	startRoverMapping(&roverMapStruct, mainROVER_CONTROL_TASK_PRIORITY, &vtLCDdata);
 	startRoverControlTask(&roverControlData, mainROVER_CONTROL_TASK_PRIORITY, &wiflyUART, &roverMapStruct);
 	#endif //if USE_ROVER_CONTROL == 1
 	
