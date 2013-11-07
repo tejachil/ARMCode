@@ -89,6 +89,6 @@ void printFloat(char* buf, float number, int newLine){
 }
 
 double getEncoderDistance(uint8_t revolutions, uint16_t ticksOffset){
-	double distance = WHEEL_CIRCUMFERENCE*revolutions + (ticksOffset/TICKS_PER_REVOLUTION)*WHEEL_CIRCUMFERENCE;
+	double distance = WHEEL_CIRCUMFERENCE * (revolutions + ((ticksOffset)/TICKS_PER_REVOLUTION));
 	return distance;
 }

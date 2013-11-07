@@ -26,8 +26,8 @@ typedef struct __RoverMapStruct {
 
 typedef struct __MapCornerStruct {
 	double angleCorner;
-	double distFromSide;
 	double distSide;
+	double distFromSide;
 } MapCorner;
 
 void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, vtLCDStruct *lcd);

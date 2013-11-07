@@ -35,9 +35,9 @@
 #define FIX_FRONT_RIGHT 			2
 
 //encoder defines
-#define TICKS_PER_REVOLUTION		6000 //tyler was measuring 5250 and actual is 6000
+#define TICKS_PER_REVOLUTION		5250.0 //tyler was measuring 5250 and actual is 6000
 #define WHEEL_CIRCUMFERENCE			14.1 //inches
-#define ROVER_LENGTH				12
+#define ROVER_LENGTH				12.0
 
 typedef struct __RoverControlStruct {
 	UARTstruct *uartDevice;

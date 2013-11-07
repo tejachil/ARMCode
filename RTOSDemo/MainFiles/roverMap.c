@@ -1,4 +1,5 @@
 #include "roverMap.h"
+#include "sensorFunctions.h"
 
 static MapCorner mapCorners[MAXIMUM_CORNERS];
 static uint8_t cornersCount;
@@ -23,7 +24,7 @@ void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE ux
 	
 	sprintf(lcdBuffer,"Hello!");
 	if (lcdStruct != NULL) {
-		vtLEDToggle(0x40);
+		
 		if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
@@ -39,26 +40,54 @@ void mapRoverTask( void *param ){
 	RoverMapStruct *roverMapStruct = (RoverMapStruct *) param;
 	
 	MapCorner receivedCorner;
-	
-	char lcdBuffer[10];
 
+	double totalAngle = 0;
+	double area;
+	
+	char lcdBuffer[19];
+	double number;
+	int intPart, decimalPart;
 	for(;;){
 		if (xQueueReceive(roverMapStruct->inQ, (void *) &receivedCorner, portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
 
 
-		sprintf(lcdBuffer,"%d, %d, %d", (uint8_t)(receivedCorner.distFromSide*100), (uint8_t)(receivedCorner.distSide*100), (uint8_t)(receivedCorner.angleCorner*100));
-		if (lcdStruct != NULL) {
-			vtLEDToggle(0x40);
+		if(cornersCount < MAXIMUM_CORNERS){
+			mapCorners[cornersCount] = receivedCorner;
+			++cornersCount;
+		}
+
+		totalAngle += receivedCorner.angleCorner;
+		
+		if(totalAngle >= 370.0){
+			area = (mapCorners[1].distSide + mapCorners[0].distFromSide) * (mapCorners[2].distSide + mapCorners[1].distFromSide);
+
+			number = area;
+			intPart = (int)number;
+			decimalPart = (number - (int)number)*1000;
+			sprintf(lcdBuffer, "Area=%d.%d, ", intPart,decimalPart);
 			if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
 				VT_HANDLE_FATAL_ERROR(0);
 			}
 		}
+		else{
+			number = receivedCorner.distSide;
+			intPart = (int)number;
+			decimalPart = (number - (int)number)*1000;
+			sprintf(lcdBuffer, "%d.%d, ", intPart,decimalPart);
+			if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
+				VT_HANDLE_FATAL_ERROR(0);
+			}
 
-		if(cornersCount < MAXIMUM_CORNERS){
-			mapCorners[cornersCount] = receivedCorner;
-			++cornersCount;
+			number = receivedCorner.distFromSide;
+			intPart = (int)number;
+			decimalPart = (number - (int)number)*1000;
+			sprintf(lcdBuffer, "%d.%d", intPart,decimalPart);
+			if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
+				VT_HANDLE_FATAL_ERROR(0);
+			}
+
 		}
 	}
 }

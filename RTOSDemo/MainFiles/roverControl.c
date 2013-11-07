@@ -46,6 +46,7 @@ void roverControlTask( void *param ){
 	uint8_t encoderReceived = 0;
 	uint8_t isFirstCorner = 0;
 	MapCorner newCorner;
+	newCorner.distSide = 0;
 	double totalExternalAngle = 0;
 
 	// Request sensor data
@@ -135,7 +136,7 @@ void roverControlTask( void *param ){
 						newCorner.distFromSide = (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
 						newCorner.angleCorner = 90;
 						totalExternalAngle += newCorner.angleCorner;
-						newCorner.distSide += ROVER_LENGTH + (roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR])/2;
+						//newCorner.distSide += ROVER_LENGTH;// + (roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR])/2;
 
 						if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);
 						
@@ -147,7 +148,11 @@ void roverControlTask( void *param ){
 		}
 		else if (receivedMsg.message_type == PUB_MSG_T_ENCODER_DATA){
 			encoderReceived = 1;
-			newCorner.distSide = getEncoderDistance(receivedMsg.data[2], receivedMsg.data[0] || (receivedMsg.data[1] << 8));
+			newCorner.distSide = (receivedMsg.data[0] + (receivedMsg.data[1] << 8))/TICKS_PER_REVOLUTION;
+			newCorner.distSide += receivedMsg.data[2];
+			newCorner.distSide = newCorner.distSide * WHEEL_CIRCUMFERENCE;
+			newCorner.distSide = newCorner.distSide + ROVER_LENGTH + FRONT_STOP_DISTANCE*1.0;
+			//getEncoderDistance(receivedMsg.data[2], );
 		}
 		else{
 			;
