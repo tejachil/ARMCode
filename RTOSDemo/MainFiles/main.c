@@ -262,7 +262,6 @@ int main( void ){
 	#if USE_ROVER_CONTROL == 1
 	startRoverMapping(&roverMapStruct, mainROVER_CONTROL_TASK_PRIORITY);
 	startRoverControlTask(&roverControlData, mainROVER_CONTROL_TASK_PRIORITY, &wiflyUART, &roverMapStruct);
-	vtLEDOn(0x80);
 	#endif //if USE_ROVER_CONTROL == 1
 	
 	#if USE_UART == 1

@@ -2,21 +2,16 @@
 #include <math.h>
 #include <stdio.h> //for printf()
 
+double getEncoderDistance(uint8_t revolutions, uint16_t ticksOffset);
+
 void readNewMsg(RoverControlStruct *roverControlData, public_message_t *receivedMsg){
-	if (receivedMsg->message_type == PUB_MSG_T_SENS_DIST){
-		int i=0;
-		//store each sesnor a sampling array for averaging later on
-		for(i=0; i<NUMBER_OF_SENSORS;i++)
-			roverControlData->sensorDistanceSamples[i][roverControlData->samplingCounter] = receivedMsg->data[2*i+1] << 8 | receivedMsg->data[2*i];
-		// increment for the next sample
-		roverControlData->samplingCounter = (roverControlData->samplingCounter+1)%NUMBER_OF_SAMPLES; 
-	}
-	else if (receivedMsg->message_type == PUB_MSG_T_ENCODER_DATA){
-		;
-	}
-	else{
-		;
-	}
+	int i=0;
+	//store each sesnor a sampling array for averaging later on
+	for(i=0; i<NUMBER_OF_SENSORS;i++)
+		roverControlData->sensorDistanceSamples[i][roverControlData->samplingCounter] = receivedMsg->data[2*i+1] << 8 | receivedMsg->data[2*i];
+	
+	// increment for the next sample
+	roverControlData->samplingCounter = (roverControlData->samplingCounter+1)%NUMBER_OF_SAMPLES; 
 }
 
 
@@ -91,4 +86,9 @@ void printFloat(char* buf, float number, int newLine){
 	printf("%s %d.%d, ",buf, intPart,decimalPart);
 	if(newLine)
 		printf("\n");
+}
+
+double getEncoderDistance(uint8_t revolutions, uint16_t ticksOffset){
+	double distance = WHEEL_CIRCUMFERENCE*revolutions + (ticksOffset/TICKS_PER_REVOLUTION)*WHEEL_CIRCUMFERENCE;
+	return distance;
 }

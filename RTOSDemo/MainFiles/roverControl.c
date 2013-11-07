@@ -64,55 +64,64 @@ void roverControlTask( void *param ){
 		// 3. Process message received in step 1, contained in receivedMsg.
 		// See public_messages.h for the structure of receivedMsg (it is type "public_message_t").
 
-		//read a new message
-		readNewMsg(roverControlData, &receivedMsg);
-		averageValues(roverControlData);
-		convertToDistance(roverControlData);
-		findAngles(roverControlData);
-		printFloat("SiRear:", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR], 0);
-		printFloat("SiFront:", roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR], 0);
-		printFloat("FroLeft:", roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
-		printFloat("FroRight:", roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR], 0);
-		printFloat("Angle:", roverControlData->shortSensorAngle, 1);
 
-		switch(roverControlData->state){
-			case INIT:
-				//send command to move rover
-				moveRover(roverControlData);
-				break;
-			case TRAVERSAL:
-				if(isFrontCloseToWall(roverControlData) == 1){
-					turnRover(roverControlData);
-				}
-				else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
-					//fix to Left
-					fixRover(roverControlData, FIX_FRONT_LEFT);
-				}
-				else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_RIGHT){
-					//fix to Right
-					fixRover(roverControlData, FIX_FRONT_RIGHT);
-				}
-				break;
-			case FIX:
-				if(isFrontCloseToWall(roverControlData) == 1){
-					turnRover(roverControlData);
-				}
-				else if(isRoverParallelToWall(roverControlData) == PARALLEL){
+		if (receivedMsg.message_type == PUB_MSG_T_SENS_DIST){
+			//read a new message
+			readNewMsg(roverControlData, &receivedMsg);
+			averageValues(roverControlData);
+			convertToDistance(roverControlData);
+			findAngles(roverControlData);
+			printFloat("SiRear:", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR], 0);
+			printFloat("SiFront:", roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR], 0);
+			printFloat("FroLeft:", roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
+			printFloat("FroRight:", roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR], 0);
+			printFloat("Angle:", roverControlData->shortSensorAngle, 1);
+
+			switch(roverControlData->state){
+				case INIT:
+					//send command to move rover
 					moveRover(roverControlData);
-				}
-				break;
-			case TURN:
-				if(isFrontCloseToWall(roverControlData) == 0 && isRoverParallelToWall(roverControlData) == PARALLEL){
-					moveRover(roverControlData);
-				}
-				break;
-			/*case STOP:
-				//if(isRoverParallelToWall(roverControlData) == PARALLEL && isSensorInRange(roverControlData) == 1){
-				if(isFrontCloseToWall(roverControlData) == 0){
-					//send command to move
-					moveRover(roverControlData);
-				}
-				break;*/
+					break;
+				case TRAVERSAL:
+					if(isFrontCloseToWall(roverControlData) == 1){
+						turnRover(roverControlData);
+					}
+					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
+						//fix to Left
+						fixRover(roverControlData, FIX_FRONT_LEFT);
+					}
+					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_RIGHT){
+						//fix to Right
+						fixRover(roverControlData, FIX_FRONT_RIGHT);
+					}
+					break;
+				case FIX:
+					if(isFrontCloseToWall(roverControlData) == 1){
+						turnRover(roverControlData);
+					}
+					else if(isRoverParallelToWall(roverControlData) == PARALLEL){
+						moveRover(roverControlData);
+					}
+					break;
+				case TURN:
+					if(isFrontCloseToWall(roverControlData) == 0 && isRoverParallelToWall(roverControlData) == PARALLEL){
+						moveRover(roverControlData);
+					}
+					break;
+				/*case STOP:
+					//if(isRoverParallelToWall(roverControlData) == PARALLEL && isSensorInRange(roverControlData) == 1){
+					if(isFrontCloseToWall(roverControlData) == 0){
+						//send command to move
+						moveRover(roverControlData);
+					}
+					break;*/
+			}
+		}
+		else if (receivedMsg.message_type == PUB_MSG_T_ENCODER_DATA){
+			roverControlData->encoderDistance = getEncoderDistance(receivedMsg.data[2], receivedMsg.data[0] || (receivedMsg.data[1] << 8));
+		}
+		else{
+			;
 		}
 	}
 }
