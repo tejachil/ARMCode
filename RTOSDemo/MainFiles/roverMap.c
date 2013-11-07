@@ -32,7 +32,7 @@ void mapRoverTask( void *param ){
 		if (xQueueReceive(roverMapStruct->inQ, (void *) &receivedCorner, portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
-		
+		vtLEDToggle(0x40);
 		if(cornersCount < MAXIMUM_CORNERS){
 			mapCorners[cornersCount] = receivedCorner;
 			++cornersCount;

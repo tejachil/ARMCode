@@ -81,8 +81,10 @@ static portTASK_FUNCTION( vConductorUpdateTask, pvParameters )
 			// Decide where to send the message based on the message type
 			switch(message.message_type) {
 			// Distance reading for a given sensor.
-			case PUB_MSG_T_SENS_DIST: {
-				// Send the message to the Rover Control tasl
+			case PUB_MSG_T_SENS_DIST:
+			case PUB_MSG_T_ENCODER_DATA:
+			{
+				// Send the message to the Rover Control task
 				xQueueSendToBack(param->roverControlTaskData->inQ, &message, portMAX_DELAY);
 				break;
 			} // End case PUB_MSG_T_SENS_DIST

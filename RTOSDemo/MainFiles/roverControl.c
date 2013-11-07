@@ -39,6 +39,15 @@ void roverControlTask( void *param ){
 	sensorRequestMsg.msgID = 0; // The count will be updated before sending each request
 	sensorRequestMsg.txLen = 0; // No data is included in the request
 
+	UARTmsg encoderRequestMsg;
+	encoderRequestMsg.msgType = PUB_MSG_T_ENCODER_DATA;
+	encoderRequestMsg.msgID = 0; // The count will be updated before sending each request
+	encoderRequestMsg.txLen = 0; // No data is included in the request
+	uint8_t encoderReceived = 0;
+	uint8_t isFirstCorner = 0;
+	MapCorner newCorner;
+	double totalExternalAngle = 0;
+
 	// Request sensor data
 	// Update the count and send the request
 	sensorRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
@@ -84,7 +93,11 @@ void roverControlTask( void *param ){
 					break;
 				case TRAVERSAL:
 					if(isFrontCloseToWall(roverControlData) == 1){
-						turnRover(roverControlData);
+						stopRover(roverControlData);
+
+						encoderRequestMsg.msgID = public_message_get_count(PUB_MSG_T_ENCODER_DATA);
+						uartEnQ(roverControlData->uartDevice, encoderRequestMsg.msgType, encoderRequestMsg.msgID, encoderRequestMsg.txLen,
+							encoderRequestMsg.data);
 					}
 					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
 						//fix to Left
@@ -97,7 +110,11 @@ void roverControlTask( void *param ){
 					break;
 				case FIX:
 					if(isFrontCloseToWall(roverControlData) == 1){
-						turnRover(roverControlData);
+						stopRover(roverControlData);
+
+						encoderRequestMsg.msgID = public_message_get_count(PUB_MSG_T_ENCODER_DATA);
+						uartEnQ(roverControlData->uartDevice, encoderRequestMsg.msgType, encoderRequestMsg.msgID, encoderRequestMsg.txLen,
+							encoderRequestMsg.data);
 					}
 					else if(isRoverParallelToWall(roverControlData) == PARALLEL){
 						moveRover(roverControlData);
@@ -108,17 +125,29 @@ void roverControlTask( void *param ){
 						moveRover(roverControlData);
 					}
 					break;
-				/*case STOP:
+				case STOP:
 					//if(isRoverParallelToWall(roverControlData) == PARALLEL && isSensorInRange(roverControlData) == 1){
-					if(isFrontCloseToWall(roverControlData) == 0){
-						//send command to move
-						moveRover(roverControlData);
+					if (totalExternalAngle >= 370.0){
+						vtLEDOn(0x80);
 					}
-					break;*/
+					else if(encoderReceived != 0){
+						//vtLEDOn(0x20);
+						newCorner.distFromSide = (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
+						newCorner.angleCorner = 90;
+						totalExternalAngle += newCorner.angleCorner;
+						newCorner.distSide += ROVER_LENGTH + (roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR])/2;
+
+						if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);
+						
+						turnRover(roverControlData);
+						encoderReceived = 0;
+					}
+					break;
 			}
 		}
 		else if (receivedMsg.message_type == PUB_MSG_T_ENCODER_DATA){
-			roverControlData->encoderDistance = getEncoderDistance(receivedMsg.data[2], receivedMsg.data[0] || (receivedMsg.data[1] << 8));
+			encoderReceived = 1;
+			newCorner.distSide = getEncoderDistance(receivedMsg.data[2], receivedMsg.data[0] || (receivedMsg.data[1] << 8));
 		}
 		else{
 			;
