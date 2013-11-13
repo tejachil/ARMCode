@@ -3,11 +3,45 @@
   <head>
     <title>FreeRTOS.org uIP WEB server demo</title>
   </head>
-  <BODY onLoad="window.setTimeout(&quot;location.href='rover.shtml'&quot;,100)">
+  <BODY>
 <font face="arial">
-Loading index.shtml.  Click <a href="index.shtml">here</a> if not automatically redirected.
+<form name="roverForm" action="/index.html" method="get">
+<table border = "1" align="center">
+    <tr>
+        <td></td>
+        <td rowspan="8"><iframe src="runtime.shtml" width="525" height="575"></iframe></td>
+    </tr>
+    <tr>
+        <td><center><b>Control Panel</b></center></td>
+    </tr>
+    <tr>
+        <td>Regular Polygon? <input type="checkbox" name="regPol" value="regularPolygon"></td>
+    </tr>
+    <tr>
+        <td>Polygon Sides: <input type="number" name="polSid" value="numSides" min="3" max="20"></td>
+    </tr>
+    <tr>
+        <td>Current Task: 
+			<select name="task">
+			<option value="pre1">Preliminary Task 1</option>
+			<option value="man1">Mandatory Task 1</option>
+			<option value="man2">Mandatory Task 2</option>
+			<option value="man3">Mandatory Task 3</option>
+			</select>
+	</td>
+    </tr>
+    <tr>
+        <td><center><input type="submit" value="Start" name="act"> <input type="submit" value="Stop" name="act"></center></td>
+    </tr>
+    <tr>
+        <td>Debug Output:</td>
+    </tr>
+    <tr>
+        <td><iframe src="index.shtml" width="400" height="400"></iframe></td>
+    </tr>
+</table>
+</form>
 </font>
 </font>
 </body>
 </html>
-
