@@ -4,16 +4,11 @@
 <title>Map</title>
 </head>
 <body onLoad="window.setTimeout(&quot;location.href='runtime.shtml'&quot;,500)">
-<p align = "center">Area:<input type="text" name="area"></p>
 <p align = "center">
 	<svg svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="500" height="500">
-		<polyline id="mapline" fill="none" stroke="blue" stroke-width="2" />
+		%! led-io
 	</svg>
 </p>
-<script type="text/javascript">
-	var map=document.getElementById("mapline");
-	map.setAttribute("points", "0,500 000,000 500,000 500,500");
-</script>
 </body>
 </html>
 

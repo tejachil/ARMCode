@@ -59,7 +59,7 @@ HTTPD_CGI_CALL(tcp, "tcp-connections", tcp_stats);
 HTTPD_CGI_CALL(net, "net-stats", net_stats);
 HTTPD_CGI_CALL(rtos, "rtos-stats", rtos_stats );
 HTTPD_CGI_CALL(run, "run-time", run_time );
-HTTPD_CGI_CALL(io, "led-io", led_io );
+HTTPD_CGI_CALL(io, "led-io", led_io ); //will be used to for map function
 
 
 static const struct httpd_cgi_call *calls[] = { &file, &tcp, &net, &rtos, &run, &io, NULL };
@@ -215,7 +215,7 @@ static unsigned short
 generate_rtos_stats(void *arg)
 {
 	( void ) arg;
-	lRefreshCount++;
+	//lRefreshCount++;
 	sprintf( cCountBuf, "<p><br>Refresh count = %d<p><br>%s", (int)lRefreshCount, pcGetTaskStatusMessage() );
     vTaskList( uip_appdata );
 	strcat( uip_appdata, cCountBuf );
@@ -254,8 +254,12 @@ extern long lParTestGetLEDState( void );
 		pcStatus = "checked";
 	}
 
-	sprintf( uip_appdata,
-		"<input type=\"checkbox\" name=\"LED0\" value=\"1\" %s>LED<p><p>", pcStatus );
+  // teja print to map right here
+
+	sprintf( uip_appdata, 
+    "<polyline fill=\"none\" stroke=\"blue\" stroke-width=\"2\" points=\"%s\" /><p align=\"center\">(Length, Angle): (L1, A1) (L2, A2) (L3,A3) (L4,A4)</p>",
+    "100,100 400,75 500,400");
+  sprintf(uip_appdata, "%s <p>Area = %f square inches</p>", uip_appdata, 43.535);
 
 	return strlen( uip_appdata );
 }
