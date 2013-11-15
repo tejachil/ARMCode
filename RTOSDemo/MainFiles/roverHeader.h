@@ -8,7 +8,9 @@
 #define DISTANCE_BETWEEN_IR 		6.5
 #define PARALLEL_THRESHOLD 			0.8
 #define SIDE_SENSOR_RANGE 			15
-#define FRONT_STOP_DISTANCE			8
+#define FRONT_STOP_DISTANCE			11
+#define TOO_CLOSE_THRESHOLD			4
+#define SPEED_RANGE					1.5
 
 //number of things
 #define NUMBER_OF_SAMPLES 			5
@@ -26,13 +28,16 @@
 #define INIT 						0
 #define TRAVERSAL 					1
 #define FIX 						2
-#define TURN						3
-#define STOP	  					4
+#define TOO_CLOSE					3
+#define TURN						4
+#define STOP	  					5
 
 //parallel states
 #define PARALLEL 					0
 #define FIX_FRONT_LEFT  			1
 #define FIX_FRONT_RIGHT 			2
+#define TOO_CLOSE_SIDE				3
+#define TOO_FAR_SIDE				4
 
 //encoder defines
 #define TICKS_PER_REVOLUTION		5250.0 //tyler was measuring 5250 and actual is 6000

@@ -64,7 +64,7 @@ void roverControlTask( void *param ){
 		if (xQueueReceive(roverControlData->inQ, (void *) &receivedMsg, portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
-		vtLEDToggle(0x01);
+		vtLEDToggle(0x80);
 		
 		//printf(" :L: ");
 		// 2. Request new sensor data.
@@ -91,20 +91,42 @@ void roverControlTask( void *param ){
 					moveRover(roverControlData);
 					break;
 				case TRAVERSAL:
+					vtLEDOn(0x01);	
+					vtLEDOff(0x02);
+					vtLEDOff(0x04);
+					vtLEDOff(0x08);
+
+					//if close to front wall move to stop state
 					if(isFrontCloseToWall(roverControlData) == 1){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
+					/*else if(isRoverParallelToWall(roverControlData) == TOO_CLOSE_SIDE){
+						roverControlData->state = TOO_CLOSE;	
+					}*/
 					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
-						//fix to Left
-						fixRover(roverControlData, FIX_FRONT_LEFT);
+						if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]+PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
+							fixRover(roverControlData, FIX_CMD_LEFT_FAST);
+						}else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]+PARALLEL_THRESHOLD + SPEED_RANGE)){
+							fixRover(roverControlData, FIX_CMD_LEFT);
+						}else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]+PARALLEL_THRESHOLD)){
+							fixRover(roverControlData, FIX_CMD_LEFT_SLOW);	
+						}
 					}
 					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_RIGHT){
-						//fix to Right
-						fixRover(roverControlData, FIX_FRONT_RIGHT);
-					}
+						if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]+PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
+							fixRover(roverControlData, FIX_CMD_RIGHT_FAST);
+						}else if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]+PARALLEL_THRESHOLD + SPEED_RANGE)){
+							fixRover(roverControlData, FIX_CMD_RIGHT);
+						}else if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]+PARALLEL_THRESHOLD)){
+							fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
+					}	}
 					break;
 				case FIX:
+					vtLEDOff(0x01);	
+					vtLEDOn(0x02);
+					vtLEDOff(0x04);
+					vtLEDOff(0x08);
 					if(isFrontCloseToWall(roverControlData) == 1){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
@@ -113,19 +135,42 @@ void roverControlTask( void *param ){
 						moveRover(roverControlData);
 					}
 					break;
-				case TURN:
+				/*case TOO_CLOSE:
+					vtLEDOff(0x01);	
+					vtLEDOff(0x02);
+					vtLEDOn(0x04);
+					vtLEDOff(0x08);
+					if(isFrontCloseToWall(roverControlData) == 1){
+						stopRover(roverControlData);
+						requestType = REQUEST_TYPE_ENCODER;
+					}
+					else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD){
+						fixRover(roverControlData, FIX_FRONT_RIGHT);
+						roverControlData->state = TOO_CLOSE;
+					}
+					else if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD + 1){
+						moveRover(roverControlData);
+						roverControlData->state = TOO_CLOSE;
+					}else{
+						fixRover(roverControlData, FIX_FRONT_LEFT);
+					}
+					break;*/
+				case TURN:	
+					vtLEDOff(0x01);	
+					vtLEDOff(0x02);
+					vtLEDOff(0x04);
+					vtLEDOn(0x08);
 					if(isFrontCloseToWall(roverControlData) == 0 && isRoverParallelToWall(roverControlData) == PARALLEL){
 						moveRover(roverControlData);
 					}
 					break;
 				case STOP:
-					vtLEDOn(0x40);
 					//if(isRoverParallelToWall(roverControlData) == PARALLEL && isSensorInRange(roverControlData) == 1){
 					/*if (totalExternalAngle >= 370.0){
 						vtLEDOn(0x80);
 					}
 					else */if(encoderReceived != 0){
-						vtLEDOn(0x20);
+						//vtLEDOn(0x20);
 						//vtLEDOn(0x20);
 						newCorner.distFromSide = (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
 						newCorner.angleCorner = 90;

@@ -54,16 +54,24 @@ void findAngles(RoverControlStruct *roverControlData){
 }
 
 int isRoverParallelToWall(RoverControlStruct *roverControlData){
+	//if(!isSensorInRange(roverControlData))
+	//	return TOO_FAR_SIDE;
+	/*if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD
+	|| roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD){
+		//vtLEDOff(0x04);
+		return TOO_CLOSE_SIDE;
+	}
+	else*/ 
 	if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]+PARALLEL_THRESHOLD)){
-		vtLEDOff(0x04);
+		//vtLEDOff(0x04);
 		return FIX_FRONT_RIGHT;
 	}
 	else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]+PARALLEL_THRESHOLD)){
-		vtLEDOff(0x04);
+		//vtLEDOff(0x04);
 		return FIX_FRONT_LEFT;
 	}
 	else{
-		vtLEDOn(0x04);
+		//vtLEDOn(0x04);
 		return PARALLEL;
 	}	
 }
@@ -72,11 +80,11 @@ int isFrontCloseToWall(RoverControlStruct *roverControlData){
 	float average = roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR];
 	average /= 2;
 	if(average < FRONT_STOP_DISTANCE){
-		vtLEDOn(0x08);
+		//vtLEDOn(0x08);
 		return 1;
 	}
 	else{
-		vtLEDOff(0x08);
+		//vtLEDOff(0x08);
 		return 0;
 	}
 }
