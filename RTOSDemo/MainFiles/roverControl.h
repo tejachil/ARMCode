@@ -12,9 +12,15 @@
 #define roverSTACK_SIZE		(baseStack*configMINIMAL_STACK_SIZE)
 #endif
 
+typedef struct __RoverDataStruct {
+	RoverMapStruct* map;
+	RoverControlStruct* control;
+	UARTstruct* uart;
+} RoverDataStruct;
+
 //static portTASK_FUNCTION_PROTO( roverControlTask, param );
 void roverControlTask( void *param );
 
-void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct);
+void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct, xTaskHandle taskHandle);
 
 #endif

@@ -4,10 +4,12 @@
 #include <math.h>
 
 #define roverControlQLen (10)
+#define REQUEST_TYPE_DISTANCE	0
+#define REQUEST_TYPE_ENCODER	1
 
 static RoverMapStruct *roverMap;
 
-void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct) {
+void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct, xTaskHandle taskHandle) {
 	roverControlData->uartDevice = uart;
 
 	roverMap = roverMapStruct;
@@ -17,9 +19,9 @@ void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBA
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 
-	/*if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, uxPriority, ( xTaskHandle * ) NULL ) != pdPASS) {
+	if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, uxPriority, ( xTaskHandle * ) taskHandle ) != pdPASS) {
 		VT_HANDLE_FATAL_ERROR(0);
-	}*/ // Teja moved this to the webserver
+	}
 }
 
 void roverControlTask( void *param ){
@@ -43,20 +45,20 @@ void roverControlTask( void *param ){
 	encoderRequestMsg.msgType = PUB_MSG_T_ENCODER_DATA;
 	encoderRequestMsg.msgID = 0; // The count will be updated before sending each request
 	encoderRequestMsg.txLen = 0; // No data is included in the request
+	
+	uint8_t requestType = REQUEST_TYPE_DISTANCE;
 	uint8_t encoderReceived = 0;
 	uint8_t isFirstCorner = 0;
 	MapCorner newCorner;
 	newCorner.distSide = 0;
-	double totalExternalAngle = 0;
+	//double totalExternalAngle = 0;
 
-	// Request sensor data
 	// Update the count and send the request
 	sensorRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
 	uartEnQ(roverControlData->uartDevice, sensorRequestMsg.msgType, sensorRequestMsg.msgID, sensorRequestMsg.txLen,
 		sensorRequestMsg.data);
 
-	for(;;)
-	{
+	for(;;){
 		// 1. Read sensor data response from the conductor (blocks until
 		// data is available).
 		if (xQueueReceive(roverControlData->inQ, (void *) &receivedMsg, portMAX_DELAY) != pdTRUE) {
@@ -66,10 +68,6 @@ void roverControlTask( void *param ){
 		
 		//printf(" :L: ");
 		// 2. Request new sensor data.
-		// Update the count and send the request
-		sensorRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
-		uartEnQ(roverControlData->uartDevice, sensorRequestMsg.msgType, sensorRequestMsg.msgID, sensorRequestMsg.txLen,
-			sensorRequestMsg.data);
 
 		// 3. Process message received in step 1, contained in receivedMsg.
 		// See public_messages.h for the structure of receivedMsg (it is type "public_message_t").
@@ -95,10 +93,7 @@ void roverControlTask( void *param ){
 				case TRAVERSAL:
 					if(isFrontCloseToWall(roverControlData) == 1){
 						stopRover(roverControlData);
-
-						encoderRequestMsg.msgID = public_message_get_count(PUB_MSG_T_ENCODER_DATA);
-						uartEnQ(roverControlData->uartDevice, encoderRequestMsg.msgType, encoderRequestMsg.msgID, encoderRequestMsg.txLen,
-							encoderRequestMsg.data);
+						requestType == REQUEST_TYPE_ENCODER;
 					}
 					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
 						//fix to Left
@@ -112,10 +107,7 @@ void roverControlTask( void *param ){
 				case FIX:
 					if(isFrontCloseToWall(roverControlData) == 1){
 						stopRover(roverControlData);
-
-						encoderRequestMsg.msgID = public_message_get_count(PUB_MSG_T_ENCODER_DATA);
-						uartEnQ(roverControlData->uartDevice, encoderRequestMsg.msgType, encoderRequestMsg.msgID, encoderRequestMsg.txLen,
-							encoderRequestMsg.data);
+						requestType == REQUEST_TYPE_ENCODER;
 					}
 					else if(isRoverParallelToWall(roverControlData) == PARALLEL){
 						moveRover(roverControlData);
@@ -127,19 +119,21 @@ void roverControlTask( void *param ){
 					}
 					break;
 				case STOP:
+					vtLEDOn(0x40);
 					//if(isRoverParallelToWall(roverControlData) == PARALLEL && isSensorInRange(roverControlData) == 1){
-					if (totalExternalAngle >= 370.0){
+					/*if (totalExternalAngle >= 370.0){
 						vtLEDOn(0x80);
 					}
-					else if(encoderReceived != 0){
+					else */if(encoderReceived != 0){
+						vtLEDOn(0x20);
 						//vtLEDOn(0x20);
 						newCorner.distFromSide = (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
 						newCorner.angleCorner = 90;
-						totalExternalAngle += newCorner.angleCorner;
+						//totalExternalAngle += newCorner.angleCorner;
 						//newCorner.distSide += ROVER_LENGTH;// + (roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR])/2;
 
 						if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);
-						
+						//vtLEDOn(0x40);
 						turnRover(roverControlData);
 						encoderReceived = 0;
 					}
@@ -147,15 +141,31 @@ void roverControlTask( void *param ){
 			}
 		}
 		else if (receivedMsg.message_type == PUB_MSG_T_ENCODER_DATA){
+			vtLEDOn(0x80);
 			encoderReceived = 1;
 			newCorner.distSide = (receivedMsg.data[0] + (receivedMsg.data[1] << 8))/TICKS_PER_REVOLUTION;
 			newCorner.distSide += receivedMsg.data[2];
 			newCorner.distSide = newCorner.distSide * WHEEL_CIRCUMFERENCE;
 			newCorner.distSide = newCorner.distSide + ROVER_LENGTH + FRONT_STOP_DISTANCE*1.0;
+			requestType == REQUEST_TYPE_DISTANCE;
 			//getEncoderDistance(receivedMsg.data[2], );
 		}
+		else{ // unhandled message type
+			VT_HANDLE_FATAL_ERROR(0);
+		}
+
+		if(requestType == REQUEST_TYPE_DISTANCE){
+			// Request sensor distance data
+			// Update the count and send the request
+			sensorRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
+			uartEnQ(roverControlData->uartDevice, sensorRequestMsg.msgType, sensorRequestMsg.msgID, sensorRequestMsg.txLen,
+				sensorRequestMsg.data);
+			}
 		else{
-			;
+			encoderRequestMsg.msgID = public_message_get_count(PUB_MSG_T_ENCODER_DATA);
+			uartEnQ(roverControlData->uartDevice, encoderRequestMsg.msgType, encoderRequestMsg.msgID, encoderRequestMsg.txLen,
+				encoderRequestMsg.data);
+			//requestType == REQUEST_TYPE_DISTANCE;
 		}
 	}
 }

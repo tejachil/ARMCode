@@ -3,14 +3,14 @@
 
 static MapCorner mapCorners[MAXIMUM_CORNERS];
 static uint8_t cornersCount;
-vtLCDStruct *lcdStruct;
+//vtLCDStruct *lcdStruct;
 
 void mapRoverTask( void *param );
 //static portTASK_FUNCTION_PROTO( mapRoverTask, pvParameters );
 
-void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, vtLCDStruct *lcd){
+void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle taskHandle){
 	cornersCount = 0;
-	lcdStruct = lcd;
+	//lcdStruct = lcd;
 	
 	if ((roverMapStruct->inQ = xQueueCreate(ROVERMAP_QLEN,sizeof(MapCorner))) == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
@@ -20,17 +20,17 @@ void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE ux
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 
-	char lcdBuffer[10];
+/*	char lcdBuffer[10];
 	
 	sprintf(lcdBuffer,"Hello!");
 	if (lcdStruct != NULL) {
 		
-		if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
+	if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
-	}
+	}*/
 
-	if (xTaskCreate(mapRoverTask, ( signed char * ) "Rover Map", mapSTACK_SIZE, (void *) roverMapStruct, uxPriority, ( xTaskHandle * ) NULL ) != pdPASS) {
+	if (xTaskCreate(mapRoverTask, ( signed char * ) "Rover Map", mapSTACK_SIZE, (void *) roverMapStruct, uxPriority, ( xTaskHandle * ) taskHandle ) != pdPASS) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 }
@@ -60,7 +60,7 @@ void mapRoverTask( void *param ){
 
 		totalAngle += receivedCorner.angleCorner;
 		
-		if(totalAngle >= 370.0){
+		/*if(totalAngle >= 370.0){
 			area = (mapCorners[1].distSide + mapCorners[0].distFromSide) * (mapCorners[2].distSide + mapCorners[1].distFromSide);
 
 			number = area;
@@ -71,8 +71,8 @@ void mapRoverTask( void *param ){
 				VT_HANDLE_FATAL_ERROR(0);
 			}
 		}
-		else{
-			number = receivedCorner.distSide;
+		else{*/
+			/*number = receivedCorner.distSide;
 			intPart = (int)number;
 			decimalPart = (number - (int)number)*1000;
 			sprintf(lcdBuffer, "%d.%d, ", intPart,decimalPart);
@@ -86,8 +86,8 @@ void mapRoverTask( void *param ){
 			sprintf(lcdBuffer, "%d.%d", intPart,decimalPart);
 			if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
 				VT_HANDLE_FATAL_ERROR(0);
-			}
+			}*/
 
-		}
+		//}
 	}
 }

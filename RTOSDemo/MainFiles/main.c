@@ -207,6 +207,7 @@ static vtConductorStruct conductorData;
 // data structure for the rover control task
 static RoverControlStruct roverControlData;
 static RoverMapStruct roverMapStruct;
+static RoverDataStruct roverInfo;
 #endif //if USE_ROVER_CONTROL == 1
 
 /*-----------------------------------------------------------*/
@@ -240,7 +241,10 @@ int main( void ){
 	#if USE_WEB_SERVER == 1
 	// Not a standard demo -- but also not one of mine (MTJ)
 	/* Create the uIP task.  The WEB server runs in this task. */
-    xTaskCreate( vuIP_Task, ( signed char * ) "uIP", mainBASIC_WEB_STACK_SIZE, ( void * ) &roverControlData, mainUIP_TASK_PRIORITY, NULL ); // Teja changed from null to roverControlData
+	roverInfo.map = &roverMapStruct;
+	roverInfo.control = &roverControlData;
+	roverInfo.uart = &wiflyUART;
+    xTaskCreate( vuIP_Task, ( signed char * ) "uIP", mainBASIC_WEB_STACK_SIZE, ( void * ) &roverInfo, mainUIP_TASK_PRIORITY, NULL ); // Teja changed from null to roverControlData
 	#endif
 
 	#if USE_MTJ_LCD == 1
@@ -260,8 +264,8 @@ int main( void ){
 
 	// Start the rover control task
 	#if USE_ROVER_CONTROL == 1
-	startRoverMapping(&roverMapStruct, mainROVER_CONTROL_TASK_PRIORITY, &vtLCDdata);
-	startRoverControlTask(&roverControlData, mainROVER_CONTROL_TASK_PRIORITY, &wiflyUART, &roverMapStruct);
+	//startRoverMapping(&roverMapStruct, mainROVER_CONTROL_TASK_PRIORITY, &vtLCDdata);
+	//startRoverControlTask(&roverControlData, mainROVER_CONTROL_TASK_PRIORITY, &wiflyUART, &roverMapStruct);
 	#endif //if USE_ROVER_CONTROL == 1
 	
 	#if USE_UART == 1

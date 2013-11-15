@@ -71,6 +71,7 @@
 #include "EthDev.h"
 #include "ParTest.h"
 #include "roverControl.h"
+#include "vtUtilities.h"
 
 /*-----------------------------------------------------------*/
 
@@ -91,7 +92,8 @@
 static void prvSetMACAddress( void );
 
 //Teja added this:
-RoverControlStruct *roverControlData;
+//RoverControlStruct *roverControlData;
+static RoverDataStruct* roverInfo;
 
 /*
  * Port functions required by the uIP stack.
@@ -126,7 +128,7 @@ struct timer periodic_timer, arp_timer;
 extern void ( vEMAC_ISR_Wrapper )( void );
 
 	//( void ) pvParameters;
-	roverControlData = (RoverControlStruct *) pvParameters; // Teja added this
+	roverInfo = (RoverDataStruct *) pvParameters; // Teja added this
 
 	/* Initialise the uIP stack. */
 	timer_set( &periodic_timer, configTICK_RATE_HZ / 2 );
@@ -262,18 +264,18 @@ extern void vParTestSetLEDState( long lState );
     {
     	//c = strstr( pcInputString, "index.html?" ); 
 		/* Turn the FIO1 LED's on or off in accordance with the check box status. */
-		static xTaskHandle roverTaskHandle;
+		static xTaskHandle roverTaskHandle, mapTaskHandle;
 		if (strstr( c, "act=Start" ) != NULL )
 		{
-			if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, tskIDLE_PRIORITY, ( xTaskHandle * ) &roverTaskHandle ) != pdPASS) {
-				VT_HANDLE_FATAL_ERROR(0);
-			}
+			startRoverMapping(roverInfo->map, tskIDLE_PRIORITY, mapTaskHandle);
+			startRoverControlTask(roverInfo->control, tskIDLE_PRIORITY, roverInfo->uart, roverInfo->map, roverTaskHandle);
 			//vParTestSetLEDState( pdTRUE ); // Add the task for when the Start button is pressed
 		}
 		else if (strstr( c, "act=Stop" ) != NULL )
 		{
-			stopRover(roverControlData);
+			stopRover(roverInfo->control);
 			vTaskDelete(roverTaskHandle);
+			vTaskDelete(mapTaskHandle);
 			//vParTestSetLEDState( pdFALSE ); // Add the task for when the Stop button is pressed
 		}
     }	
