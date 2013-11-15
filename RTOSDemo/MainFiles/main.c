@@ -326,9 +326,13 @@ int main( void ){
 void GyroTimerCallback(xTimerHandle pxTimer)
 {
 	vtLEDToggle(0x02);
-	static char lcdBuffer[15];
-	
-	sprintf(lcdBuffer,"%d %d",value[0], value[1]);
+	static char lcdBuffer[30];
+	static uint16_t	finalValue = 0;
+	finalValue = value[0];
+	finalValue = finalValue << 8;
+	finalValue = finalValue | (uint16_t) value[1];
+	//finalValue = (value[0] << 8) || value[1];
+	sprintf(lcdBuffer,"%u    %d %d", finalValue, value[0], value[1]);
 				if (&vtLCDdata != NULL) {
 					if (SendLCDPrintMsg(&vtLCDdata,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
 						VT_HANDLE_FATAL_ERROR(0);
