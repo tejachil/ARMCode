@@ -93,7 +93,7 @@ void roverControlTask( void *param ){
 				case TRAVERSAL:
 					if(isFrontCloseToWall(roverControlData) == 1){
 						stopRover(roverControlData);
-						requestType == REQUEST_TYPE_ENCODER;
+						requestType = REQUEST_TYPE_ENCODER;
 					}
 					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
 						//fix to Left
@@ -107,7 +107,7 @@ void roverControlTask( void *param ){
 				case FIX:
 					if(isFrontCloseToWall(roverControlData) == 1){
 						stopRover(roverControlData);
-						requestType == REQUEST_TYPE_ENCODER;
+						requestType = REQUEST_TYPE_ENCODER;
 					}
 					else if(isRoverParallelToWall(roverControlData) == PARALLEL){
 						moveRover(roverControlData);
@@ -141,13 +141,12 @@ void roverControlTask( void *param ){
 			}
 		}
 		else if (receivedMsg.message_type == PUB_MSG_T_ENCODER_DATA){
-			vtLEDOn(0x80);
 			encoderReceived = 1;
 			newCorner.distSide = (receivedMsg.data[0] + (receivedMsg.data[1] << 8))/TICKS_PER_REVOLUTION;
 			newCorner.distSide += receivedMsg.data[2];
 			newCorner.distSide = newCorner.distSide * WHEEL_CIRCUMFERENCE;
 			newCorner.distSide = newCorner.distSide + ROVER_LENGTH + FRONT_STOP_DISTANCE*1.0;
-			requestType == REQUEST_TYPE_DISTANCE;
+			requestType = REQUEST_TYPE_DISTANCE;
 			//getEncoderDistance(receivedMsg.data[2], );
 		}
 		else{ // unhandled message type
