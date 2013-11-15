@@ -12,6 +12,11 @@
  */
 #define SENSOR_PIC_ADDR (0x2A)
 
+/**
+ * I2C2 address for the gyro. This address is used for initializing the gyro.
+ */
+#define GYRO_SLAVE_ADDRESS (0b1101000)
+
 /** Public message type values. */
 typedef enum {
     /** Distance reading for a given sensor. */
@@ -36,6 +41,8 @@ typedef enum {
     PUB_MSG_T_CORNER_WEB,
     /** Encoder data for distance. */
     PUB_MSG_T_ENCODER_DATA,
+    /** Gyro data for angle. */
+    PUB_MSG_T_GYRO_DATA,
 
     // ADD ANY NEW MESSAGE TYPES ABOVE THIS LINE
     // So that NUM_PUB_MSG_T will be correct.
@@ -52,6 +59,7 @@ typedef enum {
     MOV_CMD_STOP = 0xAA
 } MOV_CMD_VALUE;
 
+/** Data byte values for FIX_CMD. */
 typedef enum {
     /** Command to fix to the left*/
     FIX_CMD_LEFT = 0x5A,
@@ -64,6 +72,7 @@ typedef enum {
  * type as defined in public_message_type_t.  For example, the data size for a
  * message of type PUB_MSG_T_SENS_DIST should be determined by:
  * public_message_data_size[PUB_MSG_T_SENS_DIST].
+ * The values are defined in public_messages.c.
  */
 extern const unsigned char public_message_data_size[NUM_PUB_MSG_T];
 
