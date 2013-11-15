@@ -83,6 +83,7 @@ static portTASK_FUNCTION( vConductorUpdateTask, pvParameters )
 			// Distance reading for a given sensor.
 			case PUB_MSG_T_SENS_DIST:
 			case PUB_MSG_T_ENCODER_DATA:
+			case PUB_MSG_T_GYRO_DATA:
 			{
 				// Send the message to the Rover Control task
 				xQueueSendToBack(param->roverControlTaskData->inQ, &message, portMAX_DELAY);

@@ -99,7 +99,7 @@ You should read the note above.
 
 #define USE_UART (1)
 
-#define USE_WEB_SERVER 1
+#define USE_WEB_SERVER 0
 
 #define USE_ROVER_CONTROL (1)
 
@@ -204,11 +204,19 @@ static vtConductorStruct conductorData;
 #endif
 
 #if USE_ROVER_CONTROL == 1
+
+//static public_message_t receivedMsg;
+	static char lcdBuffer[15];
+static uint8_t value[2];
+
 // data structure for the rover control task
 static RoverControlStruct roverControlData;
 static RoverMapStruct roverMapStruct;
 static RoverDataStruct roverInfo;
 #endif //if USE_ROVER_CONTROL == 1
+
+void GyroTimerCallback(xTimerHandle pxTimer);
+void gyroTask( void *pvParameters );
 
 /*-----------------------------------------------------------*/
 
@@ -250,6 +258,7 @@ int main( void ){
 	#if USE_MTJ_LCD == 1
 	// MTJ: My LCD demonstration task
 	StartLCDTask(&vtLCDdata,mainLCD_TASK_PRIORITY);
+	vtLEDOn(0x80);
 	// LCD Task creates a queue to receive messages -- what it does with those messages will depend on how the task is configured (see LCDtask.c)
 	// Here we set up a timer that will send messages to the LCD task.  You don't have to have this timer for the LCD task, it is just showing
 	//  how to use a timer and how to send messages from that timer.
@@ -261,11 +270,12 @@ int main( void ){
 	initUSB();  // MTJ: This is my routine used to make sure we can do printf() with USB
     xTaskCreate( vUSBTask, ( signed char * ) "USB", configMINIMAL_STACK_SIZE, ( void * ) NULL, mainUSB_TASK_PRIORITY, NULL );
 	#endif
-
+    value[0] = 0;
+    value[1] = 0;
 	// Start the rover control task
 	#if USE_ROVER_CONTROL == 1
-	//startRoverMapping(&roverMapStruct, mainROVER_CONTROL_TASK_PRIORITY, &vtLCDdata);
-	//startRoverControlTask(&roverControlData, mainROVER_CONTROL_TASK_PRIORITY, &wiflyUART, &roverMapStruct);
+	startRoverMapping(&roverMapStruct, mainROVER_CONTROL_TASK_PRIORITY, NULL);
+	startRoverControlTask(&roverControlData, mainROVER_CONTROL_TASK_PRIORITY, &wiflyUART, &roverMapStruct, NULL);
 	#endif //if USE_ROVER_CONTROL == 1
 	
 	#if USE_UART == 1
@@ -285,6 +295,19 @@ int main( void ){
 	conductorData.roverControlTaskData = &roverControlData;
 	#endif
 	vStartConductorTask(&conductorData, mainCONDUCTOR_TASK_PRIORITY);
+	vtLEDOn(0x40);
+	xTimerHandle gyroTyimerHandle = xTimerCreate((const signed char *)"Gyro Timer", ( ( portTickType ) 100 / portTICK_RATE_MS), pdTRUE,(void *) NULL,GyroTimerCallback);
+	if (gyroTyimerHandle == NULL) {
+		VT_HANDLE_FATAL_ERROR(0);
+	} else {
+		if (xTimerStart(gyroTyimerHandle,0) != pdPASS) {
+			VT_HANDLE_FATAL_ERROR(0);
+		}
+	}
+	vtLEDOn(0x20);
+
+    xTaskCreate( gyroTask, ( signed char * ) "Gyro Task", roverSTACK_SIZE, ( void * ) NULL, mainUIP_TASK_PRIORITY, NULL ); // Teja changed from null to roverControlData
+    vtLEDOn(0x10);
 	#endif //if USE_UART == 1
 	
 	
@@ -298,6 +321,70 @@ int main( void ){
 	for( ;; );
 }
 /*-----------------------------------------------------------*/
+
+
+void GyroTimerCallback(xTimerHandle pxTimer)
+{
+	vtLEDToggle(0x02);
+	static char lcdBuffer[15];
+	
+	sprintf(lcdBuffer,"%d %d",value[0], value[1]);
+				if (&vtLCDdata != NULL) {
+					if (SendLCDPrintMsg(&vtLCDdata,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
+						VT_HANDLE_FATAL_ERROR(0);
+			}
+	}
+	/*uartEnQ(&wiflyUART, gyroRequestMsg.msgType, gyroRequestMsg.msgID, gyroRequestMsg.txLen,
+		gyroRequestMsg.data);
+	vtLEDOn(0x04);*/
+	/*if (xQueueReceive(roverControlData.inQ, (void *) &receivedMsg, portMAX_DELAY) != pdTRUE) {
+			VT_HANDLE_FATAL_ERROR(0);
+		}
+		vtLEDToggle(0x01);
+		if (receivedMsg.message_type == PUB_MSG_T_GYRO_DATA){
+			value = (receivedMsg.data[0] << 8)||(receivedMsg.data[1]);
+			sprintf(lcdBuffer,"%d",value);
+				if (&vtLCDdata != NULL) {
+					if (SendLCDPrintMsg(&vtLCDdata,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
+						VT_HANDLE_FATAL_ERROR(0);
+				}
+			}
+	}*/
+}
+
+void gyroTask( void *pvParameters ){
+	UARTmsg gyroRequestMsg;
+	gyroRequestMsg.msgType = PUB_MSG_T_GYRO_DATA;
+	gyroRequestMsg.msgID = 0; // The count will be updated before sending each request
+	gyroRequestMsg.txLen = 0; // No data is included in the request
+	public_message_t receivedMsg;
+	uartEnQ(&wiflyUART, gyroRequestMsg.msgType, gyroRequestMsg.msgID, gyroRequestMsg.txLen,
+		gyroRequestMsg.data);
+	
+	for(;;){
+		if (xQueueReceive(roverControlData.inQ, (void *) &receivedMsg, portMAX_DELAY) != pdTRUE) {
+			VT_HANDLE_FATAL_ERROR(0);
+		}
+
+		if (receivedMsg.message_type == PUB_MSG_T_GYRO_DATA){
+			vtLEDToggle(0x04);
+			value[0] = receivedMsg.data[0];
+			value[1] = receivedMsg.data[1];
+			//value = (receivedMsg.data[0] << 8)||(receivedMsg.data[1]);
+		}
+		/*	sprintf(lcdBuffer,"%d",value);
+				if (&vtLCDdata != NULL) {
+					if (SendLCDPrintMsg(&vtLCDdata,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
+						VT_HANDLE_FATAL_ERROR(0);
+				}
+			}*/
+		//}
+		gyroRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
+		uartEnQ(&wiflyUART, gyroRequestMsg.msgType, gyroRequestMsg.msgID, gyroRequestMsg.txLen,
+		gyroRequestMsg.data);
+
+	}
+}
 
 void vApplicationTickHook( void )
 {

@@ -19,9 +19,9 @@ void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBA
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 
-	if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, uxPriority, ( xTaskHandle * ) taskHandle ) != pdPASS) {
+	/*if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, uxPriority, ( xTaskHandle * ) taskHandle ) != pdPASS) {
 		VT_HANDLE_FATAL_ERROR(0);
-	}
+	}*/
 }
 
 void roverControlTask( void *param ){
