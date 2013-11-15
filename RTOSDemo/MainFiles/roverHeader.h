@@ -6,9 +6,10 @@
 
 //constant values
 #define DISTANCE_BETWEEN_IR 		6.5
-#define PARALLEL_THRESHOLD 			0.6
+#define PARALLEL_THRESHOLD 			1
 #define SIDE_SENSOR_RANGE 			15
-#define FRONT_STOP_DISTANCE			6
+#define FRONT_STOP_DISTANCE			10
+#define SIDE_CLOSE_DISTANCE			3
 
 //number of things
 #define NUMBER_OF_SAMPLES 			5
@@ -33,6 +34,10 @@
 #define PARALLEL 					0
 #define FIX_FRONT_LEFT  			1
 #define FIX_FRONT_RIGHT 			2
+
+//too close side states
+#define SIDE_FRONT_CLOSE			1
+#define SIDE_REAR_CLOSE				2
 
 typedef struct __RoverControlStruct {
 	UARTstruct *uartDevice;
