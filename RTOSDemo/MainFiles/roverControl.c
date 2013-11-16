@@ -7,6 +7,7 @@
 #define REQUEST_TYPE_DISTANCE	0
 #define REQUEST_TYPE_ENCODER	1
 
+float difference;
 static RoverMapStruct *roverMap;
 
 void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct, xTaskHandle taskHandle) {
@@ -23,7 +24,6 @@ void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBA
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 }
-
 void roverControlTask( void *param ){
 	// Get the parameters
 	RoverControlStruct *roverControlData = (RoverControlStruct *) param;
@@ -79,11 +79,11 @@ void roverControlTask( void *param ){
 			averageValues(roverControlData);
 			convertToDistance(roverControlData);
 			findAngles(roverControlData);
-			printFloat("SiRear:", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR], 0);
+			/*printFloat("SiRear:", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR], 0);
 			printFloat("SiFront:", roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR], 0);
 			printFloat("FroLeft:", roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
 			printFloat("FroRight:", roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR], 0);
-			printFloat("Angle:", roverControlData->shortSensorAngle, 1);
+			printFloat("Angle:", roverControlData->shortSensorAngle, 1);*/
 
 			switch(roverControlData->state){
 				case INIT:
@@ -105,34 +105,59 @@ void roverControlTask( void *param ){
 						roverControlData->state = TOO_CLOSE;	
 					}*/
 					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
-						if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]+PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
+						difference = roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR];
+						if(difference > (PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
 							fixRover(roverControlData, FIX_CMD_LEFT_FAST);
-						}else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]+PARALLEL_THRESHOLD + SPEED_RANGE)){
+						}else if(difference > (PARALLEL_THRESHOLD + SPEED_RANGE)){
 							fixRover(roverControlData, FIX_CMD_LEFT);
-						}else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]+PARALLEL_THRESHOLD)){
+						}else if(difference > PARALLEL_THRESHOLD){
 							fixRover(roverControlData, FIX_CMD_LEFT_SLOW);	
 						}
 					}
 					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_RIGHT){
-						if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]+PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
+						difference = roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR];
+						if(difference > (PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
 							fixRover(roverControlData, FIX_CMD_RIGHT_FAST);
-						}else if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]+PARALLEL_THRESHOLD + SPEED_RANGE)){
+						}else if(difference > (PARALLEL_THRESHOLD + SPEED_RANGE)){
 							fixRover(roverControlData, FIX_CMD_RIGHT);
-						}else if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] > (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]+PARALLEL_THRESHOLD)){
+						}else if(difference > PARALLEL_THRESHOLD){
 							fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
-					}	}
+						}	
+					}
 					break;
 				case FIX:
 					vtLEDOff(0x01);	
 					vtLEDOn(0x02);
 					vtLEDOff(0x04);
 					vtLEDOff(0x08);
+					
 					if(isFrontCloseToWall(roverControlData) == 1){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
 					else if(isRoverParallelToWall(roverControlData) == PARALLEL){
+						vtLEDOn(0x08);
 						moveRover(roverControlData);
+					}
+					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
+						difference = roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR];
+						if(difference > (PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
+							fixRover(roverControlData, FIX_CMD_LEFT_FAST);
+						}else if(difference > (PARALLEL_THRESHOLD + SPEED_RANGE)){
+							fixRover(roverControlData, FIX_CMD_LEFT);
+						}else if(difference > PARALLEL_THRESHOLD){
+							fixRover(roverControlData, FIX_CMD_LEFT_SLOW);	
+						}
+					}
+					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_RIGHT){
+						difference = roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR];
+						if(difference > (PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
+							fixRover(roverControlData, FIX_CMD_RIGHT_FAST);
+						}else if(difference > (PARALLEL_THRESHOLD + SPEED_RANGE)){
+							fixRover(roverControlData, FIX_CMD_RIGHT);
+						}else if(difference > PARALLEL_THRESHOLD){
+							fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
+						}	
 					}
 					break;
 				/*case TOO_CLOSE:
@@ -158,9 +183,10 @@ void roverControlTask( void *param ){
 				case TURN:	
 					vtLEDOff(0x01);	
 					vtLEDOff(0x02);
-					vtLEDOff(0x04);
-					vtLEDOn(0x08);
+					vtLEDOn(0x04);
+					vtLEDOff(0x08);
 					if(isFrontCloseToWall(roverControlData) == 0 && isRoverParallelToWall(roverControlData) == PARALLEL){
+						vtLEDOn(0x08);
 						moveRover(roverControlData);
 					}
 					break;
