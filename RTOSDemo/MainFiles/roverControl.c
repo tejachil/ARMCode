@@ -101,9 +101,9 @@ void roverControlTask( void *param ){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
-					/*else if(isRoverParallelToWall(roverControlData) == TOO_CLOSE_SIDE){
+					else if(isRoverParallelToWall(roverControlData) == TOO_CLOSE_SIDE){
 						roverControlData->state = TOO_CLOSE;	
-					}*/
+					}
 					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
 						difference = roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR];
 						if(difference > (PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
@@ -160,7 +160,7 @@ void roverControlTask( void *param ){
 						}	
 					}
 					break;
-				/*case TOO_CLOSE:
+				case TOO_CLOSE:
 					vtLEDOff(0x01);	
 					vtLEDOff(0x02);
 					vtLEDOn(0x04);
@@ -169,22 +169,38 @@ void roverControlTask( void *param ){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
+					// front side is too close
 					else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD){
-						fixRover(roverControlData, FIX_FRONT_RIGHT);
+						fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
 						roverControlData->state = TOO_CLOSE;
 					}
-					else if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD + 1){
-						moveRover(roverControlData);
-						roverControlData->state = TOO_CLOSE;
-					}else{
-						fixRover(roverControlData, FIX_FRONT_LEFT);
+					if((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]) > 1){
+							moveRover(roverControlData);
+							roverControlData->state = TOO_CLOSE_FRONT;
 					}
-					break;*/
-				case TURN:	
+					break;
+				case TOO_CLOSE_FRONT:
 					vtLEDOff(0x01);	
 					vtLEDOff(0x02);
 					vtLEDOn(0x04);
 					vtLEDOff(0x08);
+					if(isFrontCloseToWall(roverControlData) == 1){
+						stopRover(roverControlData);
+						requestType = REQUEST_TYPE_ENCODER;
+					}
+					else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD
+					 || roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD){
+						moveRover(roverControlData);
+						roverControlData->state = TOO_CLOSE_FRONT;
+					}else{
+						fixRover(roverControlData, FIX_CMD_LEFT_SLOW);
+					}
+				break;
+				case TURN:	
+					vtLEDOff(0x01);	
+					vtLEDOff(0x02);
+					vtLEDOff(0x04);
+					vtLEDOn(0x08);
 					if(isFrontCloseToWall(roverControlData) == 0 && isRoverParallelToWall(roverControlData) == PARALLEL){
 						vtLEDOn(0x08);
 						moveRover(roverControlData);

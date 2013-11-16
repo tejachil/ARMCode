@@ -55,16 +55,15 @@ void findAngles(RoverControlStruct *roverControlData){
 
 int isRoverParallelToWall(RoverControlStruct *roverControlData){
 	float difference;
+	difference = roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR];
 	//if(!isSensorInRange(roverControlData))
 	//	return TOO_FAR_SIDE;
-	/*if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD
+	if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD
 	|| roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD){
 		//vtLEDOff(0x04);
 		return TOO_CLOSE_SIDE;
 	}
-	else*/ 
-	difference = roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR];
-	if(difference > PARALLEL_THRESHOLD){
+	else if(difference > PARALLEL_THRESHOLD){
 		//vtLEDOff(0x04);
 		return FIX_FRONT_LEFT;
 	}

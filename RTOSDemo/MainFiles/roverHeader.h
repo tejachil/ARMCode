@@ -9,8 +9,8 @@
 #define PARALLEL_THRESHOLD 			0.8
 #define SIDE_SENSOR_RANGE 			15
 #define FRONT_STOP_DISTANCE			11
-#define TOO_CLOSE_THRESHOLD			4
-#define SPEED_RANGE					1.5
+#define TOO_CLOSE_THRESHOLD			5
+#define SPEED_RANGE					3
 
 //number of things
 #define NUMBER_OF_SAMPLES 			5
@@ -29,8 +29,9 @@
 #define TRAVERSAL 					1
 #define FIX 						2
 #define TOO_CLOSE					3
-#define TURN						4
-#define STOP	  					5
+#define TOO_CLOSE_FRONT				4
+#define TURN						5
+#define STOP	  					6
 
 //parallel states
 #define PARALLEL 					0
