@@ -29,7 +29,7 @@ void averageValues(RoverControlStruct *roverControlData){
 
 void convertToDistance(RoverControlStruct *roverControlData){
 	roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR],-1.337);
-    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.337) - 0.5; // 0.5 to adjust for calibration error
+    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.337);
     roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-1.099);
     roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.099);
     
@@ -54,8 +54,8 @@ void findAngles(RoverControlStruct *roverControlData){
 }
 
 int isRoverParallelToWall(RoverControlStruct *roverControlData){
-	float difference;
-	difference = roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR];
+	//float difference;
+	//difference = roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR];
 	//if(!isSensorInRange(roverControlData))
 	//	return TOO_FAR_SIDE;
 	if(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD
@@ -63,11 +63,11 @@ int isRoverParallelToWall(RoverControlStruct *roverControlData){
 		//vtLEDOff(0x04);
 		return TOO_CLOSE_SIDE;
 	}
-	else if(difference > PARALLEL_THRESHOLD){
+	else if((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]) > PARALLEL_THRESHOLD){
 		//vtLEDOff(0x04);
 		return FIX_FRONT_LEFT;
 	}
-	else if(difference < -PARALLEL_THRESHOLD){
+	else if((roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]) > PARALLEL_THRESHOLD){
 		//vtLEDOff(0x04);
 		return FIX_FRONT_RIGHT;
 	}
