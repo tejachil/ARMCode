@@ -1,16 +1,15 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
-    <title>Running Tasks</title>
+    <title>Debug</title>
   </head>
-  <BODY onLoad="window.setTimeout(&quot;location.href='index.shtml'&quot;,1000)">
-<font face="courier"><pre>Task          State  Priority  Stack	#<br>************************************************<br>
+<body onLoad="window.setTimeout(&quot;location.href='index.shtml'&quot;,500)">
+<font face="courier">
 %! rtos-stats
-<pre>Task            Abs Time      % Time<br>****************************************<br>
+<p align="center"><textarea rows="15" cols="40">
 %! run-time
-</pre>
-</pre></font>
+</textarea>
+</p>
 </font>
 </body>
 </html>
-

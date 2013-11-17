@@ -64,6 +64,33 @@ HTTPD_CGI_CALL(io, "led-io", led_io ); //will be used to for map function
 
 static const struct httpd_cgi_call *calls[] = { &file, &tcp, &net, &rtos, &run, &io, NULL };
 
+static const char* debugTextAreaPointer = "hello world!";
+static char debugTextTable[400] = "table";
+
+void setDebugTextAreaPointer(char* string){
+  debugTextAreaPointer = string;
+}
+
+void updateDebugTable(uint8_t row, uint8_t col, float* data){
+  char buff[20];
+  uint8_t count = 0;
+  sprintf(debugTextTable, "<table align=\"center\"  border=\"1\">");
+  uint8_t r = 0, c = 0;
+  for(r = 0; r < row; ++r){
+    strcat(debugTextTable, "<tr>");
+    for(c = 0; c < col; ++c){
+      int intPart = (int)data[count];
+      int decimalPart = (data[count] - (int)data[count])*1000;
+      sprintf(buff, "<td>%d.%d</td>", intPart, decimalPart);
+      strcat(debugTextTable, buff);
+      ++count;
+    }
+    strcat(debugTextTable, "</tr>");
+  }
+  sprintf(debugTextTable, "%s</table>", debugTextTable);
+}
+
+
 /*---------------------------------------------------------------------------*/
 static
 PT_THREAD(nullfunction(struct httpd_state *s, char *ptr))
@@ -216,9 +243,10 @@ generate_rtos_stats(void *arg)
 {
 	( void ) arg;
 	//lRefreshCount++;
-	sprintf( cCountBuf, "<p><br>Refresh count = %d<p><br>%s", (int)lRefreshCount, pcGetTaskStatusMessage() );
-    vTaskList( uip_appdata );
-	strcat( uip_appdata, cCountBuf );
+	sprintf( uip_appdata, "%s", debugTextTable);
+    //vTaskList( uip_appdata );
+    //uip_appdata = cCountBuf;
+//	strcat( uip_appdata, cCountBuf );
 
 	return strlen( uip_appdata );
 }
@@ -270,10 +298,12 @@ static unsigned short
 generate_runtime_stats(void *arg)
 {
 	( void ) arg;
-	lRefreshCount++;
-	sprintf( cCountBuf, "<p><br>Refresh count = %d", (int)lRefreshCount );
-    vTaskGetRunTimeStats( uip_appdata );
-	strcat( uip_appdata, cCountBuf );
+	//lRefreshCount++;
+  sprintf( uip_appdata, "%s",  debugTextAreaPointer);
+	//sprintf( cCountBuf, "<p><br>Refresh count = %d", (int)lRefreshCount );
+    //vTaskGetRunTimeStats( uip_appdata );
+    //uip_appdata = cCountBuf;
+	//strcat( uip_appdata, cCountBuf );
 
 	return strlen( uip_appdata );
 }

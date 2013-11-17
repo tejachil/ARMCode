@@ -62,6 +62,9 @@ struct httpd_cgi_call {
   const httpd_cgifunction function;
 };
 
+void setDebugTextAreaPointer(char* string);
+void updateDebugTable(uint8_t row, uint8_t col, float* data);
+
 /**
  * \brief      HTTPD CGI function declaration
  * \param name The C variable name of the function

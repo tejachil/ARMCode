@@ -261,7 +261,7 @@ int main( void ){
 	initUSB();  // MTJ: This is my routine used to make sure we can do printf() with USB
     xTaskCreate( vUSBTask, ( signed char * ) "USB", configMINIMAL_STACK_SIZE, ( void * ) NULL, mainUSB_TASK_PRIORITY, NULL );
 	#endif
-
+    
 	// Start the rover control task
 	#if USE_ROVER_CONTROL == 1
 	//startRoverMapping(&roverMapStruct, mainROVER_CONTROL_TASK_PRIORITY, &vtLCDdata);
