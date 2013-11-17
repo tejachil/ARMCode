@@ -15,7 +15,7 @@ void stopRover(RoverControlStruct *roverControlData){
 void turnRover(RoverControlStruct *roverControlData){
 	roverControlData->state = TURN;
 	//TODO: change this to turn later
-	sendToRover(roverControlData, PUB_MSG_T_FIX_CMD, FIX_CMD_RIGHT);
+	sendToRover(roverControlData, PUB_MSG_T_FIX_CMD, FIX_CMD_RIGHT_SLOW);
 }
 
 void fixRover(RoverControlStruct *roverControlData, int fixDir){
