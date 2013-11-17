@@ -29,7 +29,7 @@ void averageValues(RoverControlStruct *roverControlData){
 
 void convertToDistance(RoverControlStruct *roverControlData){
 	roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR],-1.337);
-    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.337);
+    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.337) - 0.5; // 0.5 to adjust for calibration error
     roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-1.099);
     roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.099);
     

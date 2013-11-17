@@ -10,6 +10,7 @@
 
 float difference;
 static RoverMapStruct *roverMap;
+static char buf[100]; 
 
 void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct, xTaskHandle taskHandle) {
 	roverControlData->uartDevice = uart;
@@ -24,7 +25,11 @@ void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBA
 	if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, uxPriority, ( xTaskHandle * ) taskHandle ) != pdPASS) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
+
+	setDebugTextAreaPointer(buf);
+
 }
+
 void roverControlTask( void *param ){
 	// Get the parameters
 	RoverControlStruct *roverControlData = (RoverControlStruct *) param;
@@ -56,6 +61,9 @@ void roverControlTask( void *param ){
 	uint8_t encoderReceived = 0;
 	uint8_t turnStatusReceived = 0;
 	uint8_t isFirstCorner = 0;
+
+	int val = 0;
+
 	MapCorner newCorner;
 	newCorner.distSide = 0;
 	//double totalExternalAngle = 0;
@@ -91,6 +99,8 @@ void roverControlTask( void *param ){
 			printFloat("FroLeft:", roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
 			printFloat("FroRight:", roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR], 0);
 			printFloat("Angle:", roverControlData->shortSensorAngle, 1);*/
+			/*sprintf(buf, "%f\n%f", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]
+								 , roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]);*/
 
 			switch(roverControlData->state){
 				case INIT:
@@ -102,6 +112,7 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x02);
 					vtLEDOff(0x04);
 					vtLEDOff(0x08);
+					sprintf(buf, "TRAVERSAL");
 
 					//if close to front wall move to stop state
 					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
@@ -146,25 +157,35 @@ void roverControlTask( void *param ){
 						vtLEDOn(0x08);
 						moveRover(roverControlData);
 					}
+					else if(isRoverParallelToWall(roverControlData) == TOO_CLOSE_SIDE){
+						roverControlData->state = TOO_CLOSE;	
+					}
 					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_LEFT){
 						difference = roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR];
-						if(difference > (PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
+						
+						sprintf(buf, "FIX_FRONT_LEFT: %f", difference);
+						/*if(difference > (PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
 							fixRover(roverControlData, FIX_CMD_LEFT_SLOW);
 						}else if(difference > (PARALLEL_THRESHOLD + SPEED_RANGE)){
 							fixRover(roverControlData, FIX_CMD_LEFT_SLOW);
-						}else if(difference > PARALLEL_THRESHOLD){
+						}else*/ if(difference > PARALLEL_THRESHOLD){
 							fixRover(roverControlData, FIX_CMD_LEFT_SLOW);	
 						}
 					}
 					else if(isRoverParallelToWall(roverControlData) == FIX_FRONT_RIGHT){
+
 						difference = roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR];
-						if(difference > (PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
+						sprintf(buf, "FIX_FRONT_RIGHT: %f", difference);
+						/*if(difference > (PARALLEL_THRESHOLD + 2*SPEED_RANGE)){
 							fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
 						}else if(difference > (PARALLEL_THRESHOLD + SPEED_RANGE)){
 							fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
-						}else if(difference > PARALLEL_THRESHOLD){
+						}else*/ if(difference > PARALLEL_THRESHOLD){
 							fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
 						}	
+					}
+					else{
+						sprintf(buf, "FIX ELSE");
 					}
 					break;
 				case TOO_CLOSE:
@@ -172,6 +193,7 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x02);
 					vtLEDOn(0x04);
 					vtLEDOff(0x08);
+					sprintf(buf, "TOO_CLOSE");
 					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
@@ -191,12 +213,13 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x02);
 					vtLEDOn(0x04);
 					vtLEDOff(0x08);
+					sprintf(buf, "TOO_CLOSE_FORWARD");
 					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
-					else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD
-					 || roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD){
+					else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD + 1
+					 || roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD + 1){
 						moveRover(roverControlData);
 						roverControlData->state = TOO_CLOSE_FORWARD;
 					}else{
@@ -208,6 +231,11 @@ void roverControlTask( void *param ){
 				//at this point we request encoder readings from the rover
 				//control PIC after that we move to turn state
 				case STOP:
+					sprintf(buf, "STOP");
+					vtLEDOff(0x01);	
+					vtLEDOff(0x02);
+					vtLEDOff(0x04);
+					vtLEDOn(0x08);
 					//if(isRoverParallelToWall(roverControlData) == PARALLEL && isSensorInRange(roverControlData) == 1){
 					/*if (totalExternalAngle >= 370.0){
 						vtLEDOn(0x80);
@@ -235,6 +263,7 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x02);
 					vtLEDOff(0x04);
 					vtLEDOn(0x08);
+					sprintf(buf, "TURN");
 					// wait here till rover turn by the specified angle
 					if(turnStatusReceived != 0){
 						moveRover(roverControlData);

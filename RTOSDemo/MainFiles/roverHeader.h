@@ -6,7 +6,7 @@
 
 //constant values
 #define DISTANCE_BETWEEN_IR 			6.5
-#define PARALLEL_THRESHOLD 				1.2
+#define PARALLEL_THRESHOLD 				0.7
 #define SIDE_SENSOR_RANGE 				15
 #define FRONT_STOP_DISTANCE				10
 #define FRONT_AQUIRE_ANGLE_DISTANCE 	15
