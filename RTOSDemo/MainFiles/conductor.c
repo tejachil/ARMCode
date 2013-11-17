@@ -82,7 +82,10 @@ static portTASK_FUNCTION( vConductorUpdateTask, pvParameters )
 			switch(message.message_type) {
 			// Distance reading for a given sensor.
 			case PUB_MSG_T_SENS_DIST:
+			// Encoder reading
 			case PUB_MSG_T_ENCODER_DATA:
+			// Turn status from motor PIC
+			case PUB_MSG_T_TURN_STATUS:
 			{
 				// Send the message to the Rover Control task
 				xQueueSendToBack(param->roverControlTaskData->inQ, &message, portMAX_DELAY);
