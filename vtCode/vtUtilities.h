@@ -111,7 +111,7 @@ Something is not right
 // 2: use a limited version of printf()	(see VTutilities.c for the formatting that is supported) -- consumes not very much space
 
 // Note that sprintf() is also space consuming -- option 2 and option 0 use the same, limited small version of sprintf()
-#define PRINTF_VERSION 2
+#define PRINTF_VERSION 2 // Note: change this to 1 to use float
 
 #if PRINTF_VERSION == 1
 // Full printf()
