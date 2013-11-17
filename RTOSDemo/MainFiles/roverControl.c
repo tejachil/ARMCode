@@ -259,10 +259,12 @@ void roverControlTask( void *param ){
 			//getEncoderDistance(receivedMsg.data[2], );
 		}
 		//received turn status
-		else if (receivedMsg.message_type ==  PUB_MSG_T_TURN_STATUS && receivedMsg.data[0]){
-			turnStatusReceived = 1;
-			//set request type to sensor distance 
-			requestType = REQUEST_TYPE_DISTANCE;
+		else if (receivedMsg.message_type ==  PUB_MSG_T_TURN_STATUS){
+			if(receivedMsg.data[0]){
+				turnStatusReceived = 1;
+				//set request type to sensor distance 
+				requestType = REQUEST_TYPE_DISTANCE;
+			}
 		}
 		else{ // unhandled message type
 			VT_HANDLE_FATAL_ERROR(0);
