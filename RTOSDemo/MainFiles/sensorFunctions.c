@@ -77,16 +77,17 @@ int isRoverParallelToWall(RoverControlStruct *roverControlData){
 	}	
 }
 
-int isFrontCloseToWall(RoverControlStruct *roverControlData){
+int frontWallStatus(RoverControlStruct *roverControlData){
 	float average = roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR];
 	average /= 2;
 	if(average < FRONT_STOP_DISTANCE){
-		//vtLEDOn(0x08);
-		return 1;
+		return CLOSE_FRONT_WALL;
+	}
+	else if(average < FRONT_AQUIRE_ANGLE_DISTANCE){
+		return FRONT_AQUIRE_ANGLE_DISTANCE;
 	}
 	else{
-		//vtLEDOff(0x08);
-		return 0;
+		return FAR_FRONT_WALL;
 	}
 }
 

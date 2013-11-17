@@ -5,12 +5,13 @@
 #include "public_messages.h"
 
 //constant values
-#define DISTANCE_BETWEEN_IR 		6.5
-#define PARALLEL_THRESHOLD 			1.2
-#define SIDE_SENSOR_RANGE 			15
-#define FRONT_STOP_DISTANCE			10
-#define TOO_CLOSE_THRESHOLD			6
-#define SPEED_RANGE					3
+#define DISTANCE_BETWEEN_IR 			6.5
+#define PARALLEL_THRESHOLD 				1.2
+#define SIDE_SENSOR_RANGE 				15
+#define FRONT_STOP_DISTANCE				10
+#define FRONT_AQUIRE_ANGLE_DISTANCE 	15
+#define TOO_CLOSE_THRESHOLD				6
+#define SPEED_RANGE						3
 
 //number of things
 #define NUMBER_OF_SAMPLES 			5
@@ -29,9 +30,14 @@
 #define TRAVERSAL 					1
 #define FIX 						2
 #define TOO_CLOSE					3
-#define TOO_CLOSE_FRONT				4
+#define TOO_CLOSE_FORWARD			4
 #define TURN						5
 #define STOP	  					6
+
+//front wall states
+#define FAR_FRONT_WALL				0
+#define ACQUIRE_FRONT_ANGLE			1				
+#define CLOSE_FRONT_WALL			2
 
 //parallel states
 #define PARALLEL 					0

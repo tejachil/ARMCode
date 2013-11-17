@@ -104,7 +104,7 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x08);
 
 					//if close to front wall move to stop state
-					if(isFrontCloseToWall(roverControlData) == 1){
+					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
@@ -138,7 +138,7 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x04);
 					vtLEDOff(0x08);
 					
-					if(isFrontCloseToWall(roverControlData) == 1){
+					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
@@ -172,7 +172,7 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x02);
 					vtLEDOn(0x04);
 					vtLEDOff(0x08);
-					if(isFrontCloseToWall(roverControlData) == 1){
+					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
@@ -183,22 +183,22 @@ void roverControlTask( void *param ){
 					}
 					if((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] - roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]) > 0.7){
 							moveRover(roverControlData);
-							roverControlData->state = TOO_CLOSE_FRONT;
+							roverControlData->state = TOO_CLOSE_FORWARD;
 					}
 					break;
-				case TOO_CLOSE_FRONT:
+				case TOO_CLOSE_FORWARD:
 					vtLEDOff(0x01);	
 					vtLEDOff(0x02);
 					vtLEDOn(0x04);
 					vtLEDOff(0x08);
-					if(isFrontCloseToWall(roverControlData) == 1){
+					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
 					else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD
 					 || roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD){
 						moveRover(roverControlData);
-						roverControlData->state = TOO_CLOSE_FRONT;
+						roverControlData->state = TOO_CLOSE_FORWARD;
 					}else{
 						// leave this task
 						moveRover(roverControlData);
@@ -235,10 +235,6 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x02);
 					vtLEDOff(0x04);
 					vtLEDOn(0x08);
-					/*if(isFrontCloseToWall(roverControlData) == 0 && isRoverParallelToWall(roverControlData) == PARALLEL){
-						vtLEDOn(0x08);
-						moveRover(roverControlData);
-					}*/
 					// wait here till rover turn by the specified angle
 					if(turnStatusReceived != 0){
 						moveRover(roverControlData);
