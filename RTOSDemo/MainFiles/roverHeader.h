@@ -5,12 +5,13 @@
 #include "public_messages.h"
 
 //constant values
-#define DISTANCE_BETWEEN_IR 			6.5
-#define PARALLEL_THRESHOLD 				0.6
+#define DISTANCE_BETWEEN_IR 			7.625
+#define DISTANCE_BETWEEN_FRONT_MEDIUM	4.75
+#define PARALLEL_THRESHOLD 				0.8
 #define SIDE_SENSOR_RANGE 				15
 #define FRONT_STOP_DISTANCE				10
 #define FRONT_AQUIRE_ANGLE_DISTANCE 	15
-#define TOO_CLOSE_THRESHOLD				5
+#define TOO_CLOSE_THRESHOLD				3
 #define SPEED_RANGE						3
 
 //number of things
