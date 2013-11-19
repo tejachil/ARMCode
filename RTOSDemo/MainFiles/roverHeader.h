@@ -5,7 +5,7 @@
 #include "public_messages.h"
 
 //constant values
-#define DISTANCE_BETWEEN_IR 			7.625
+#define DISTANCE_BETWEEN_SIDE_SHORT		7.625
 #define DISTANCE_BETWEEN_FRONT_MEDIUM	4.75
 #define PARALLEL_THRESHOLD 				0.8
 #define SIDE_SENSOR_RANGE 				15
@@ -62,7 +62,7 @@ typedef struct __RoverControlStruct {
 	//counter for sampling
 	int samplingCounter;
 	//define angles
-	float shortSensorAngle;
+	float frontSensorAngle;
 } RoverControlStruct;
 
 #endif

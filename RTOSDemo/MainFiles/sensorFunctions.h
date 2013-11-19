@@ -6,7 +6,7 @@
 void readNewMsg(RoverControlStruct *roverControlData, public_message_t *receivedMsg);
 void averageValues(RoverControlStruct *roverControlData);
 void convertToDistance(RoverControlStruct *roverControlData);
-void findAngles(RoverControlStruct *roverControlData);
+void findAngle(RoverControlStruct *roverControlData);
 int isSensorInRange(RoverControlStruct *roverControlData);
 int isRoverParallelToWall(RoverControlStruct *roverControlData);
 int frontWallStatus(RoverControlStruct *roverControlData);
