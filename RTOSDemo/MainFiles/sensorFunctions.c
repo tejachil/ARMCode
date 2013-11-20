@@ -30,8 +30,8 @@ void averageValues(RoverControlStruct *roverControlData){
 void convertToDistance(RoverControlStruct *roverControlData){
 	roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR],-1.337);
     roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.337);
-    roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-1.099);
-    roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.099);
+    roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-1.099) - 0.5; // Teja sub 0.5
+    roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.099) + 0.5; // Teja add 0.5
     
     //TODO: convert other sensors
 }
@@ -47,9 +47,11 @@ int isSensorInRange(RoverControlStruct *roverControlData){
 void findAngle(RoverControlStruct *roverControlData){
 	//TODO: find angle between sensors
     roverControlData->frontSensorAngle = atanf(DISTANCE_BETWEEN_FRONT_MEDIUM/(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]-roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR])) * 180/M_PI;
-    if(roverControlData->frontSensorAngle <= 0.0  || roverControlData->frontSensorAngle >= 90.0){
+    if(roverControlData->frontSensorAngle <= 0.0)
+    	roverControlData->frontSensorAngle *= -1.0;
+    /*if(roverControlData->frontSensorAngle <= 0.0  || roverControlData->frontSensorAngle >= 90.0){
     	roverControlData->frontSensorAngle = 90.0;
-    }
+    }*/
 }
 
 int isRoverParallelToWall(RoverControlStruct *roverControlData){

@@ -68,6 +68,10 @@ void roverControlTask( void *param ){
 	newCorner.distSide = 0;
 	//double totalExternalAngle = 0;
 
+	// Angle polling averages
+	double anglePollTotal = 0.0;
+	uint8_t anglePollCount = 0;
+
 	// Update the count and send the request
 	sensorRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
 	uartEnQ(roverControlData->uartDevice, sensorRequestMsg.msgType, sensorRequestMsg.msgID, sensorRequestMsg.txLen,
@@ -100,7 +104,7 @@ void roverControlTask( void *param ){
 			printFloat("Angle:", roverControlData->shortSensorAngle, 1);*/
 			/*sprintf(buf, "%f\n%f", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]
 								 , roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]);*/
-
+			vtLEDOff(0x40);
 			switch(roverControlData->state){
 				case INIT:
 					//send command to move rover
@@ -141,8 +145,16 @@ void roverControlTask( void *param ){
 						}	
 					}
 					else if (frontWallStatus(roverControlData) == ACQUIRE_FRONT_ANGLE){
-						findAngle(roverControlData);
-						sprintf(buf, "ANGLE=%f", roverControlData->frontSensorAngle);
+						vtLEDOn(0x40);
+						if(anglePollCount < 50){
+							findAngle(roverControlData);
+							anglePollTotal += roverControlData->frontSensorAngle;
+							++anglePollCount;
+						}
+						//printFloat("DISTANCE:",  roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
+						//printFloat("\t",  roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR], 0);
+						//printFloat("\tANGLE = ",  roverControlData->frontSensorAngle, 1);
+						//sprintf(buf, "ANGLE=%f\n%f\n%f", roverControlData->frontSensorAngle, roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]);
 					}
 					break;
 				case FIX:
@@ -252,7 +264,14 @@ void roverControlTask( void *param ){
 						if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);
 						//vtLEDOn(0x40);
 						//turn rover and keep asking for turning status
+
+						// Teja added the angle stuff to the turn
+						roverControlData->frontSensorAngle = anglePollTotal/anglePollCount;
+						printFloat("\t",  roverControlData->frontSensorAngle, 1);
 						turnRover(roverControlData);
+						anglePollTotal = 0.0;
+						anglePollCount = 0;
+
 						requestType = REQUEST_TYPE_TURN_STATUS;
 						encoderReceived = 0;
 					}
