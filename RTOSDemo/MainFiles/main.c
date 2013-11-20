@@ -99,7 +99,7 @@ You should read the note above.
 
 #define USE_UART (1)
 
-#define USE_WEB_SERVER 1
+#define USE_WEB_SERVER 0
 
 #define USE_ROVER_CONTROL (1)
 
@@ -245,6 +245,10 @@ int main( void ){
 	roverInfo.control = &roverControlData;
 	roverInfo.uart = &wiflyUART;
     xTaskCreate( vuIP_Task, ( signed char * ) "uIP", mainBASIC_WEB_STACK_SIZE, ( void * ) &roverInfo, mainUIP_TASK_PRIORITY, NULL ); // Teja changed from null to roverControlData
+
+	#else
+	startRoverMapping(&roverMapStruct, tskIDLE_PRIORITY, NULL);
+	startRoverControlTask(&roverControlData, tskIDLE_PRIORITY, &wiflyUART, &roverMapStruct, NULL);
 	#endif
 
 	#if USE_MTJ_LCD == 1
