@@ -210,7 +210,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>0</aSer4>
+        <aSer4>1</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -311,8 +311,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>203</TopLine>
-      <CurrentLine>209</CurrentLine>
+      <TopLine>214</TopLine>
+      <CurrentLine>215</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\MainFiles/main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -409,8 +409,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>148</TopLine>
-      <CurrentLine>152</CurrentLine>
+      <TopLine>112</TopLine>
+      <CurrentLine>113</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\MainFiles/uartDriver.c</PathWithFileName>
       <FilenameWithoutPath>uartDriver.c</FilenameWithoutPath>
@@ -1025,8 +1025,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>774</TopLine>
+      <CurrentLine>774</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>../NXPDrivers/source/lpc17xx_uart.c</PathWithFileName>
       <FilenameWithoutPath>lpc17xx_uart.c</FilenameWithoutPath>
@@ -1053,5 +1053,34 @@
       <FilenameWithoutPath>vtI2C.c</FilenameWithoutPath>
     </File>
   </Group>
+
+  <MDIGroups>
+    <Orientation>1</Orientation>
+    <ActiveMDIGroup>0</ActiveMDIGroup>
+    <MDIGroup>
+      <Size>100</Size>
+      <ActiveTab>1</ActiveTab>
+      <Documents>
+        <Doc>
+          <Name>.\MainFiles/main.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>214</TopLine>
+          <CurrentLine>215</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>../NXPDrivers/source/lpc17xx_uart.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>774</TopLine>
+          <CurrentLine>774</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\MainFiles/uartDriver.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>112</TopLine>
+          <CurrentLine>113</CurrentLine>
+        </Doc>
+      </Documents>
+    </MDIGroup>
+  </MDIGroups>
 
 </ProjectOpt>
