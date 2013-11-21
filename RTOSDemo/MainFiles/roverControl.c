@@ -116,7 +116,7 @@ void roverControlTask( void *param ){
 					//sprintf(buf, "TRAVERSAL");
 
 					//if close to front wall move to stop state
-					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
+					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
@@ -144,7 +144,7 @@ void roverControlTask( void *param ){
 							fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
 						}	
 					}
-					else if (frontWallStatus(roverControlData) == ACQUIRE_FRONT_ANGLE){
+					else if (frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == ACQUIRE_FRONT_ANGLE){
 						vtLEDOn(0x40);
 						if(anglePollCount < 50){
 							findAngle(roverControlData);
@@ -160,7 +160,7 @@ void roverControlTask( void *param ){
 				case FIX:
 					vtLEDOff(0x7F);
 					vtLEDOn(0x02);
-					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
+					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
@@ -204,7 +204,7 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x7F);
 					vtLEDOn(0x04);
 					//sprintf(buf, "TOO_CLOSE");
-					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
+					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}
@@ -222,7 +222,7 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x7F);
 					vtLEDOn(0x08);
 					//sprintf(buf, "TOO_CLOSE_FORWARD");
-					if(frontWallStatus(roverControlData) == CLOSE_FRONT_WALL){
+					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
 						requestType = REQUEST_TYPE_ENCODER;
 					}

@@ -13,6 +13,7 @@
 #define FRONT_AQUIRE_ANGLE_DISTANCE 	15
 #define TOO_CLOSE_THRESHOLD				3
 #define SPEED_RANGE						3
+#define FRONT_THRESHOLD_ADJUSTMENT 		0.04
 
 //number of things
 #define NUMBER_OF_SAMPLES 			5

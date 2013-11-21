@@ -9,7 +9,7 @@ void convertToDistance(RoverControlStruct *roverControlData);
 void findAngle(RoverControlStruct *roverControlData);
 int isSensorInRange(RoverControlStruct *roverControlData);
 int isRoverParallelToWall(RoverControlStruct *roverControlData);
-int frontWallStatus(RoverControlStruct *roverControlData);
+int frontWallStatus(RoverControlStruct *roverControlData, double anglePollTotal, uint8_t anglePollCount);
 
 void printFloat(char* buf, float number, int newLine);
 

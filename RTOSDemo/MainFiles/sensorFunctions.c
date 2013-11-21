@@ -78,10 +78,18 @@ int isRoverParallelToWall(RoverControlStruct *roverControlData){
 	}	
 }
 
-int frontWallStatus(RoverControlStruct *roverControlData){
+int frontWallStatus(RoverControlStruct *roverControlData, double anglePollTotal, uint8_t anglePollCount){
 	float average = roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR];
 	average /= 2;
-	if(average < FRONT_STOP_DISTANCE){
+	//find the adjustment necessary for the front threshold based on the front angle
+	int thresholdAdjustment  = 0;
+	if(anglePollCount > 7){
+		thresholdAdjustment = (90 - anglePollTotal/anglePollCount) * FRONT_THRESHOLD_ADJUSTMENT;
+		if(thresholdAdjustment < 0) thresholdAdjustment = 0;
+	}
+	//Using average is not a good idea, we are using threshold adjustment for now.
+	//if(average < (FRONT_STOP_DISTANCE + thresholdAdjustment)){
+	if(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] < (FRONT_STOP_DISTANCE + thresholdAdjustment)){
 		return CLOSE_FRONT_WALL;
 	}
 	else if(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] < FRONT_AQUIRE_ANGLE_DISTANCE){ // between 10 inches and 15 inches
