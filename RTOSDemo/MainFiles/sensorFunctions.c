@@ -28,11 +28,11 @@ void averageValues(RoverControlStruct *roverControlData){
 }
 
 void convertToDistance(RoverControlStruct *roverControlData){
-	roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR],-1.337);
-    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 12317*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.337);
-    roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-1.099) - 0.5; // Teja sub 0.5
-    roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 5864*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.099) + 0.5; // Teja add 0.5
-    
+	roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] = 11781*pow(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR],-1.349);
+    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 20142*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.43);
+    roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 6409.9*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-1.116);
+    roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 6409.9*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.116);//10444*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.197); // 2240.5*x^-0.83 but values were shakey
+    roverControlData->sensorDistance[FRONT_LEFT_LONG_SENSOR] = 9838.7*pow(roverControlData->sensorDistance[FRONT_LEFT_LONG_SENSOR], -1.063);
     //TODO: convert other sensors
 }
 
@@ -95,7 +95,7 @@ int frontWallStatus(RoverControlStruct *roverControlData){
 void printFloat(char* buf, float number, int newLine){
 	int intPart = (int)number;
 	int decimalPart = (number - (int)number)*1000;
-	printf("%s %d.%d, ",buf, intPart,decimalPart);
+	printf("%s %d.%-4d, ",buf, intPart, decimalPart);
 	if(newLine)
 		printf("\n");
 }
