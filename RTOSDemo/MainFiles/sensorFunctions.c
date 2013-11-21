@@ -28,11 +28,11 @@ void averageValues(RoverControlStruct *roverControlData){
 }
 
 void convertToDistance(RoverControlStruct *roverControlData){
-	roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] = 1012.3*pow(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR],-0.694);
-    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 1027.3*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-0.732);
-    roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 2563.9*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-0.895);
-    roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 2563.9*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-0.895); // 2240.5*x^-0.83 but values were shakey
-    roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 5457.1*pow(roverControlData->sensorDistance[FRONTLEFT_LONG_SENSOR], -0.926);
+	roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] = 11781*pow(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR],-1.349);
+    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 20142*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.43);
+    roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 6409.9*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-1.116);
+    roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 6409.9*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.116);//10444*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.197); // 2240.5*x^-0.83 but values were shakey
+    roverControlData->sensorDistance[FRONT_LEFT_LONG_SENSOR] = 9838.7*pow(roverControlData->sensorDistance[FRONT_LEFT_LONG_SENSOR], -1.063);
     //TODO: convert other sensors
 }
 
@@ -95,7 +95,7 @@ int frontWallStatus(RoverControlStruct *roverControlData){
 void printFloat(char* buf, float number, int newLine){
 	int intPart = (int)number;
 	int decimalPart = (number - (int)number)*1000;
-	printf("%s %d, ",buf, intPart);
+	printf("%s %d.%-4d, ",buf, intPart, decimalPart);
 	if(newLine)
 		printf("\n");
 }
