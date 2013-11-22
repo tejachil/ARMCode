@@ -3,15 +3,13 @@
 #include <stdio.h>
 
 static MapCorner mapCorners[MAXIMUM_CORNERS];
-static uint8_t cornersCount;
+//static uint8_t cornersCount;
 //vtLCDStruct *lcdStruct;
 
 void mapRoverTask( void *param );
 //static portTASK_FUNCTION_PROTO( mapRoverTask, pvParameters );
 
 void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle taskHandle){
-	cornersCount = 0;
-	//lcdStruct = lcd;
 	
 	if ((roverMapStruct->inQ = xQueueCreate(ROVERMAP_QLEN,sizeof(MapCorner))) == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
@@ -47,21 +45,34 @@ void mapRoverTask( void *param ){
 	
 	char lcdBuffer[19];
 	double number;
-	int intPart, decimalPart;
+	//int intPart, decimalPart;
+	uint8_t cornersCount = 0;
 	for(;;){
 		if (xQueueReceive(roverMapStruct->inQ, (void *) &receivedCorner, portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
 
 		// Print the received distance reading
-		printf("Dist. from encoders: %f\n", receivedCorner.distSide);
+		vtLEDToggle(0x40);
+		printFloat("Angle: ", receivedCorner.angleCornerExterior, 0);
+		//printFloat("Side Dist: ", receivedCorner.distSide, 1);
+		
+
+
+		if(cornersCount != 0){
+			totalAngle += receivedCorner.angleCornerExterior;
+			receivedCorner.distSide += mapCorners[cornersCount-1].distFromSide;
+
+			if ((totalAngle + mapCorners[0].angleCornerExterior) >= 350.0){
+				//calculate area;
+			}
+		}
 
 		if(cornersCount < MAXIMUM_CORNERS){
 			mapCorners[cornersCount] = receivedCorner;
 			++cornersCount;
 		}
 
-		totalAngle += receivedCorner.angleCorner;
 		
 		/*if(totalAngle >= 370.0){
 			area = (mapCorners[1].distSide + mapCorners[0].distFromSide) * (mapCorners[2].distSide + mapCorners[1].distFromSide);

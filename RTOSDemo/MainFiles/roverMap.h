@@ -25,7 +25,7 @@ typedef struct __RoverMapStruct {
 } RoverMapStruct;
 
 typedef struct __MapCornerStruct {
-	double angleCorner;
+	double angleCornerExterior;
 	double distSide;
 	double distFromSide;
 } MapCorner;

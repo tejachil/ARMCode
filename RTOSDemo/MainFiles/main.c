@@ -99,7 +99,7 @@ You should read the note above.
 
 #define USE_UART (1)
 
-#define USE_WEB_SERVER 0
+#define USE_WEB_SERVER 1
 
 #define USE_ROVER_CONTROL (1)
 

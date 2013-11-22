@@ -7,9 +7,9 @@
 //constant values
 #define DISTANCE_BETWEEN_SIDE_SHORT		7.625
 #define DISTANCE_BETWEEN_FRONT_MEDIUM	4.75
-#define PARALLEL_THRESHOLD 				0.8
+#define PARALLEL_THRESHOLD 				0.6
 #define SIDE_SENSOR_RANGE 				15
-#define FRONT_STOP_DISTANCE				10
+#define FRONT_STOP_DISTANCE				8
 #define FRONT_AQUIRE_ANGLE_DISTANCE 	15
 #define TOO_CLOSE_THRESHOLD				3
 #define SPEED_RANGE						3
@@ -49,7 +49,7 @@
 #define TOO_FAR_SIDE				4
 
 //encoder defines
-#define TICKS_PER_REVOLUTION		5250.0 //tyler was measuring 5250 and actual is 6000
+#define TICKS_PER_REVOLUTION		6000.0 //tyler was measuring 5250 and actual is 6000
 #define WHEEL_CIRCUMFERENCE			14.1 //inches
 #define ROVER_LENGTH				12.0
 

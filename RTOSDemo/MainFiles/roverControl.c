@@ -76,6 +76,7 @@ void roverControlTask( void *param ){
 	sensorRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
 	uartEnQ(roverControlData->uartDevice, sensorRequestMsg.msgType, sensorRequestMsg.msgID, sensorRequestMsg.txLen,
 		sensorRequestMsg.data);
+	printf("Hello World!");
 
 	for(;;){
 		// 1. Read sensor data response from the conductor (blocks until
@@ -104,7 +105,7 @@ void roverControlTask( void *param ){
 			printFloat("Angle:", roverControlData->shortSensorAngle, 1);*/
 			/*sprintf(buf, "%f\n%f", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]
 								 , roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]);*/
-			vtLEDOff(0x40);
+			
 			switch(roverControlData->state){
 				case INIT:
 					//send command to move rover
@@ -145,7 +146,7 @@ void roverControlTask( void *param ){
 						}	
 					}
 					else if (frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == ACQUIRE_FRONT_ANGLE){
-						vtLEDOn(0x40);
+						
 						if(anglePollCount < 50){
 							findAngle(roverControlData);
 							anglePollTotal += roverControlData->frontSensorAngle;
@@ -257,21 +258,15 @@ void roverControlTask( void *param ){
 						//vtLEDOn(0x20);
 						//vtLEDOn(0x20);
 						newCorner.distFromSide = (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
-						newCorner.angleCorner = 90;
 						//totalExternalAngle += newCorner.angleCorner;
 						//newCorner.distSide += ROVER_LENGTH;// + (roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR])/2;
 
+						// Send the reading to the map task
 						if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);
+
 						//vtLEDOn(0x40);
 						//turn rover and keep asking for turning status
-
-						// Teja added the angle stuff to the turn
-						roverControlData->frontSensorAngle = anglePollTotal/anglePollCount;
-						sprintf(buf, "%f", roverControlData->frontSensorAngle);
-						printFloat("\t",  roverControlData->frontSensorAngle, 1);
 						turnRover(roverControlData);
-						anglePollTotal = 0.0;
-						anglePollCount = 0;
 
 						requestType = REQUEST_TYPE_TURN_STATUS;
 						encoderReceived = 0;
@@ -295,12 +290,12 @@ void roverControlTask( void *param ){
 			double distSide1, distSide2;
 
 			encoderReceived = 1;
-
 			// Calculate the distance for the first encoder
 			distSide1 = (receivedMsg.data[0] + (receivedMsg.data[1] << 8))/TICKS_PER_REVOLUTION;
 			distSide1 += receivedMsg.data[2];
 			distSide1 = distSide1 * WHEEL_CIRCUMFERENCE;
-			distSide1 = distSide1 + ROVER_LENGTH + FRONT_STOP_DISTANCE*1.0;
+			distSide1 = distSide1 + ROVER_LENGTH + roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR];
+
 
 			// Calculate the distance for the second encoder
 			/*
@@ -312,11 +307,20 @@ void roverControlTask( void *param ){
 			// Average the two readings
 			newCorner.distSide = (distSide1 + distSide2) / 2.0;
 			*/
-			// REMOVE THIS WHEN THE OTHER ENCODER WORKS
+			// TODO REMOVE THIS WHEN THE OTHER ENCODER WORKS
 			newCorner.distSide = distSide1;
 
-			// Send the reading to the map task
-			xQueueSend(roverMap->inQ, &newCorner, portMAX_DELAY);
+
+			// Teja added the angle stuff to the turn
+			roverControlData->frontSensorAngle = anglePollTotal/anglePollCount;
+			sprintf(buf, "%d  %d  %d   \nSide: %f \nAngle: %f", receivedMsg.data[0],
+			 receivedMsg.data[1], receivedMsg.data[3], distSide1, roverControlData->frontSensorAngle);
+			 //roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR]);
+			//printFloat("\t",  roverControlData->frontSensorAngle, 1);
+			anglePollTotal = 0.0;
+			anglePollCount = 0;
+
+			newCorner.angleCornerExterior = roverControlData->frontSensorAngle;
 
 			//set request type to sensor distance 
 			requestType = REQUEST_TYPE_DISTANCE;
