@@ -14,7 +14,7 @@ static char guiMapCoordinates[100];
 //vtLCDStruct *lcdStruct;
 
 void mapRoverTask( void *param );
-//static portTASK_FUNCTION_PROTO( mapRoverTask, pvParameters );
+double calculateArea(uint8_t sides, double *x, double *y);
 
 void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle taskHandle){
 
@@ -131,4 +131,19 @@ void mapRoverTask( void *param ){
 
 		//}
 	}
+}
+
+double calculateArea(uint8_t sides, double *x, double *y){
+	uint8_t i = 0;
+	//double sum1 = 0.0;
+	//double sum2 = 0.0;
+	double sum = 0;
+	for(i; i < sides; ++i){
+		//sum1 += x[i]*y[(i+1)%sides];
+		//sum2 += y[i]*x[(i+1)%sides];
+		sum += x[i]*y[(i+1)%sides] - y[i]*x[(i+1)%sides];
+	}
+	
+	if (sum < 0.0)	sum *= -1.0;
+	return sum;
 }
