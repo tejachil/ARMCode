@@ -1,6 +1,7 @@
 #include "roverMap.h"
 #include "sensorFunctions.h"
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 
 static MapCorner mapCorners[MAXIMUM_CORNERS];
@@ -17,7 +18,8 @@ void mapRoverTask( void *param );
 
 void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle taskHandle){
 
-	setDebugTextAreaPointer(&guiMapCoordinates);
+	setMapCoordinatesPointer(guiMapCoordinates);
+	//setDebugTextAreaPointer(guiMapCoordinates);
 	
 	if ((roverMapStruct->inQ = xQueueCreate(ROVERMAP_QLEN,sizeof(MapCorner))) == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
@@ -57,7 +59,7 @@ void mapRoverTask( void *param ){
 	//int intPart, decimalPart;
 	uint8_t cornersCount = 0;
 
-	sprintf(guiMapCoordinates, "");
+	sprintf(guiMapCoordinates, "100,100 400,400");
 	
 	for(;;){
 		if (xQueueReceive(roverMapStruct->inQ, (void *) &receivedCorner, portMAX_DELAY) != pdTRUE) {
