@@ -1,5 +1,5 @@
 #ifndef PUBLIC_MESSAGES_H
-#define	PUBLIC_MESSAGES_H
+#define        PUBLIC_MESSAGES_H
 
 /**
  * I2C slave address for the Motor Controller PIC.  This is the 7-bit address
@@ -43,8 +43,9 @@ typedef enum {
     PUB_MSG_T_ENCODER_DATA,
     /** Gyro data for angle. */
     PUB_MSG_T_GYRO_DATA,
-    /** Information about whether or not the rover has finished turning*/
+    /** Request turning status */
     PUB_MSG_T_TURN_STATUS,
+
     // ADD ANY NEW MESSAGE TYPES ABOVE THIS LINE
     // So that NUM_PUB_MSG_T will be correct.
 
@@ -139,5 +140,4 @@ public_message_t;
  */
 unsigned char public_message_get_count(const public_message_type_t type);
 
-#endif	/* PUBLIC_MESSAGES_H */
-
+#endif        /* PUBLIC_MESSAGES_H */
