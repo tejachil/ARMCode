@@ -1,5 +1,6 @@
 #include "roverMap.h"
 #include "sensorFunctions.h"
+#include <stdio.h>
 
 static MapCorner mapCorners[MAXIMUM_CORNERS];
 static uint8_t cornersCount;
@@ -52,6 +53,8 @@ void mapRoverTask( void *param ){
 			VT_HANDLE_FATAL_ERROR(0);
 		}
 
+		// Print the received distance reading
+		printf("Dist. from encoders: %f\n", receivedCorner.distSide);
 
 		if(cornersCount < MAXIMUM_CORNERS){
 			mapCorners[cornersCount] = receivedCorner;

@@ -291,11 +291,33 @@ void roverControlTask( void *param ){
 		}
 		//received encoder data
 		else if (receivedMsg.message_type == PUB_MSG_T_ENCODER_DATA){
+			// Variables to hold the distance readings for each encoder
+			double distSide1, distSide2;
+
 			encoderReceived = 1;
-			newCorner.distSide = (receivedMsg.data[0] + (receivedMsg.data[1] << 8))/TICKS_PER_REVOLUTION;
-			newCorner.distSide += receivedMsg.data[2];
-			newCorner.distSide = newCorner.distSide * WHEEL_CIRCUMFERENCE;
-			newCorner.distSide = newCorner.distSide + ROVER_LENGTH + FRONT_STOP_DISTANCE*1.0;
+
+			// Calculate the distance for the first encoder
+			distSide1 = (receivedMsg.data[0] + (receivedMsg.data[1] << 8))/TICKS_PER_REVOLUTION;
+			distSide1 += receivedMsg.data[2];
+			distSide1 = distSide1 * WHEEL_CIRCUMFERENCE;
+			distSide1 = distSide1 + ROVER_LENGTH + FRONT_STOP_DISTANCE*1.0;
+
+			// Calculate the distance for the second encoder
+			/*
+			distSide2 = (receivedMsg.data[3] + (receivedMsg.data[4] << 8))/TICKS_PER_REVOLUTION;
+			distSide2 += receivedMsg.data[5];
+			distSide2 = distSide2 * WHEEL_CIRCUMFERENCE;
+			distSide2 = distSide2 + ROVER_LENGTH + FRONT_STOP_DISTANCE*1.0;
+
+			// Average the two readings
+			newCorner.distSide = (distSide1 + distSide2) / 2.0;
+			*/
+			// REMOVE THIS WHEN THE OTHER ENCODER WORKS
+			newCorner.distSide = distSide1;
+
+			// Send the reading to the map task
+			xQueueSend(roverMap->inQ, &newCorner, portMAX_DELAY);
+
 			//set request type to sensor distance 
 			requestType = REQUEST_TYPE_DISTANCE;
 			//getEncoderDistance(receivedMsg.data[2], );
