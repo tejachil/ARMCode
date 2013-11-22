@@ -314,7 +314,7 @@ void roverControlTask( void *param ){
 			// Teja added the angle stuff to the turn
 			roverControlData->frontSensorAngle = anglePollTotal/anglePollCount;
 			sprintf(buf, "%d  %d  %d   \nSide: %f \nAngle: %f", receivedMsg.data[0],
-			 receivedMsg.data[1], receivedMsg.data[3], distSide1, roverControlData->frontSensorAngle);
+			 receivedMsg.data[1], receivedMsg.data[2], distSide1, roverControlData->frontSensorAngle);
 			 //roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR]);
 			//printFloat("\t",  roverControlData->frontSensorAngle, 1);
 			anglePollTotal = 0.0;

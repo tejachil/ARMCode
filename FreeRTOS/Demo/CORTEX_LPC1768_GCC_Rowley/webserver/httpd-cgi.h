@@ -63,6 +63,7 @@ struct httpd_cgi_call {
 };
 
 void setDebugTextAreaPointer(char* string);
+void setMapCoordinatesPointer(char* coordinates);
 void updateDebugTable(uint8_t row, uint8_t col, float* data);
 
 /**

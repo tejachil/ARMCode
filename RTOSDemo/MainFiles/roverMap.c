@@ -1,8 +1,14 @@
 #include "roverMap.h"
 #include "sensorFunctions.h"
 #include <stdio.h>
+#include <math.h>
 
 static MapCorner mapCorners[MAXIMUM_CORNERS];
+static double xPoints[MAXIMUM_CORNERS];
+static double yPoints[MAXIMUM_CORNERS];
+
+static char guiMapCoordinates[100];
+
 //static uint8_t cornersCount;
 //vtLCDStruct *lcdStruct;
 
@@ -10,6 +16,8 @@ void mapRoverTask( void *param );
 //static portTASK_FUNCTION_PROTO( mapRoverTask, pvParameters );
 
 void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle taskHandle){
+
+	setDebugTextAreaPointer(&guiMapCoordinates);
 	
 	if ((roverMapStruct->inQ = xQueueCreate(ROVERMAP_QLEN,sizeof(MapCorner))) == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
@@ -41,12 +49,16 @@ void mapRoverTask( void *param ){
 	MapCorner receivedCorner;
 
 	double totalAngle = 0;
+	double totalCalcAngle = 90.0;
 	double area;
 	
-	char lcdBuffer[19];
+	char buf[20];
 	double number;
 	//int intPart, decimalPart;
 	uint8_t cornersCount = 0;
+
+	sprintf(guiMapCoordinates, "");
+	
 	for(;;){
 		if (xQueueReceive(roverMapStruct->inQ, (void *) &receivedCorner, portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
@@ -63,10 +75,23 @@ void mapRoverTask( void *param ){
 			totalAngle += receivedCorner.angleCornerExterior;
 			receivedCorner.distSide += mapCorners[cornersCount-1].distFromSide;
 
+			// Yasir's conversion to coordinates
+			xPoints[cornersCount] = xPoints[cornersCount - 1] + receivedCorner.distSide*cos(totalCalcAngle*M_PI/180.0);
+			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
+			totalCalcAngle -= receivedCorner.angleCornerExterior;
+
 			if ((totalAngle + mapCorners[0].angleCornerExterior) >= 350.0){
 				//calculate area;
 			}
 		}
+		else{
+			totalCalcAngle = 90;
+			xPoints[0] = 0;
+			xPoints[0] = 0;
+		}
+
+		sprintf(buf, "%d,%d", (int)(xPoints[cornersCount]*5 + 100), (int)(yPoints[cornersCount]*-5 - 400));
+		strcat(guiMapCoordinates, buf);
 
 		if(cornersCount < MAXIMUM_CORNERS){
 			mapCorners[cornersCount] = receivedCorner;
