@@ -10,7 +10,6 @@
 
 float difference;
 static RoverMapStruct *roverMap;
-static char buf[100]; 
 
 void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct, xTaskHandle taskHandle) {
 	roverControlData->uartDevice = uart;
@@ -25,8 +24,6 @@ void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBA
 	if (xTaskCreate( roverControlTask, ( signed char * ) "Rover Control", roverSTACK_SIZE, (void *) roverControlData, uxPriority, ( xTaskHandle * ) taskHandle ) != pdPASS) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
-
-	setDebugTextAreaPointer(buf);
 
 }
 
@@ -308,8 +305,7 @@ void roverControlTask( void *param ){
 
 			// Teja added the angle stuff to the turn
 			roverControlData->frontSensorAngle = anglePollTotal/anglePollCount;
-			sprintf(buf, "%d  %d  %d    %d  %d  %d \nSide: %f \nAngle: %f", receivedMsg.data[0],
-			 receivedMsg.data[1], receivedMsg.data[2], receivedMsg.data[3], receivedMsg.data[4], receivedMsg.data[5], newCorner.distSide, roverControlData->frontSensorAngle);
+			// sprintf(buf, "%d  %d  %d    %d  %d  %d \nSide: %f \nAngle: %f", receivedMsg.data[0], receivedMsg.data[1], receivedMsg.data[2], receivedMsg.data[3], receivedMsg.data[4], receivedMsg.data[5], newCorner.distSide, roverControlData->frontSensorAngle);
 			 //roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR]);
 			//printFloat("\t",  roverControlData->frontSensorAngle, 1);
 			anglePollTotal = 0.0;

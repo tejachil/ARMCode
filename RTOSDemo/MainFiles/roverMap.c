@@ -9,6 +9,7 @@ static double xPoints[MAXIMUM_CORNERS];
 static double yPoints[MAXIMUM_CORNERS];
 
 static char guiMapCoordinates[100];
+static char debugBuf[100];
 
 //static uint8_t cornersCount;
 //vtLCDStruct *lcdStruct;
@@ -42,6 +43,9 @@ void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE ux
 	if (xTaskCreate(mapRoverTask, ( signed char * ) "Rover Map", mapSTACK_SIZE, (void *) roverMapStruct, uxPriority, ( xTaskHandle * ) taskHandle ) != pdPASS) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
+
+	setDebugTextAreaPointer(debugBuf);
+	sprintf(debugBuf, "Hello from Map \n");
 }
 
 void mapRoverTask( void *param ){
@@ -82,8 +86,13 @@ void mapRoverTask( void *param ){
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
 			totalCalcAngle -= receivedCorner.angleCornerExterior;
 
-			if ((totalAngle + mapCorners[0].angleCornerExterior) >= 350.0){
-				//calculate area;
+			sprintf(buf, "(%f, %f) %f\n", xPoints[cornersCount], yPoints[cornersCount], receivedCorner.angleCornerExterior);
+			strcat(debugBuf, buf);
+
+			if ((totalAngle + mapCorners[0].angleCornerExterior) >= 340.0){
+				// TODO: calculate area;
+				sprintf(buf, "Area=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
+				strcat(debugBuf, buf);
 			}
 		}
 		else{
