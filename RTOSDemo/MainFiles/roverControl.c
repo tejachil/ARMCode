@@ -2,6 +2,8 @@
 #include "sensorFunctions.h"
 #include "roverFunctions.h"
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define roverControlQLen (10)
 #define REQUEST_TYPE_DISTANCE		0
@@ -10,6 +12,9 @@
 
 float difference;
 static RoverMapStruct *roverMap;
+static int anglesSamples[ANGLE_SAMPLE_COUNT];
+
+int cmpfunc (const void * a, const void * b);
 
 void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct, xTaskHandle taskHandle) {
 	roverControlData->uartDevice = uart;
@@ -147,7 +152,13 @@ void roverControlTask( void *param ){
 						if(anglePollCount < 50){
 							findAngle(roverControlData);
 							anglePollTotal += roverControlData->frontSensorAngle;
+							// Teja does the angle array adding here for the quicksort
+							if(anglePollCount < ANGLE_SAMPLE_COUNT){
+								anglesSamples[anglePollCount] = (int)roverControlData->frontSensorAngle;
+							}
+
 							++anglePollCount;
+
 						}
 						//printFloat("DISTANCE:",  roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
 						//printFloat("\t",  roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR], 0);
@@ -304,7 +315,18 @@ void roverControlTask( void *param ){
 			
 
 			// Teja added the angle stuff to the turn
-			roverControlData->frontSensorAngle = anglePollTotal/anglePollCount;
+			roverControlData->frontSensorAngle = anglePollTotal/anglePollCount; // This gets overwritten bellow with the qsort value
+			
+			// New quicksort implementation added here:
+			qsort(anglesSamples, anglePollCount, sizeof(int), cmpfunc);
+
+			roverControlData->frontSensorAngle = 0.0;
+			uint8_t i = anglePollCount;
+			for((i = anglePollCount/2 - 2); i <= (anglePollCount/2 + 2); ++i){
+				roverControlData->frontSensorAngle += anglesSamples[i];
+			}
+			roverControlData->frontSensorAngle /= 5.0;
+
 			// sprintf(buf, "%d  %d  %d    %d  %d  %d \nSide: %f \nAngle: %f", receivedMsg.data[0], receivedMsg.data[1], receivedMsg.data[2], receivedMsg.data[3], receivedMsg.data[4], receivedMsg.data[5], newCorner.distSide, roverControlData->frontSensorAngle);
 			 //roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR]);
 			//printFloat("\t",  roverControlData->frontSensorAngle, 1);
@@ -354,4 +376,9 @@ void roverControlTask( void *param ){
 				turnRequestMsg.data);
 		}
 	}
+}
+
+int cmpfunc (const void * a, const void * b)
+{
+   return ( *(int*)a - *(int*)b );
 }

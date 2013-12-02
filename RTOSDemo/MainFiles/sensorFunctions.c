@@ -61,7 +61,7 @@ void findAngle(RoverControlStruct *roverControlData){
     /*if(roverControlData->frontSensorAngle <= 0.0  || roverControlData->frontSensorAngle >= 90.0){
     	roverControlData->frontSensorAngle = 90.0;
     }*/
-    	roverControlData->frontSensorAngle+=5.0;
+    	//roverControlData->frontSensorAngle+=5.0;
 }
 
 int isRoverParallelToWall(RoverControlStruct *roverControlData){

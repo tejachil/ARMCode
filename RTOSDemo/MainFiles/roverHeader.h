@@ -53,6 +53,7 @@
 #define WHEEL_CIRCUMFERENCE			14.1 //inches
 #define ROVER_LENGTH				12.0
 
+#define ANGLE_SAMPLE_COUNT			200
 typedef struct __RoverControlStruct {
 	UARTstruct *uartDevice;
 	xQueueHandle inQ;
