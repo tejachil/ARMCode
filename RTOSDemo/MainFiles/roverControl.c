@@ -296,9 +296,7 @@ void roverControlTask( void *param ){
 			distSide1 = distSide1 * WHEEL_CIRCUMFERENCE;
 			distSide1 = distSide1 + ROVER_LENGTH + roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR];
 
-
-			// Calculate the distance for the second encoder
-			/*
+			// Calculate the distance for the second encoder			
 			distSide2 = (receivedMsg.data[3] + (receivedMsg.data[4] << 8))/TICKS_PER_REVOLUTION;
 			distSide2 += receivedMsg.data[5];
 			distSide2 = distSide2 * WHEEL_CIRCUMFERENCE;
@@ -306,15 +304,12 @@ void roverControlTask( void *param ){
 
 			// Average the two readings
 			newCorner.distSide = (distSide1 + distSide2) / 2.0;
-			*/
-			// TODO REMOVE THIS WHEN THE OTHER ENCODER WORKS
-			newCorner.distSide = distSide1;
-
+			
 
 			// Teja added the angle stuff to the turn
 			roverControlData->frontSensorAngle = anglePollTotal/anglePollCount;
-			sprintf(buf, "%d  %d  %d   \nSide: %f \nAngle: %f", receivedMsg.data[0],
-			 receivedMsg.data[1], receivedMsg.data[2], distSide1, roverControlData->frontSensorAngle);
+			sprintf(buf, "%d  %d  %d    %d  %d  %d \nSide: %f \nAngle: %f", receivedMsg.data[0],
+			 receivedMsg.data[1], receivedMsg.data[2], receivedMsg.data[3], receivedMsg.data[4], receivedMsg.data[5], newCorner.distSide, roverControlData->frontSensorAngle);
 			 //roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR]);
 			//printFloat("\t",  roverControlData->frontSensorAngle, 1);
 			anglePollTotal = 0.0;
