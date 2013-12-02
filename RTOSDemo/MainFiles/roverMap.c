@@ -8,8 +8,8 @@ static MapCorner mapCorners[MAXIMUM_CORNERS];
 static double xPoints[MAXIMUM_CORNERS];
 static double yPoints[MAXIMUM_CORNERS];
 
-static char guiMapCoordinates[100];
-static char debugBuf[100];
+static char guiMapCoordinates[500];
+static char debugBuf[500];
 
 //static uint8_t cornersCount;
 //vtLCDStruct *lcdStruct;
@@ -63,7 +63,7 @@ void mapRoverTask( void *param ){
 	//int intPart, decimalPart;
 	uint8_t cornersCount = 0;
 
-	sprintf(guiMapCoordinates, "100,100 400,400");
+	sprintf(guiMapCoordinates, "");
 	
 	for(;;){
 		if (xQueueReceive(roverMapStruct->inQ, (void *) &receivedCorner, portMAX_DELAY) != pdTRUE) {
@@ -86,12 +86,13 @@ void mapRoverTask( void *param ){
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
 			totalCalcAngle -= receivedCorner.angleCornerExterior;
 
-			sprintf(buf, "(%f, %f) %f\n", xPoints[cornersCount], yPoints[cornersCount], receivedCorner.angleCornerExterior);
+			sprintf(buf, "(%f,%f) \n%f %f\n-------------------\n", xPoints[cornersCount], yPoints[cornersCount], receivedCorner.angleCornerExterior, receivedCorner.distSide);
 			strcat(debugBuf, buf);
 
 			if ((totalAngle + mapCorners[0].angleCornerExterior) >= 340.0){
 				// TODO: calculate area;
-				sprintf(buf, "Area=%f\n", calculateArea(3, xPoints, yPoints));
+				// param for calculateArea (side) is 1 minus the number of sides
+				sprintf(buf, "Side=%dArea=%f\n", cornersCount, calculateArea(5, xPoints, yPoints));
 				strcat(debugBuf, buf);
 			}
 		}
@@ -101,7 +102,7 @@ void mapRoverTask( void *param ){
 			xPoints[0] = 0;
 		}
 
-		sprintf(buf, "%d,%d", (int)(xPoints[cornersCount]*5 + 100), (int)(yPoints[cornersCount]*-5 - 400));
+		sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*5 + 100), (int)(yPoints[cornersCount]*-5 + 400));
 		strcat(guiMapCoordinates, buf);
 
 		if(cornersCount < MAXIMUM_CORNERS){
