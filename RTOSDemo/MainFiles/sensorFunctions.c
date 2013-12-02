@@ -58,6 +58,8 @@ void findAngle(RoverControlStruct *roverControlData){
 	}
     if(roverControlData->frontSensorAngle <= 0.0)
     	roverControlData->frontSensorAngle *= -1.0;
+    if(roverControlData->frontSensorAngle >= 90.0)
+    	roverControlData->frontSensorAngle = 90.0;
     /*if(roverControlData->frontSensorAngle <= 0.0  || roverControlData->frontSensorAngle >= 90.0){
     	roverControlData->frontSensorAngle = 90.0;
     }*/

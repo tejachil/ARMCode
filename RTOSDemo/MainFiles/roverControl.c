@@ -322,10 +322,11 @@ void roverControlTask( void *param ){
 
 			roverControlData->frontSensorAngle = 0.0;
 			uint8_t i = anglePollCount;
-			for((i = anglePollCount/2 - 2); i <= (anglePollCount/2 + 2); ++i){
-				roverControlData->frontSensorAngle += anglesSamples[i];
-			}
-			roverControlData->frontSensorAngle /= 5.0;
+			//for((i = anglePollCount/2 - 2); i <= (anglePollCount/2 + 2); ++i){
+		//		roverControlData->frontSensorAngle += anglesSamples[i];
+		//	}
+			//roverControlData->frontSensorAngle /= 5.0;
+			roverControlData->frontSensorAngle = anglesSamples[anglePollCount-1];
 
 			// sprintf(buf, "%d  %d  %d    %d  %d  %d \nSide: %f \nAngle: %f", receivedMsg.data[0], receivedMsg.data[1], receivedMsg.data[2], receivedMsg.data[3], receivedMsg.data[4], receivedMsg.data[5], newCorner.distSide, roverControlData->frontSensorAngle);
 			 //roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR]);
