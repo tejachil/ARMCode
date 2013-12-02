@@ -46,12 +46,22 @@ int isSensorInRange(RoverControlStruct *roverControlData){
 
 void findAngle(RoverControlStruct *roverControlData){
 	//TODO: find angle between sensors
-    roverControlData->frontSensorAngle = atanf(DISTANCE_BETWEEN_FRONT_MEDIUM/(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]-roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR])) * 180/M_PI;
+	double sideAngle;
+    if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]){
+    	sideAngle = atanf((roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
+    	roverControlData->frontSensorAngle = atanf(DISTANCE_BETWEEN_FRONT_MEDIUM/(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]-roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR])) * 180/M_PI - sideAngle;
+	}
+	else{
+		sideAngle = atanf((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
+    	roverControlData->frontSensorAngle = atanf(DISTANCE_BETWEEN_FRONT_MEDIUM/(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]-roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR])) * 180/M_PI + sideAngle;
+
+	}
     if(roverControlData->frontSensorAngle <= 0.0)
     	roverControlData->frontSensorAngle *= -1.0;
     /*if(roverControlData->frontSensorAngle <= 0.0  || roverControlData->frontSensorAngle >= 90.0){
     	roverControlData->frontSensorAngle = 90.0;
     }*/
+    	roverControlData->frontSensorAngle+=5.0;
 }
 
 int isRoverParallelToWall(RoverControlStruct *roverControlData){
