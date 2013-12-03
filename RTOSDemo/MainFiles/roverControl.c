@@ -13,6 +13,8 @@
 float difference;
 static RoverMapStruct *roverMap;
 static int anglesSamples[ANGLE_SAMPLE_COUNT];
+static char debugBuf[500];
+int count = 0;
 
 int cmpfunc (const void * a, const void * b);
 
@@ -20,6 +22,8 @@ void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBA
 	roverControlData->uartDevice = uart;
 
 	roverMap = roverMapStruct;
+
+	setDebugTextAreaPointer(debugBuf);
 
 	// Create the queue that will be used to talk to this task
 	if ((roverControlData->inQ = xQueueCreate(roverControlQLen,sizeof(public_message_t))) == NULL) {
@@ -105,6 +109,18 @@ void roverControlTask( void *param ){
 			printFloat("FroLeft:", roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
 			printFloat("FroRight:", roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR], 0);
 			printFloat("Angle:", roverControlData->shortSensorAngle, 1);*/
+			char buf[20];
+			if(count%25 == 0){
+				sprintf(debugBuf, "(%f,%f)\n-------------------\n", roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]);
+				//strcat(debugBuf, buf);
+				count == 0;
+			}
+			/*if(count >= 160){
+				sprintf(debugBuf, "");
+				count == 0;
+			}*/
+
+			count++;
 			/*sprintf(buf, "%f\n%f", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]
 								 , roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]);*/
 			
@@ -121,7 +137,9 @@ void roverControlTask( void *param ){
 					//if close to front wall move to stop state
 					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
-						requestType = REQUEST_TYPE_ENCODER;
+						anglePollTotal = 0.0;
+						anglePollCount = 0;
+						//requestType = REQUEST_TYPE_ENCODER;
 					}
 					else if(isRoverParallelToWall(roverControlData) == TOO_CLOSE_SIDE){
 						fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
@@ -171,7 +189,9 @@ void roverControlTask( void *param ){
 					vtLEDOn(0x02);
 					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
-						requestType = REQUEST_TYPE_ENCODER;
+						anglePollTotal = 0.0;
+						anglePollCount = 0;
+						//requestType = REQUEST_TYPE_ENCODER;
 					}
 					else if(isRoverParallelToWall(roverControlData) == PARALLEL){
 						moveRover(roverControlData);
@@ -215,7 +235,9 @@ void roverControlTask( void *param ){
 					//sprintf(buf, "TOO_CLOSE");
 					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
-						requestType = REQUEST_TYPE_ENCODER;
+						anglePollTotal = 0.0;
+						anglePollCount = 0;
+						//requestType = REQUEST_TYPE_ENCODER;
 					}
 					// front side is too close
 					/*else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD){
@@ -233,7 +255,9 @@ void roverControlTask( void *param ){
 					//sprintf(buf, "TOO_CLOSE_FORWARD");
 					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
-						requestType = REQUEST_TYPE_ENCODER;
+						anglePollTotal = 0.0;
+						anglePollCount = 0;
+						//requestType = REQUEST_TYPE_ENCODER;
 					}
 					//if front is still close, get back to too_close state
 					/*else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < (TOO_CLOSE_THRESHOLD - 1.5)){
@@ -261,6 +285,18 @@ void roverControlTask( void *param ){
 						vtLEDOn(0x80);
 					}
 					else */
+					if(anglePollCount < 10){
+							findAngle(roverControlData);
+							anglePollTotal += roverControlData->frontSensorAngle;
+							++anglePollCount;
+							newCorner.rightMediumSensor = roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR];
+							newCorner.leftMediumSensor = roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR];
+					}else{
+						//findAngle(roverControlData);
+						//anglePollTotal = roverControlData->frontSensorAngle;
+						//anglePollCount = 1;
+						requestType = REQUEST_TYPE_ENCODER;
+					}
 					// wait here till data is received
 					if(encoderReceived != 0){
 						//vtLEDOn(0x20);
@@ -274,7 +310,7 @@ void roverControlTask( void *param ){
 
 						//vtLEDOn(0x40);
 						//turn rover and keep asking for turning status
-						turnRover(roverControlData);
+						turnRover(roverControlData, (uint8_t)(anglePollTotal/anglePollCount));
 
 						requestType = REQUEST_TYPE_TURN_STATUS;
 						encoderReceived = 0;
@@ -320,13 +356,13 @@ void roverControlTask( void *param ){
 			// New quicksort implementation added here:
 			qsort(anglesSamples, anglePollCount, sizeof(int), cmpfunc);
 
-			roverControlData->frontSensorAngle = 0.0;
+			/*roverControlData->frontSensorAngle = 0.0;
 			uint8_t i = anglePollCount;
-			//for((i = anglePollCount/2 - 2); i <= (anglePollCount/2 + 2); ++i){
-		//		roverControlData->frontSensorAngle += anglesSamples[i];
-		//	}
+			for((i = anglePollCount/2 - 2); i <= (anglePollCount/2 + 2); ++i){
+				roverControlData->frontSensorAngle += anglesSamples[i];
+			}
 			//roverControlData->frontSensorAngle /= 5.0;
-			roverControlData->frontSensorAngle = anglesSamples[anglePollCount-1];
+			roverControlData->frontSensorAngle = anglesSamples[anglePollCount-1];*/
 
 			// sprintf(buf, "%d  %d  %d    %d  %d  %d \nSide: %f \nAngle: %f", receivedMsg.data[0], receivedMsg.data[1], receivedMsg.data[2], receivedMsg.data[3], receivedMsg.data[4], receivedMsg.data[5], newCorner.distSide, roverControlData->frontSensorAngle);
 			 //roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR]);

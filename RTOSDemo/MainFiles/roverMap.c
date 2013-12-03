@@ -44,7 +44,7 @@ void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE ux
 		VT_HANDLE_FATAL_ERROR(0);
 	}
 
-	setDebugTextAreaPointer(debugBuf);
+	//setDebugTextAreaPointer(debugBuf);
 	sprintf(debugBuf, "Hello from Map \n");
 }
 
@@ -86,13 +86,13 @@ void mapRoverTask( void *param ){
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
 			totalCalcAngle -= receivedCorner.angleCornerExterior;
 
-			sprintf(buf, "(%f,%f) \n%f %f\n-------------------\n", xPoints[cornersCount], yPoints[cornersCount], receivedCorner.angleCornerExterior, receivedCorner.distSide);
+			sprintf(buf, "(%f,%f) \n%f %f \n%f %f\n-------------------\n", xPoints[cornersCount], yPoints[cornersCount], receivedCorner.angleCornerExterior, receivedCorner.distSide, receivedCorner.leftMediumSensor, receivedCorner.rightMediumSensor);
 			strcat(debugBuf, buf);
 
 			if ((totalAngle + mapCorners[0].angleCornerExterior) >= 340.0){
 				// TODO: calculate area;
 				// param for calculateArea (side) is 1 minus the number of sides
-				sprintf(buf, "Side=%dArea=%f\n", cornersCount, calculateArea(5, xPoints, yPoints));
+				sprintf(buf, "Side=%dArea=%f\nLeft=%f, Right=%f\n", cornersCount, calculateArea(5, xPoints, yPoints));
 				strcat(debugBuf, buf);
 			}
 		}

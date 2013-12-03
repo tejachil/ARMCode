@@ -28,6 +28,8 @@ typedef struct __MapCornerStruct {
 	double angleCornerExterior;
 	double distSide;
 	double distFromSide;
+	double rightMediumSensor;
+	double leftMediumSensor;
 } MapCorner;
 
 void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle taskHandle);

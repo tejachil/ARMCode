@@ -12,10 +12,10 @@ void stopRover(RoverControlStruct *roverControlData){
 	sendToRover(roverControlData, PUB_MSG_T_MOV_CMD, MOV_CMD_STOP);
 }
 
-void turnRover(RoverControlStruct *roverControlData){
+void turnRover(RoverControlStruct *roverControlData, uint8_t angle){
 	roverControlData->state = TURN;
 	//TODO: change this to turn later
-	sendToRover(roverControlData, PUB_MSG_T_TURN_CMD, (uint8_t)roverControlData->frontSensorAngle);
+	sendToRover(roverControlData, PUB_MSG_T_TURN_CMD, (uint8_t)angle);
 }
 
 void fixRover(RoverControlStruct *roverControlData, int fixDir){

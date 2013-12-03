@@ -95,7 +95,7 @@ int frontWallStatus(RoverControlStruct *roverControlData, double anglePollTotal,
 	average /= 2;
 	//find the adjustment necessary for the front threshold based on the front angle
 	int thresholdAdjustment  = 0;
-	if(anglePollCount > 7){
+	if(anglePollCount > 12){
 		thresholdAdjustment = (90 - anglePollTotal/anglePollCount) * FRONT_THRESHOLD_ADJUSTMENT;
 		if(thresholdAdjustment < 0) thresholdAdjustment = 0;
 	}
