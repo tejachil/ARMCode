@@ -95,7 +95,7 @@ int frontWallStatus(RoverControlStruct *roverControlData){
 void printFloat(char* buf, float number, int newLine){
 	int intPart = (int)number;
 	int decimalPart = (number - (int)number)*1000;
-	printf("%s %d.%-4d, ",buf, intPart, decimalPart);
+	printf("%s %4d.%-4d, ",buf, intPart, decimalPart);
 	if(newLine)
 		printf("\n");
 }

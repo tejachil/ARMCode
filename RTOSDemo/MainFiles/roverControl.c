@@ -96,7 +96,7 @@ void roverControlTask( void *param ){
 			//read a new message
 			readNewMsg(roverControlData, &receivedMsg);
 			averageValues(roverControlData);
-			convertToDistance(roverControlData);
+			//convertToDistance(roverControlData);
 			printFloat("SiRear:", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR], 0);
 			printFloat("\tSiFront:", roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR], 0);
 			printFloat("\tFroLeft:", roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
