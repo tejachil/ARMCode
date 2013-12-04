@@ -19,7 +19,7 @@ static char debugBuf[BUFFER_SIZE];
 void mapRoverTask( void *param );
 double calculateArea(uint8_t sides, double *x, double *y);
 
-void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle taskHandle){
+void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle* taskHandle){
 
 	setMapCoordinatesPointer(guiMapCoordinates);
 	//setDebugTextAreaPointer(guiMapCoordinates);

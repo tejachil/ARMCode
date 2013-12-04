@@ -21,6 +21,6 @@ typedef struct __RoverDataStruct {
 //static portTASK_FUNCTION_PROTO( roverControlTask, param );
 void roverControlTask( void *param );
 
-void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct, xTaskHandle taskHandle);
+void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct, xTaskHandle* taskHandle);
 
 #endif

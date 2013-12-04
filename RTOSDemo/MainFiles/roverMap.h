@@ -24,6 +24,7 @@ typedef struct __RoverMapStruct {
 	xQueueHandle outQ;
 	uint8_t taskDescription;
 	uint8_t numberSides;
+	double gotoX, gotoY;
 } RoverMapStruct;
 
 typedef struct __MapCornerStruct {
@@ -32,7 +33,7 @@ typedef struct __MapCornerStruct {
 	double distFromSide;
 } MapCorner;
 
-void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle taskHandle);
+void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle* taskHandle);
 
 
 #endif

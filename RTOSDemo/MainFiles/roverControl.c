@@ -16,7 +16,7 @@ static int anglesSamples[ANGLE_SAMPLE_COUNT];
 
 int cmpfunc (const void * a, const void * b);
 
-void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct, xTaskHandle taskHandle) {
+void startRoverControlTask(RoverControlStruct *roverControlData, unsigned portBASE_TYPE uxPriority, UARTstruct *uart, RoverMapStruct *roverMapStruct, xTaskHandle* taskHandle) {
 	roverControlData->uartDevice = uart;
 
 	roverMap = roverMapStruct;
