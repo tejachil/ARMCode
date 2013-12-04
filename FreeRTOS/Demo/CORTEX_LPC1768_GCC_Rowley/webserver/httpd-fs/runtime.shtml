@@ -2,10 +2,19 @@
 <html>
 <head>
 <title>Map</title>
+<script>
+	function mapClick(evt){
+		var map = document.getElementById("mapsvg");
+		var x = evt.clientX - map.getBoundingClientRect().left;
+		var y = evt.clientY - map.getBoundingClientRect().top;
+		window.alert(x + ", " + y);
+	}
+</script>
 </head>
-<body onLoad="window.setTimeout(&quot;location.href='runtime.shtml'&quot;,500)">
+<body onLoad="window.setTimeout(&quot;location.href='runtime.shtml'&quot;,1000)">
 <p align = "center">
-	<svg svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="500" height="500">
+	<svg id="mapsvg" xmlns="http://www.w3.org/2000/svg" version="1.1" width="500" height="500" onclick='mapClick(evt)'>
+		<rect width="500" height="500"style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)"/>
 		%! led-io
 	</svg>
 </p>
