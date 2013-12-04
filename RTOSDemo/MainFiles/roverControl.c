@@ -71,8 +71,8 @@ void roverControlTask( void *param ){
 	//double totalExternalAngle = 0;
 
 	// Angle polling averages
-	double anglePollTotal = 0.0;
-	uint8_t anglePollCount = 0;
+	double anglePollTotal = 0.0, thresholdAnglePollTotal = 0.0;
+	uint8_t anglePollCount = 0, thresholdAnglePollCount = 0;
 
 	// Update the count and send the request
 	sensorRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
@@ -120,9 +120,9 @@ void roverControlTask( void *param ){
 					//sprintf(buf, "TRAVERSAL");
 
 					//if close to front wall move to stop state
-					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
+					if(frontWallStatus(roverControlData, thresholdAnglePollTotal, thresholdAnglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
-						requestType = REQUEST_TYPE_ENCODER;
+						//requestType = REQUEST_TYPE_ENCODER;
 					}
 					else if(isRoverParallelToWall(roverControlData) == TOO_CLOSE_SIDE){
 						fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
@@ -148,18 +148,12 @@ void roverControlTask( void *param ){
 							fixRover(roverControlData, FIX_CMD_RIGHT_SLOW);
 						}	
 					}
-					else if (frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == ACQUIRE_FRONT_ANGLE){
+					else if (frontWallStatus(roverControlData, thresholdAnglePollTotal, thresholdAnglePollCount) == ACQUIRE_FRONT_ANGLE){
 						
-						if(anglePollCount < 50){
+						if(thresholdAnglePollCount < 50){
 							findAngle(roverControlData);
-							anglePollTotal += roverControlData->frontSensorAngle;
-							// Teja does the angle array adding here for the quicksort
-							if(anglePollCount < ANGLE_SAMPLE_COUNT){
-								anglesSamples[anglePollCount] = (int)roverControlData->frontSensorAngle;
-							}
-
-							++anglePollCount;
-
+							thresholdAnglePollTotal += roverControlData->frontSensorAngle;
+							++thresholdAnglePollCount;
 						}
 						//printFloat("DISTANCE:",  roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
 						//printFloat("\t",  roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR], 0);
@@ -170,9 +164,9 @@ void roverControlTask( void *param ){
 				case FIX:
 					vtLEDOff(0x7F);
 					vtLEDOn(0x02);
-					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
+					if(frontWallStatus(roverControlData, thresholdAnglePollTotal, thresholdAnglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
-						requestType = REQUEST_TYPE_ENCODER;
+						//requestType = REQUEST_TYPE_ENCODER;
 					}
 					else if(isRoverParallelToWall(roverControlData) == PARALLEL){
 						moveRover(roverControlData);
@@ -214,9 +208,9 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x7F);
 					vtLEDOn(0x04);
 					//sprintf(buf, "TOO_CLOSE");
-					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
+					if(frontWallStatus(roverControlData, thresholdAnglePollTotal, thresholdAnglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
-						requestType = REQUEST_TYPE_ENCODER;
+						//requestType = REQUEST_TYPE_ENCODER;
 					}
 					// front side is too close
 					/*else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < TOO_CLOSE_THRESHOLD){
@@ -232,9 +226,9 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x7F);
 					vtLEDOn(0x08);
 					//sprintf(buf, "TOO_CLOSE_FORWARD");
-					if(frontWallStatus(roverControlData, anglePollTotal, anglePollCount) == CLOSE_FRONT_WALL){
+					if(frontWallStatus(roverControlData, thresholdAnglePollTotal, thresholdAnglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
-						requestType = REQUEST_TYPE_ENCODER;
+						//requestType = REQUEST_TYPE_ENCODER;
 					}
 					//if front is still close, get back to too_close state
 					/*else if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < (TOO_CLOSE_THRESHOLD - 1.5)){
@@ -262,6 +256,17 @@ void roverControlTask( void *param ){
 						vtLEDOn(0x80);
 					}
 					else */
+					if(anglePollCount < 30){
+						findAngle(roverControlData);
+						anglePollTotal += roverControlData->frontSensorAngle;
+						// Teja does the angle array adding here for the quicksort
+						if(anglePollCount < ANGLE_SAMPLE_COUNT){
+							anglesSamples[anglePollCount] = (int)roverControlData->frontSensorAngle;
+						}
+						++anglePollCount;
+					}else{
+						requestType = REQUEST_TYPE_ENCODER;
+					}
 					// wait here till data is received
 					if(encoderReceived != 0){
 						//vtLEDOn(0x20);
@@ -281,7 +286,7 @@ void roverControlTask( void *param ){
 
 						//vtLEDOn(0x40);
 						//turn rover and keep asking for turning status
-						turnRover(roverControlData);
+						turnRover(roverControlData, anglePollTotal/anglePollCount);
 
 						requestType = REQUEST_TYPE_TURN_STATUS;
 						encoderReceived = 0;
@@ -325,21 +330,21 @@ void roverControlTask( void *param ){
 			roverControlData->frontSensorAngle = anglePollTotal/anglePollCount; // This gets overwritten bellow with the qsort value
 			
 			// New quicksort implementation added here:
-			qsort(anglesSamples, anglePollCount, sizeof(int), cmpfunc);
+			//qsort(anglesSamples, anglePollCount, sizeof(int), cmpfunc);
 
-			roverControlData->frontSensorAngle = 0.0;
+			/*roverControlData->frontSensorAngle = 0.0;
 			uint8_t i = anglePollCount;
-			//for((i = anglePollCount/2 - 2); i <= (anglePollCount/2 + 2); ++i){
-		//		roverControlData->frontSensorAngle += anglesSamples[i];
-		//	}
-			//roverControlData->frontSensorAngle /= 5.0;
-			roverControlData->frontSensorAngle = anglesSamples[anglePollCount-1];
-
+			for((i = anglePollCount/2 - 2); i <= (anglePollCount/2 + 2); ++i){
+				roverControlData->frontSensorAngle += anglesSamples[i];
+			}
+			roverControlData->frontSensorAngle /= 5.0;*/
 			// sprintf(buf, "%d  %d  %d    %d  %d  %d \nSide: %f \nAngle: %f", receivedMsg.data[0], receivedMsg.data[1], receivedMsg.data[2], receivedMsg.data[3], receivedMsg.data[4], receivedMsg.data[5], newCorner.distSide, roverControlData->frontSensorAngle);
 			 //roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR]);
 			//printFloat("\t",  roverControlData->frontSensorAngle, 1);
 			anglePollTotal = 0.0;
 			anglePollCount = 0;
+			thresholdAnglePollTotal = 0.0;
+			thresholdAnglePollCount = 0;
 
 			newCorner.angleCornerExterior = roverControlData->frontSensorAngle;
 

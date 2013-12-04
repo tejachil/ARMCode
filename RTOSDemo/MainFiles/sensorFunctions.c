@@ -46,13 +46,13 @@ int isSensorInRange(RoverControlStruct *roverControlData){
 
 void findAngle(RoverControlStruct *roverControlData){
 	//TODO: find angle between sensors
-	double sideAngle;
+	double sideAngle = 0;
     if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]){
-    	sideAngle = atanf((roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
+    	//sideAngle = atanf((roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
     	roverControlData->frontSensorAngle = atanf(DISTANCE_BETWEEN_FRONT_MEDIUM/(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]-roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR])) * 180/M_PI - sideAngle;
 	}
 	else{
-		sideAngle = atanf((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
+		//sideAngle = atanf((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
     	roverControlData->frontSensorAngle = atanf(DISTANCE_BETWEEN_FRONT_MEDIUM/(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]-roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR])) * 180/M_PI + sideAngle;
 
 	}
@@ -90,13 +90,13 @@ int isRoverParallelToWall(RoverControlStruct *roverControlData){
 	}	
 }
 
-int frontWallStatus(RoverControlStruct *roverControlData, double anglePollTotal, uint8_t anglePollCount){
+int frontWallStatus(RoverControlStruct *roverControlData, double thresholdAnglePollTotal, uint8_t thresholdAnglePollCount){
 	float average = roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR];
 	average /= 2;
 	//find the adjustment necessary for the front threshold based on the front angle
 	int thresholdAdjustment  = 0;
-	if(anglePollCount > 7){
-		thresholdAdjustment = (90 - anglePollTotal/anglePollCount) * FRONT_THRESHOLD_ADJUSTMENT;
+	if(thresholdAnglePollCount > 10){
+		thresholdAdjustment = (90 - thresholdAnglePollTotal/thresholdAnglePollCount) * FRONT_THRESHOLD_ADJUSTMENT;
 		if(thresholdAdjustment < 0) thresholdAdjustment = 0;
 	}
 	//Using average is not a good idea, we are using threshold adjustment for now.
