@@ -49,8 +49,8 @@
 #define TOO_FAR_SIDE				4
 
 //encoder defines
-#define TICKS_PER_REVOLUTION		6000.0 //tyler was measuring 5250 and actual is 6000
-#define WHEEL_CIRCUMFERENCE			14.1 //inches
+#define TICKS_PER_REVOLUTION		6207.34375 // spec says 6000
+#define WHEEL_CIRCUMFERENCE			14.9 //inches
 #define ROVER_LENGTH				12.0
 
 #define ANGLE_SAMPLE_COUNT			200
