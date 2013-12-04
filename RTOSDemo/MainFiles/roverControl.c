@@ -337,10 +337,12 @@ void roverControlTask( void *param ){
 			newCorner.angleCornerExterior = roverControlData->frontSensorAngle;
 
 			
-			frontDist = (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] + 5.0)/tan(newCorner.angleCornerExterior*M_PI/180.0);
-			frontDist = roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] - frontDist;
 			newCorner.distSide = newCorner.distSide*WHEEL_CIRCUMFERENCE + ROVER_LENGTH; // + frontDist; // TODO: add the front part if need to
-
+			if(newCorner.angleCornerExterior > 70.0){
+				frontDist = (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] + 5.0)/tan(newCorner.angleCornerExterior*M_PI/180.0);
+				frontDist = roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] - frontDist;
+				newCorner.distSide += frontDist;
+			}
 			//set request type to sensor distance 
 			requestType = REQUEST_TYPE_DISTANCE;
 			//getEncoderDistance(receivedMsg.data[2], );

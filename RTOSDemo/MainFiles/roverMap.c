@@ -8,8 +8,10 @@ static MapCorner mapCorners[MAXIMUM_CORNERS];
 static double xPoints[MAXIMUM_CORNERS];
 static double yPoints[MAXIMUM_CORNERS];
 
-static char guiMapCoordinates[500];
-static char debugBuf[500];
+#define BUFFER_SIZE		500
+
+static char guiMapCoordinates[BUFFER_SIZE];
+static char debugBuf[BUFFER_SIZE];
 
 //static uint8_t cornersCount;
 //vtLCDStruct *lcdStruct;
@@ -22,6 +24,7 @@ void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE ux
 	setMapCoordinatesPointer(guiMapCoordinates);
 	//setDebugTextAreaPointer(guiMapCoordinates);
 	
+
 	if ((roverMapStruct->inQ = xQueueCreate(ROVERMAP_QLEN,sizeof(MapCorner))) == NULL) {
 		VT_HANDLE_FATAL_ERROR(0);
 	}
@@ -70,6 +73,13 @@ void mapRoverTask( void *param ){
 			VT_HANDLE_FATAL_ERROR(0);
 		}
 
+		if(strlen(guiMapCoordinates) >= (BUFFER_SIZE - 10)){
+			sprintf(guiMapCoordinates, "");
+		}
+		if(strlen(debugBuf) >= (BUFFER_SIZE - 10)){
+			sprintf(debugBuf, "");
+		}
+
 		// Print the received distance reading
 		vtLEDToggle(0x40);
 		printFloat("Angle: ", receivedCorner.angleCornerExterior, 0);
@@ -86,13 +96,13 @@ void mapRoverTask( void *param ){
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
 			totalCalcAngle -= receivedCorner.angleCornerExterior;
 
-			sprintf(buf, "(%f,%f) \n%f %f\n-------------------\n", xPoints[cornersCount], yPoints[cornersCount], receivedCorner.angleCornerExterior, receivedCorner.distSide);
+			sprintf(buf, "%f %f S=%d A=%f\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount, calculateArea(cornersCount, xPoints, yPoints));
 			strcat(debugBuf, buf);
 
 			if ((totalAngle + mapCorners[0].angleCornerExterior) >= 340.0){
 				// TODO: calculate area;
 				// param for calculateArea (side) is 1 minus the number of sides
-				sprintf(buf, "Side=%dArea=%f\n", cornersCount, calculateArea(4, xPoints, yPoints));
+				sprintf(buf, "** Greater than 350 **\n");
 				strcat(debugBuf, buf);
 			}
 		}
