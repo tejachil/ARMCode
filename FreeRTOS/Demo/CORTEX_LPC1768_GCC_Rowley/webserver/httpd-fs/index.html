@@ -5,7 +5,7 @@
   </head>
   <BODY>
 <font face="arial">
-<form name="roverForm" action="/index.html" method="get">
+<form name="roverForm" action="./index.html" method="get">
 <table border = "0" align="center">
     <tr>
         <td></td>
@@ -15,20 +15,9 @@
         <td><center><b>Control Panel</b></center></td>
     </tr>
     <tr>
-        <td>Regular Polygon? <input type="checkbox" name="regPol" value="regularPolygon"></td>
-    </tr>
-    <tr>
-        <td>Polygon Sides: <input type="number" name="polSid" value="numSides" min="3" max="20"></td>
-    </tr>
-    <tr>
-        <td>Current Task: 
-			<select name="task">
-			<option value="pre1">Preliminary Task 1</option>
-			<option value="man1">Mandatory Task 1</option>
-			<option value="man2">Mandatory Task 2</option>
-			<option value="man3">Mandatory Task 3</option>
-			</select>
-	</td>
+        <td>
+            <pre><label for="reg">Regular?</label><input id="reg" type="checkbox" name="regPol" value="1"><label for="rev">&#9;Revolve?</label><input id="rev" type="checkbox" name="rev" value="1"><label for="side">&#9;Sides: </label><input id="side" type="number" name="polSid" value="numSides" min="3" max="20"></pre>
+        </td>
     </tr>
     <tr>
         <td><center><input type="submit" value="Start" name="act"> <input type="submit" value="Stop" name="act"></center></td>
@@ -37,7 +26,7 @@
         <td>Debug Output:</td>
     </tr>
     <tr>
-        <td><iframe src="index.shtml" width="400" height="400"></iframe></td>
+        <td><iframe src="index.shtml" width="400" height="440"></iframe></td>
     </tr>
 </table>
 </form>
