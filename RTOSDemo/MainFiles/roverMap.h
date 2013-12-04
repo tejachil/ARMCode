@@ -22,7 +22,7 @@
 typedef struct __RoverMapStruct {
 	xQueueHandle inQ;
 	xQueueHandle outQ;
-	uint8_t taskDescription;
+	uint8_t taskFlags;
 	uint8_t numberSides;
 	double gotoX, gotoY;
 } RoverMapStruct;

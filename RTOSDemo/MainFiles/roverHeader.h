@@ -57,9 +57,8 @@
 #define ANGLE_SAMPLE_COUNT			200
 
 //task ID values
-#define REGULAR						0
-#define IRREGULAR					1
-#define CENTER_REVOLVE				2
+#define REGULAR						1
+#define REVOLVE						2
 
 typedef struct __RoverControlStruct {
 	UARTstruct *uartDevice;

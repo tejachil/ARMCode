@@ -267,6 +267,20 @@ extern void vParTestSetLEDState( long lState );
 		static xTaskHandle roverTaskHandle, mapTaskHandle;
 		if (strstr( c, "act=Start" ) != NULL )
 		{
+			roverInfo->map->taskFlags = 0;
+			if(strstr(c, "regPol=1") != NULL){
+				roverInfo->map->taskFlags |= REGULAR;
+			}
+			if(strstr(c, "regPol=1") != NULL){
+				roverInfo->map->taskFlags |= REVOLVE;
+			}
+			c = strstr(c, "polSid=");
+			if(c[7] != '&'){
+				roverInfo->map->numberSides = c[7] - 0;
+			}
+			else{
+				roverInfo->map->numberSides = 0;
+			}
 			startRoverMapping(roverInfo->map, tskIDLE_PRIORITY, &mapTaskHandle);
 			startRoverControlTask(roverInfo->control, tskIDLE_PRIORITY, roverInfo->uart, roverInfo->map, &roverTaskHandle);
 			//vParTestSetLEDState( pdTRUE ); // Add the task for when the Start button is pressed
