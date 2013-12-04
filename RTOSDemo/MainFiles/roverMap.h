@@ -22,6 +22,8 @@
 typedef struct __RoverMapStruct {
 	xQueueHandle inQ;
 	xQueueHandle outQ;
+	uint8_t taskDescription;
+	uint8_t numberSides;
 } RoverMapStruct;
 
 typedef struct __MapCornerStruct {
