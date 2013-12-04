@@ -100,11 +100,12 @@ void roverControlTask( void *param ){
 			readNewMsg(roverControlData, &receivedMsg);
 			averageValues(roverControlData);
 			convertToDistance(roverControlData);
+			
 			/*printFloat("SiRear:", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR], 0);
 			printFloat("SiFront:", roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR], 0);
 			printFloat("FroLeft:", roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR], 0);
 			printFloat("FroRight:", roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR], 0);
-			printFloat("Angle:", roverControlData->shortSensorAngle, 1);*/
+			printFloat("Angle:", roverControlData->frontSensorAngle, 1);*/
 			/*sprintf(buf, "%f\n%f", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]
 								 , roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]);*/
 			
@@ -268,7 +269,7 @@ void roverControlTask( void *param ){
 						newCorner.distFromSide = (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
 						//totalExternalAngle += newCorner.angleCorner;
 						//newCorner.distSide += ROVER_LENGTH;// + (roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR])/2;
-
+						printFloat("BeforeQ:", newCorner.distSide, 1);
 						// Send the reading to the map task
 						if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);
 
@@ -336,12 +337,19 @@ void roverControlTask( void *param ){
 
 			newCorner.angleCornerExterior = roverControlData->frontSensorAngle;
 
-			
-			newCorner.distSide = newCorner.distSide*WHEEL_CIRCUMFERENCE + ROVER_LENGTH; // + frontDist; // TODO: add the front part if need to
+			// TODO: Uncomment this block if you want to add the wheel circumference and the rover length
+			newCorner.distSide = newCorner.distSide*WHEEL_CIRCUMFERENCE;
+
+			printFloat("Average Encoders:", newCorner.distSide, 1);
+
+			newCorner.distSide += ROVER_LENGTH; // + frontDist; // TODO: add the front part if need to
+
+			printFloat("With RoverLength:", newCorner.distSide, 1);
 			if(newCorner.angleCornerExterior > 70.0){
-				frontDist = (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] + 5.0)/tan(newCorner.angleCornerExterior*M_PI/180.0);
+				frontDist = (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/tan(newCorner.angleCornerExterior*M_PI/180.0);
 				frontDist = roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] - frontDist;
-				newCorner.distSide += frontDist;
+				printFloat("Front Dist:", frontDist, 1);
+				newCorner.distSide += frontDist; // TODO: change this to +=
 			}
 			//set request type to sensor distance 
 			requestType = REQUEST_TYPE_DISTANCE;

@@ -79,7 +79,7 @@ void mapRoverTask( void *param ){
 		if(strlen(debugBuf) >= (BUFFER_SIZE - 10)){
 			sprintf(debugBuf, "");
 		}
-
+		printFloat("QReced:", receivedCorner.distSide, 1);
 		// Print the received distance reading
 		vtLEDToggle(0x40);
 		printFloat("Angle: ", receivedCorner.angleCornerExterior, 0);
@@ -90,7 +90,8 @@ void mapRoverTask( void *param ){
 		if(cornersCount != 0){
 			totalAngle += receivedCorner.angleCornerExterior;
 			receivedCorner.distSide += mapCorners[cornersCount-1].distFromSide;
-
+			printFloat("PrevSide:", mapCorners[cornersCount-1].distFromSide, 1);
+			printFloat("WithPrevSide:", receivedCorner.distSide, 1);
 			// Yasir's conversion to coordinates
 			xPoints[cornersCount] = xPoints[cornersCount - 1] + receivedCorner.distSide*cos(totalCalcAngle*M_PI/180.0);
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
