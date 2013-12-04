@@ -3,10 +3,10 @@
   <head>
     <title>Debug</title>
   </head>
-<body onLoad="window.setTimeout(&quot;location.href='index.shtml'&quot;,50)">
+<body onLoad="window.setTimeout(&quot;location.href='index.shtml'&quot;,500)">
 <font face="courier">
 %! rtos-stats
-<p align="center"><textarea rows="15" cols="40">
+<p align="center"><textarea rows="20" cols="40">
 %! run-time
 </textarea>
 </p>
