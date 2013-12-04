@@ -97,13 +97,13 @@ void mapRoverTask( void *param ){
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
 			totalCalcAngle -= receivedCorner.angleCornerExterior;
 
-			sprintf(buf, "%f %f S=%d A=%f\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount, calculateArea(cornersCount, xPoints, yPoints));
+			sprintf(buf, "%f %f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
 			strcat(debugBuf, buf);
 
-			if ((totalAngle + mapCorners[0].angleCornerExterior) >= 340.0){
+			if ((totalAngle) >= 350.0){
 				// TODO: calculate area;
 				// param for calculateArea (side) is 1 minus the number of sides
-				sprintf(buf, "** Greater than 350 **\n");
+				sprintf(buf, "** Greater than 350 **, A=%f\n", calculateArea(cornersCount, xPoints, yPoints));
 				strcat(debugBuf, buf);
 			}
 		}
