@@ -267,6 +267,10 @@ void roverControlTask( void *param ){
 						//vtLEDOn(0x20);
 						//vtLEDOn(0x20);
 						newCorner.distFromSide = (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
+
+						// Scale for compensating from the LENGTH WIDTH change
+						newCorner.distFromSide += ROVER_LENGTH_WIDTH_OFFSET*sin(newCorner.angleCornerExterior*M_PI/180);
+
 						//totalExternalAngle += newCorner.angleCorner;
 						//newCorner.distSide += ROVER_LENGTH;// + (roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] + roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR])/2;
 						printFloat("BeforeQ:", newCorner.distSide, 1);

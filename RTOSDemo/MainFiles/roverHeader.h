@@ -52,8 +52,10 @@
 #define TICKS_PER_REVOLUTION		6207.34375 // spec says 6000
 #define WHEEL_CIRCUMFERENCE			14.9 //inches
 #define ROVER_LENGTH				11.0
+#define ROVER_LENGTH_WIDTH_OFFSET	4.6
 
 #define ANGLE_SAMPLE_COUNT			200
+
 typedef struct __RoverControlStruct {
 	UARTstruct *uartDevice;
 	xQueueHandle inQ;
