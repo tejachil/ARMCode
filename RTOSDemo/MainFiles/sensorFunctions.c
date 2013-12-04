@@ -28,12 +28,12 @@ void averageValues(RoverControlStruct *roverControlData){
 }
 
 void convertToDistance(RoverControlStruct *roverControlData){
-	roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] = 11781*pow(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR],-1.349);
-    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 20142*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.43);
-    roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 6409.9*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-1.116);
-    roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 6409.9*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.116);//10444*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.197); // 2240.5*x^-0.83 but values were shakey
-    roverControlData->sensorDistance[FRONT_LEFT_LONG_SENSOR] = 9838.7*pow(roverControlData->sensorDistance[FRONT_LEFT_LONG_SENSOR], -1.063);
-    //TODO: convert other sensors
+	roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] = 6653.3*pow(roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR],-1.251);
+    roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] = 11276*pow(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR],-1.325);
+    roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] = 5680.3*pow(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR],-1.103);
+    roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR] = 7540.4*pow(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR],-1.15);
+    roverControlData->sensorDistance[FRONT_LEFT_LONG_SENSOR] = 14130*pow(roverControlData->sensorDistance[FRONT_LEFT_LONG_SENSOR], -1.119);
+	//TODO: convert other sensors
 }
 
 //check short range only
@@ -58,8 +58,8 @@ void findAngle(RoverControlStruct *roverControlData){
 	}
     if(roverControlData->frontSensorAngle <= 0.0)
     	roverControlData->frontSensorAngle *= -1.0;
-    if(roverControlData->frontSensorAngle >= 90.0)
-    	roverControlData->frontSensorAngle = 90.0;
+    /*if(roverControlData->frontSensorAngle >= 90.0)
+    	roverControlData->frontSensorAngle = 90.0;*/
     /*if(roverControlData->frontSensorAngle <= 0.0  || roverControlData->frontSensorAngle >= 90.0){
     	roverControlData->frontSensorAngle = 90.0;
     }*/
