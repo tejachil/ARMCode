@@ -1,23 +1,51 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<META HTTP-EQUIV="refresh" CONTENT="1">
 <title>Map</title>
 <script>
 	function mapClick(evt){
 		var map = document.getElementById("mapsvg");
 		var x = evt.clientX - map.getBoundingClientRect().left;
 		var y = evt.clientY - map.getBoundingClientRect().top;
-		window.alert(x + ", " + y);
+		
+		var form = document.createElement("form");
+		form.setAttribute('method',"get");
+		form.setAttribute('action',"./runtime.shtml");
+
+		var xHidden = document.createElement("input");
+		xHidden.setAttribute("type", "hidden");
+		xHidden.setAttribute("name", "x");
+		xHidden.setAttribute("value", x);
+		form.appendChild(xHidden);
+		
+		var yHidden = document.createElement("input");
+		yHidden.setAttribute("type", "hidden");
+		yHidden.setAttribute("name", "y");
+		yHidden.setAttribute("value", y);
+		form.appendChild(yHidden);
+
+		document.body.appendChild(form);
+    	form.submit();
 	}
 </script>
 </head>
-<body onLoad="window.setTimeout(&quot;location.href='runtime.shtml'&quot;,1000)">
+<body>
 <p align = "center">
 	<svg id="mapsvg" xmlns="http://www.w3.org/2000/svg" version="1.1" width="500" height="500" onclick='mapClick(evt)'>
-		<rect width="500" height="500"style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)"/>
+		<rect width="500" height="500"style="fill:rgb(255,255,255);stroke-width:3;stroke:rgb(0,0,0)"/>
+		<circle id="mapcircle" r="3" stroke="black" stroke-width="1" fill="red"/>
 		%! led-io
 	</svg>
 </p>
+<p id='text' align="center"></p>
+<script type="text/javascript">
+	var circle = document.getElementById("mapcircle");
+	var prmarr = window.location.search.substr(1).split("&");
+	circle.setAttribute('cx',prmarr[0].split("=")[1]);
+	circle.setAttribute('cy',prmarr[1].split("=")[1]);
+	document.getElementById('text').innerHTML = "Goto Location: " + prmarr[0].split("=")[1] + ", " + prmarr[1].split("=")[1];
+</script>
 </body>
 </html>
 
