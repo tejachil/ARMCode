@@ -8,7 +8,7 @@ static MapCorner mapCorners[MAXIMUM_CORNERS];
 static double xPoints[MAXIMUM_CORNERS];
 static double yPoints[MAXIMUM_CORNERS];
 
-#define BUFFER_SIZE		500
+#define BUFFER_SIZE		400
 
 static char guiMapCoordinates[BUFFER_SIZE];
 static char debugBuf[BUFFER_SIZE];
@@ -99,7 +99,9 @@ void mapRoverTask( void *param ){
 
 			sprintf(buf, "%f %f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
 			strcat(debugBuf, buf);
-
+			
+			sprintf(buf, "A=%f\n", calculateArea(cornersCount, xPoints, yPoints));
+			strcat(debugBuf, buf);
 			if ((totalAngle) >= 350.0){
 				// TODO: calculate area;
 				// param for calculateArea (side) is 1 minus the number of sides
