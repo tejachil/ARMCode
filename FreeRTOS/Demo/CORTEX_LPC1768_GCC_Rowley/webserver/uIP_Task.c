@@ -262,8 +262,6 @@ extern void vParTestSetLEDState( long lState );
 	c = strstr( pcInputString, "index.html?" );
     if( c )
     {
-    	//c = strstr( pcInputString, "index.html?" ); 
-		/* Turn the FIO1 LED's on or off in accordance with the check box status. */
 		static xTaskHandle roverTaskHandle, mapTaskHandle;
 		if (strstr( c, "act=Start" ) != NULL )
 		{
@@ -271,12 +269,12 @@ extern void vParTestSetLEDState( long lState );
 			if(strstr(c, "regPol=1") != NULL){
 				roverInfo->map->taskFlags |= REGULAR;
 			}
-			if(strstr(c, "regPol=1") != NULL){
+			if(strstr(c, "rev=1") != NULL){
 				roverInfo->map->taskFlags |= REVOLVE;
 			}
 			c = strstr(c, "polSid=");
 			if(c[7] != '&'){
-				roverInfo->map->numberSides = c[7] - 0;
+				roverInfo->map->numberSides = c[7] - '0';
 			}
 			else{
 				roverInfo->map->numberSides = 0;
@@ -294,6 +292,11 @@ extern void vParTestSetLEDState( long lState );
 		}
     }	
 	
+	c = strstr( pcInputString, "runtime.shtml?" );
+    if( c ){
+		// TODO: this is where we need to process a new press
+    }
+
 	c = strstr( pcInputString, "io.shtml?" );
     if( c )
     {
