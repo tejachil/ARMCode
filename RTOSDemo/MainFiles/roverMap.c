@@ -19,6 +19,8 @@ static char debugBuf[BUFFER_SIZE];
 void mapRoverTask( void *param );
 double calculateArea(uint8_t sides, double *x, double *y);
 
+double calculateRegularArea(uint8_t sides, uint8_t totalSides);
+
 void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle* taskHandle){
 
 	setMapCoordinatesPointer(guiMapCoordinates);
@@ -86,97 +88,100 @@ void mapRoverTask( void *param ){
 		//printFloat("Side Dist: ", receivedCorner.distSide, 1);
 		
 		totalAngle += receivedCorner.angleCornerExterior;
-		if(cornersCount != 0){
-			//totalAngle += receivedCorner.angleCornerExterior;
-			receivedCorner.distSide += mapCorners[cornersCount-1].distFromSide;
-			printFloat("PrevSide:", mapCorners[cornersCount-1].distFromSide, 1);
-			printFloat("WithPrevSide:", receivedCorner.distSide, 1);
-			// Yasir's conversion to coordinates
-			xPoints[cornersCount] = xPoints[cornersCount - 1] + receivedCorner.distSide*cos(totalCalcAngle*M_PI/180.0);
-			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
-			totalCalcAngle -= receivedCorner.angleCornerExterior;
 
-			sprintf(buf, "Deg=%.1f Len=%.1f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
-			strcat(debugBuf, buf);
-
-			sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
-			strcat(debugBuf, buf);
-			if ((totalAngle) >= 350.0){
-				// TODO: calculate area;
-				// param for calculateArea (side) is 1 minus the number of sides
-				sprintf(buf, "** Greater than 350 **, A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
+		// For a regular polygon
+		if((roverMapStruct->taskFlags)&REGULAR){
+			if(cornersCount != 0){
+				receivedCorner.distSide += mapCorners[cornersCount-1].distFromSide;
+				sprintf(buf, "Deg=%.1f Len=%.1f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
 				strcat(debugBuf, buf);
+
+				sprintf(buf, "A=%f\n", cornersCount, calculateRegularArea(cornersCount+1, roverMapStruct->numberSides));
+				strcat(debugBuf, buf);
+				
+				if ((totalAngle) >= 350.0){
+					// param for calculateArea (side) is 1 minus the number of sides
+					sprintf(buf, "** Greater than 350 **, S=%d A=%f\n", cornersCount, calculateRegularArea(cornersCount+1, roverMapStruct->numberSides));
+					strcat(debugBuf, buf);
+				}
 			}
 		}
+
+		// If it is not a regular polygon
 		else{
-			totalCalcAngle = 90;
-			xPoints[0] = 0;
-			xPoints[0] = 0;
+			if(cornersCount != 0){
+				//totalAngle += receivedCorner.angleCornerExterior;
+				receivedCorner.distSide += mapCorners[cornersCount-1].distFromSide;
+				
+				// Yasir's conversion to coordinates
+				xPoints[cornersCount] = xPoints[cornersCount - 1] + receivedCorner.distSide*cos(totalCalcAngle*M_PI/180.0);
+				yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
+				totalCalcAngle -= receivedCorner.angleCornerExterior;
+
+				sprintf(buf, "Deg=%.1f Len=%.1f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
+				strcat(debugBuf, buf);
+
+				sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
+				strcat(debugBuf, buf);
+				
+				if ((totalAngle) >= 350.0){
+					// param for calculateArea (side) is 1 minus the number of sides
+					sprintf(buf, "** Greater than 350 **, A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
+					strcat(debugBuf, buf);
+				}
+			}
+			else{
+				totalCalcAngle = 90;
+				xPoints[0] = 0;
+				xPoints[0] = 0;
+			}
 		}
 
-		sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*5 + 100), (int)(yPoints[cornersCount]*-5 + 400));
-		strcat(guiMapCoordinates, buf);
 
-		/*sprintf(buf, "Deg=%f Len=%f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
-		strcat(debugBuf, buf);
-		
-		sprintf(buf, "%f, %f\n", xPoints[cornersCount], yPoints[cornersCount]);
-		strcat(debugBuf, buf);
-
-		sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
-		strcat(debugBuf, buf);
-*/
 		if(cornersCount < MAXIMUM_CORNERS){
 			mapCorners[cornersCount] = receivedCorner;
 			++cornersCount;
 		}
-
-
-		
-		/*if(totalAngle >= 370.0){
-			area = (mapCorners[1].distSide + mapCorners[0].distFromSide) * (mapCorners[2].distSide + mapCorners[1].distFromSide);
-
-			number = area;
-			intPart = (int)number;
-			decimalPart = (number - (int)number)*1000;
-			sprintf(lcdBuffer, "Area=%d.%d, ", intPart,decimalPart);
-			if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
-				VT_HANDLE_FATAL_ERROR(0);
-			}
-		}
-		else{*/
-			/*number = receivedCorner.distSide;
-			intPart = (int)number;
-			decimalPart = (number - (int)number)*1000;
-			sprintf(lcdBuffer, "%d.%d, ", intPart,decimalPart);
-			if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
-				VT_HANDLE_FATAL_ERROR(0);
-			}
-
-			number = receivedCorner.distFromSide;
-			intPart = (int)number;
-			decimalPart = (number - (int)number)*1000;
-			sprintf(lcdBuffer, "%d.%d", intPart,decimalPart);
-			if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
-				VT_HANDLE_FATAL_ERROR(0);
-			}*/
-
-		//}
 	}
 }
 
 double calculateArea(uint8_t sides, double *x, double *y){
 	uint8_t i = 0;
-	//double sum1 = 0.0;
-	//double sum2 = 0.0;
 	double sum = 0.0;
 	for(i; i < sides; ++i){
-	//	sum1 += x[i]*y[(i+1)%sides];
-	//	sum2 += y[i]*x[(i+1)%sides];
 		sum += x[i]*y[(i+1)%sides] - y[i]*x[(i+1)%sides];
 	}
 	sum  /= 2.0;
 	
 	if (sum < 0.0)	sum *= -1.0;
 	return sum;
+}
+
+double calculateRegularArea(uint8_t sides, uint8_t totalSides){
+	double length = 0.0;
+	double angle = 0.0;
+	char buf[20];
+	uint8_t i = 1;
+	for(i; i < sides; ++i){
+		length += mapCorners[i].distSide; 
+		angle += mapCorners[i].angleCornerExterior;
+	}
+	sprintf(buf, "TOT L=%f AN=%f\n", length, angle);
+	strcat(debugBuf, buf);
+	length /= (sides-1);
+	angle /= (sides-1);
+	sprintf(buf, "AV L=%f AN=%f\n", length, angle);
+	strcat(debugBuf, buf);
+
+	if(totalSides == 0)		totalSides = 360/angle;
+
+	double area;
+	area = 4*tan(M_PI/totalSides);
+	
+	sprintf(buf, "TAN %f\n", area);
+	strcat(debugBuf, buf);
+
+	area = totalSides*length*length/area;
+
+	return area;
 }
