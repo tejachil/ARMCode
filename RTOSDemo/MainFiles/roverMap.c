@@ -85,10 +85,9 @@ void mapRoverTask( void *param ){
 		printFloat("Angle: ", receivedCorner.angleCornerExterior, 0);
 		//printFloat("Side Dist: ", receivedCorner.distSide, 1);
 		
-
-
+		totalAngle += receivedCorner.angleCornerExterior;
 		if(cornersCount != 0){
-			totalAngle += receivedCorner.angleCornerExterior;
+			//totalAngle += receivedCorner.angleCornerExterior;
 			receivedCorner.distSide += mapCorners[cornersCount-1].distFromSide;
 			printFloat("PrevSide:", mapCorners[cornersCount-1].distFromSide, 1);
 			printFloat("WithPrevSide:", receivedCorner.distSide, 1);
@@ -97,12 +96,12 @@ void mapRoverTask( void *param ){
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
 			totalCalcAngle -= receivedCorner.angleCornerExterior;
 
-			sprintf(buf, "%f %f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
+			sprintf(buf, "Deg=%f Len=%f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
 			strcat(debugBuf, buf);
-			
+
 			sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
 			strcat(debugBuf, buf);
-			if ((totalAngle + mapCorners[cornersCount].angleCornerExterior) >= 350.0){
+			if ((totalAngle) >= 350.0){
 				// TODO: calculate area;
 				// param for calculateArea (side) is 1 minus the number of sides
 				sprintf(buf, "** Greater than 350 **, A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
@@ -118,10 +117,20 @@ void mapRoverTask( void *param ){
 		sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*5 + 100), (int)(yPoints[cornersCount]*-5 + 400));
 		strcat(guiMapCoordinates, buf);
 
+		/*sprintf(buf, "Deg=%f Len=%f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
+		strcat(debugBuf, buf);
+		
+		sprintf(buf, "%f, %f\n", xPoints[cornersCount], yPoints[cornersCount]);
+		strcat(debugBuf, buf);
+
+		sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
+		strcat(debugBuf, buf);
+*/
 		if(cornersCount < MAXIMUM_CORNERS){
 			mapCorners[cornersCount] = receivedCorner;
 			++cornersCount;
 		}
+
 
 		
 		/*if(totalAngle >= 370.0){
@@ -160,12 +169,13 @@ double calculateArea(uint8_t sides, double *x, double *y){
 	uint8_t i = 0;
 	//double sum1 = 0.0;
 	//double sum2 = 0.0;
-	double sum = 0;
+	double sum = 0.0;
 	for(i; i < sides; ++i){
-		//sum1 += x[i]*y[(i+1)%sides];
-		//sum2 += y[i]*x[(i+1)%sides];
+	//	sum1 += x[i]*y[(i+1)%sides];
+	//	sum2 += y[i]*x[(i+1)%sides];
 		sum += x[i]*y[(i+1)%sides] - y[i]*x[(i+1)%sides];
 	}
+	sum  /= 2.0;
 	
 	if (sum < 0.0)	sum *= -1.0;
 	return sum;
