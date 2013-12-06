@@ -369,12 +369,13 @@ void roverControlTask( void *param ){
 			}
 
 			// Adds the front distance
-			if(newCorner.angleCornerExterior > 70.0){
+			//if(newCorner.angleCornerExterior > 59.0){
 				frontDist = (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/tan(newCorner.angleCornerExterior*M_PI/180.0);
 				frontDist = roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] - frontDist;
 				printFloat("Front Dist:", frontDist, 1);
+			if(frontDist > 0.0)
 				newCorner.distSide += frontDist;
-			}
+			//}
 			//set request type to sensor distance 
 			requestType = REQUEST_TYPE_DISTANCE;
 			//getEncoderDistance(receivedMsg.data[2], );
