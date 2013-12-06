@@ -88,6 +88,7 @@ void mapRoverTask( void *param ){
 		//printFloat("Side Dist: ", receivedCorner.distSide, 1);
 		
 		totalAngle += receivedCorner.angleCornerExterior;
+		mapCorners[cornersCount] = receivedCorner;
 
 		// For a regular polygon
 		if((roverMapStruct->taskFlags)&REGULAR){
@@ -140,7 +141,6 @@ void mapRoverTask( void *param ){
 
 
 		if(cornersCount < MAXIMUM_CORNERS){
-			mapCorners[cornersCount] = receivedCorner;
 			++cornersCount;
 		}
 	}
@@ -165,17 +165,17 @@ double calculateRegularArea(uint8_t sides, uint8_t totalSides){
 	uint8_t i = 1;
 	
 	for(i; i < sides; ++i){
-		length += mapCorners[i].distSide; 
+		length += mapCorners[i].distSide;
 		angle += mapCorners[i].angleCornerExterior;
 	}
 
-	sprintf(buf, "Total: L=%.2f A=%.2f\n", length, angle);
+	sprintf(buf, "Total: %d L=%.2f A=%.2f\n", sides, length, angle);
 	strcat(debugBuf, buf);
 
-	length /= (sides-2);
-	angle /= (sides-2);
+	length /= (sides-1);
+	angle /= (sides-1);
 
-	sprintf(buf, "Average: L=%.2ff A=%.2f\n", length, angle);
+	sprintf(buf, "Average: L=%.2f A=%.2f\n", length, angle);
 	strcat(debugBuf, buf);
 
 	if(totalSides == 0)		totalSides = 360/angle;
