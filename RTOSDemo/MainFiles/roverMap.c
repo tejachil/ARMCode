@@ -93,10 +93,11 @@ void mapRoverTask( void *param ){
 		if((roverMapStruct->taskFlags)&REGULAR){
 			if(cornersCount != 0){
 				receivedCorner.distSide += mapCorners[cornersCount-1].distFromSide;
-				sprintf(buf, "Deg=%.1f Len=%.1f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
+				sprintf(buf, "Deg=%.2f Len=%.2f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
 				strcat(debugBuf, buf);
 
-				sprintf(buf, "A=%f\n", cornersCount, calculateRegularArea(cornersCount+1, roverMapStruct->numberSides));
+				double area = calculateRegularArea(cornersCount+1, roverMapStruct->numberSides);
+				sprintf(buf, "A=%f\n", area);
 				strcat(debugBuf, buf);
 				
 				if ((totalAngle) >= 350.0){
@@ -162,15 +163,19 @@ double calculateRegularArea(uint8_t sides, uint8_t totalSides){
 	double angle = 0.0;
 	char buf[20];
 	uint8_t i = 1;
+	
 	for(i; i < sides; ++i){
 		length += mapCorners[i].distSide; 
 		angle += mapCorners[i].angleCornerExterior;
 	}
-	sprintf(buf, "TOT L=%f AN=%f\n", length, angle);
+
+	sprintf(buf, "Total: L=%.2f A=%.2f\n", length, angle);
 	strcat(debugBuf, buf);
-	length /= (sides-1);
-	angle /= (sides-1);
-	sprintf(buf, "AV L=%f AN=%f\n", length, angle);
+
+	length /= (sides-2);
+	angle /= (sides-2);
+
+	sprintf(buf, "Average: L=%.2ff A=%.2f\n", length, angle);
 	strcat(debugBuf, buf);
 
 	if(totalSides == 0)		totalSides = 360/angle;
@@ -178,10 +183,13 @@ double calculateRegularArea(uint8_t sides, uint8_t totalSides){
 	double area;
 	area = 4*tan(M_PI/totalSides);
 	
-	sprintf(buf, "TAN %f\n", area);
-	strcat(debugBuf, buf);
+	//sprintf(buf, "4tan(): %.2f\n", area);
+	//strcat(debugBuf, buf);
 
 	area = totalSides*length*length/area;
+	
+	//sprintf(buf, "Area: %.2f\n", area);
+	//strcat(debugBuf, buf);
 
 	return area;
 }
