@@ -74,6 +74,8 @@ void roverControlTask( void *param ){
 	double anglePollTotal = 0.0, thresholdAnglePollTotal = 0.0;
 	uint8_t anglePollCount = 0, thresholdAnglePollCount = 0;
 
+	double totalRevolve = 0;
+
 	// Update the count and send the request
 	sensorRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
 	uartEnQ(roverControlData->uartDevice, sensorRequestMsg.msgType, sensorRequestMsg.msgID, sensorRequestMsg.txLen,
@@ -111,8 +113,19 @@ void roverControlTask( void *param ){
 			
 			switch(roverControlData->state){
 				case INIT:
-					//send command to move rover
-					moveRover(roverControlData);
+					if((roverMap->taskFlags)&REVOLVE){
+						// TODO: revolve the rover
+						totalRevolve = 0;
+						turnRover(roverControlData, REVOLVE_ANGLE_STEP);
+						roverControlData->state = REVOLVE;
+					}
+					else{
+						//send command to move rover
+						moveRover(roverControlData);
+					}
+					break;
+				case REVOLVE:
+					// TODO: REVOLVE STATE
 					break;
 				case TRAVERSAL:
 					vtLEDOff(0x7F);

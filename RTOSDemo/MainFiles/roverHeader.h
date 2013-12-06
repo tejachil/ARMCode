@@ -30,7 +30,7 @@
 //State machine
 #define INIT 						0
 #define TRAVERSAL 					1
-#define FIX 						2
+#define FIX 						7
 #define TOO_CLOSE					3
 #define TOO_CLOSE_FORWARD			4
 #define TURN						5
@@ -55,6 +55,8 @@
 #define ROVER_LENGTH_WIDTH_OFFSET	4.6
 
 #define ANGLE_SAMPLE_COUNT			200
+
+#define REVOLVE_ANGLE_STEP			19.0
 
 //task ID values
 #define REGULAR						1
