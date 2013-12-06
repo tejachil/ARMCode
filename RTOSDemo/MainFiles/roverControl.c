@@ -114,14 +114,14 @@ void roverControlTask( void *param ){
 			switch(roverControlData->state){
 				case INIT:
 					if((roverMap->taskFlags)&REVOLVE){
-						vtLEDOn(0x40);
+						//vtLEDOn(0x40);
 						// TODO: revolve the rover
 						totalRevolve = 0;
 						turnRover(roverControlData, REVOLVE_ANGLE_STEP - REVOLVE_ANGLE_FUDGE_DEV);
 						roverControlData->state = REVOLVE;
 					}
 					else{
-						vtLEDOff(0x40);
+						//vtLEDOff(0x40);
 						//send command to move rover
 						moveRover(roverControlData);
 					}
@@ -131,7 +131,7 @@ void roverControlTask( void *param ){
 					// some calucations
 					if(turnStatusReceived != 0){
 						totalRevolve += REVOLVE_ANGLE_STEP;
-						if(totalRevolve < (360 - REVOLVE_ANGLE_STEP)){
+						if(totalRevolve < (360)){
 							turnRover(roverControlData, REVOLVE_ANGLE_STEP - REVOLVE_ANGLE_FUDGE_DEV);
 							roverControlData->state = REVOLVE;
 						}

@@ -57,8 +57,8 @@
 
 #define ANGLE_SAMPLE_COUNT			200
 
-#define REVOLVE_ANGLE_STEP			20.0
-#define REVOLVE_ANGLE_FUDGE_DEV		1.0
+#define REVOLVE_ANGLE_STEP			30.0
+#define REVOLVE_ANGLE_FUDGE_DEV		3.0
 
 //task ID values
 #define REGULAR						1
