@@ -4,6 +4,8 @@
 
 double getEncoderDistance(uint8_t revolutions, uint16_t ticksOffset);
 
+static double sideAngle = 0.0;
+
 void readNewMsg(RoverControlStruct *roverControlData, public_message_t *receivedMsg){
 	int i=0;
 	//store each sesnor a sampling array for averaging later on
@@ -46,16 +48,9 @@ int isSensorInRange(RoverControlStruct *roverControlData){
 
 void findAngle(RoverControlStruct *roverControlData){
 	//TODO: find angle between sensors
-	double sideAngle = 0;
-    if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]){
-    	//sideAngle = atanf((roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
-    	roverControlData->frontSensorAngle = atanf(DISTANCE_BETWEEN_FRONT_MEDIUM/(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]-roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR])) * 180/M_PI - sideAngle;
-	}
-	else{
-		//sideAngle = atanf((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
-    	roverControlData->frontSensorAngle = atanf(DISTANCE_BETWEEN_FRONT_MEDIUM/(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]-roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR])) * 180/M_PI + sideAngle;
 
-	}
+	roverControlData->frontSensorAngle = atanf(DISTANCE_BETWEEN_FRONT_MEDIUM/(roverControlData->sensorDistance[FRONT_RIGHT_MEDIUM_SENSOR]-roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR])) * 180/M_PI;// - sideAngle;
+
     if(roverControlData->frontSensorAngle <= 0.0)
     	roverControlData->frontSensorAngle *= -1.0;
     /*if(roverControlData->frontSensorAngle >= 90.0)
@@ -95,9 +90,21 @@ int frontWallStatus(RoverControlStruct *roverControlData, double thresholdAngleP
 	average /= 2;
 	//find the adjustment necessary for the front threshold based on the front angle
 	int thresholdAdjustment  = 0;
-	if(thresholdAnglePollCount > 10){
-		thresholdAdjustment = (90 - thresholdAnglePollTotal/thresholdAnglePollCount) * FRONT_THRESHOLD_ADJUSTMENT;
+	//if(thresholdAnglePollCount > 10){
+	if(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] > FRONT_STOP_DISTANCE + 5.0){
+		//thresholdAdjustment = (90 - thresholdAnglePollTotal/thresholdAnglePollCount) * FRONT_THRESHOLD_ADJUSTMENT;
+	    if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]){
+	    	sideAngle = atanf((roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
+		}
+		else{
+			sideAngle = -1*atanf((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
+		}
+	}
+	else{
+		thresholdAdjustment = (90 - roverControlData->frontSensorAngle) * FRONT_THRESHOLD_ADJUSTMENT;
 		if(thresholdAdjustment < 0) thresholdAdjustment = 0;
+		if(thresholdAdjustment > 5) thresholdAdjustment = 4.0;
+
 	}
 	//Using average is not a good idea, we are using threshold adjustment for now.
 	//if(average < (FRONT_STOP_DISTANCE + thresholdAdjustment)){
