@@ -114,21 +114,50 @@ void roverControlTask( void *param ){
 			switch(roverControlData->state){
 				case INIT:
 					if((roverMap->taskFlags)&REVOLVE){
+						vtLEDOn(0x40);
 						// TODO: revolve the rover
 						totalRevolve = 0;
-						turnRover(roverControlData, REVOLVE_ANGLE_STEP);
+						turnRover(roverControlData, REVOLVE_ANGLE_STEP - REVOLVE_ANGLE_FUDGE_DEV);
 						roverControlData->state = REVOLVE;
 					}
 					else{
+						vtLEDOff(0x40);
 						//send command to move rover
 						moveRover(roverControlData);
 					}
 					break;
 				case REVOLVE:
 					// TODO: REVOLVE STATE
+					// some calucations
+					if(turnStatusReceived != 0){
+						totalRevolve += REVOLVE_ANGLE_STEP;
+						if(totalRevolve < (360 - REVOLVE_ANGLE_STEP)){
+							turnRover(roverControlData, REVOLVE_ANGLE_STEP - REVOLVE_ANGLE_FUDGE_DEV);
+							roverControlData->state = REVOLVE;
+						}
+						else{
+							// TODO: add case to go strait until you reach the wall and resume normal operation
+							moveRover(roverControlData);
+							roverControlData->state = STRAIGHT;
+							requestType = REQUEST_TYPE_DISTANCE;
+						}
+						turnStatusReceived = 0;
+					}
+					else{
+						requestType = REQUEST_TYPE_TURN_STATUS;
+					}
+
+					break;
+				case STRAIGHT:
+					// Handle if too close to wall;
+					if(frontWallStatus(roverControlData, thresholdAnglePollTotal, thresholdAnglePollCount) == CLOSE_FRONT_WALL){
+						findAngle(roverControlData);
+						turnRover(roverControlData, roverControlData->frontSensorAngle);
+						requestType = REQUEST_TYPE_TURN_STATUS;
+					}
 					break;
 				case TRAVERSAL:
-					vtLEDOff(0x7F);
+					vtLEDOff(0x3F);
 					vtLEDOn(0x01);	
 					//sprintf(buf, "TRAVERSAL");
 
@@ -175,7 +204,7 @@ void roverControlTask( void *param ){
 					}
 					break;
 				case FIX:
-					vtLEDOff(0x7F);
+					vtLEDOff(0x3F);
 					vtLEDOn(0x02);
 					if(frontWallStatus(roverControlData, thresholdAnglePollTotal, thresholdAnglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
@@ -395,6 +424,8 @@ void roverControlTask( void *param ){
 		}
 		//received turn status
 		else if (receivedMsg.message_type ==  PUB_MSG_T_TURN_STATUS){
+			if(roverControlData->state == REVOLVE)
+				requestType = REQUEST_TYPE_DISTANCE;
 			if(receivedMsg.data[0]){
 				turnStatusReceived = 1;
 				//set request type to sensor distance 

@@ -35,6 +35,7 @@
 #define TOO_CLOSE_FORWARD			4
 #define TURN						5
 #define STOP	  					6
+#define STRAIGHT					8
 
 //front wall states
 #define FAR_FRONT_WALL				0
@@ -56,7 +57,8 @@
 
 #define ANGLE_SAMPLE_COUNT			200
 
-#define REVOLVE_ANGLE_STEP			19.0
+#define REVOLVE_ANGLE_STEP			20.0
+#define REVOLVE_ANGLE_FUDGE_DEV		1.0
 
 //task ID values
 #define REGULAR						1
