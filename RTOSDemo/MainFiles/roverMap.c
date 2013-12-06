@@ -101,10 +101,10 @@ void mapRoverTask( void *param ){
 
 			sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
 			strcat(debugBuf, buf);
-			if ((totalAngle) >= 350.0){
+			if ((totalAngle) >= 330.0){
 				// TODO: calculate area;
 				// param for calculateArea (side) is 1 minus the number of sides
-				sprintf(buf, "** Greater than 350 **, A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
+				sprintf(buf, "** Polygon complete **, A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
 				strcat(debugBuf, buf);
 			}
 		}
