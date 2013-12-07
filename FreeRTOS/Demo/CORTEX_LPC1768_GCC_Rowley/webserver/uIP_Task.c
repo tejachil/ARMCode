@@ -256,6 +256,7 @@ struct uip_eth_addr xAddr;
 void vApplicationProcessFormInput( char *pcInputString )
 {
 char *c;
+static uint8_t numSize;
 extern void vParTestSetLEDState( long lState );
 
 	/* Process the form input sent by the IO page of the served HTML. */
@@ -279,6 +280,10 @@ extern void vParTestSetLEDState( long lState );
 			else{
 				roverInfo->map->numberSides = 0;
 			}
+			
+			roverInfo->map->gotoX = -1.0;
+			roverInfo->map->gotoY = -1.0;
+
 			startRoverMapping(roverInfo->map, tskIDLE_PRIORITY, &mapTaskHandle);
 			startRoverControlTask(roverInfo->control, tskIDLE_PRIORITY, roverInfo->uart, roverInfo->map, &roverTaskHandle);
 			//vParTestSetLEDState( pdTRUE ); // Add the task for when the Start button is pressed
@@ -294,7 +299,18 @@ extern void vParTestSetLEDState( long lState );
 	
 	c = strstr( pcInputString, "runtime.shtml?" );
     if( c ){
-		// TODO: this is where we need to process a new press
+    	if(roverInfo->map->gotoX < 0.0 && roverInfo->map->gotoY < 0.0){
+	    	c = strstr( c, "x=" );
+	    	char num[5];
+	    	numSize = (strstr( c, "&" ) - &c[2])/sizeof(char);
+
+	    	memcpy(num, &c[2], numSize);
+			num[numSize] = 0;
+			roverInfo->map->gotoX = atoi(num);
+
+			c = strstr( c, "y=" );
+			roverInfo->map->gotoY = atoi(&c[2]);
+		}
     }
 
 	c = strstr( pcInputString, "io.shtml?" );

@@ -64,6 +64,11 @@
 #define REGULAR						1
 #define REVOLVE						2
 
+//map parameters
+#define MAP_SCALE_FACTOR			4
+#define MAP_X_OFFSET				50
+#define MAP_Y_OFFSET				350
+
 typedef struct __RoverControlStruct {
 	UARTstruct *uartDevice;
 	xQueueHandle inQ;

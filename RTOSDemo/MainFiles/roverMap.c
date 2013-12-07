@@ -114,7 +114,7 @@ void mapRoverTask( void *param ){
 			xPoints[0] = 0;
 		}
 
-		sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*5 + 100), (int)(yPoints[cornersCount]*-5 + 400));
+		sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*MAP_SCALE_FACTOR + MAP_X_OFFSET), (int)(yPoints[cornersCount]*-MAP_SCALE_FACTOR + MAP_Y_OFFSET));
 		strcat(guiMapCoordinates, buf);
 
 		/*sprintf(buf, "Deg=%f Len=%f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
