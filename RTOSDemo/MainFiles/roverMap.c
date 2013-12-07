@@ -180,3 +180,13 @@ double calculateArea(uint8_t sides, double *x, double *y){
 	if (sum < 0.0)	sum *= -1.0;
 	return sum;
 }
+
+uint8_t getGotoAngle(RoverMapStruct *map){
+
+	return 0;
+}
+
+double getGotoDistance(RoverMapStruct *map){
+	
+	return 0.0;
+}

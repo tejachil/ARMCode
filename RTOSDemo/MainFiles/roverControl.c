@@ -110,7 +110,12 @@ void roverControlTask( void *param ){
 			printFloat("Angle:", roverControlData->frontSensorAngle, 1);*/
 			/*sprintf(buf, "%f\n%f", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]
 								 , roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]);*/
-			
+
+			// Check if goto location is set from gui and do that if it is set
+			if(roverMap->gotoX > 0.0 && roverMap->gotoY > 0.0){
+				roverControlData->state = GOTO;
+			}
+
 			switch(roverControlData->state){
 				case INIT:
 					if((roverMap->taskFlags)&REVOLVE){
@@ -155,6 +160,10 @@ void roverControlTask( void *param ){
 						turnRover(roverControlData, roverControlData->frontSensorAngle);
 						requestType = REQUEST_TYPE_TURN_STATUS;
 					}
+					break;
+				case GOTO:
+
+					stopRover(roverControlData);
 					break;
 				case TRAVERSAL:
 					vtLEDOff(0x3F);
