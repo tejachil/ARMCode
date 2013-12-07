@@ -135,5 +135,5 @@ double getEncoderDistance(uint8_t revolutions, uint16_t ticksOffset){
 void distanceToEncoder(double distance, uint8_t* revolutions, uint16_t* ticksOffset){
 	distance = distance/WHEEL_CIRCUMFERENCE;
 	*revolutions = (uint8_t)(distance);
-	*ticksOffset = (uint16_t)((distance - revolutions)*TICKS_PER_REVOLUTION);
+	*ticksOffset = (uint16_t)((distance - *revolutions)*TICKS_PER_REVOLUTION);
 }
