@@ -164,9 +164,13 @@ void roverControlTask( void *param ){
 				case GOTO:
 					if(turnStatusReceived != 0){
 						//TODO if the turn is complete go strait
-						
+						uint8_t revs = 0;
+						uint16_t ticksOffset = 0;
+						distanceToEncoder(getGotoDistance(roverMap), &revs, &ticksOffset);
+						moveRoverDist(roverControlData, revs, ticksOffset);
 					}
 					else{
+						convertGotoCoordinates(roverMap);
 						stopRover(roverControlData);
 						turnRover(roverControlData, getGotoAngle(roverMap));
 						requestType = REQUEST_TYPE_TURN_STATUS;
