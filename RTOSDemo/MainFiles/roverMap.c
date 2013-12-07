@@ -181,12 +181,15 @@ double calculateArea(uint8_t sides, double *x, double *y){
 	return sum;
 }
 
-uint8_t getGotoAngle(RoverMapStruct *map){
+void convertGotoCoordinates(RoverMapStruct *map){
+	map->gotoX = (map->gotoX - MAP_X_OFFSET)/MAP_SCALE_FACTOR;
+	map->gotoY = (map->gotoY - MAP_Y_OFFSET)/-MAP_SCALE_FACTOR;
+}
 
-	return 0;
+uint8_t getGotoAngle(RoverMapStruct *map){
+	return (uint8_t)(atanf(map->gotoX/map->gotoY)*180/M_PI);
 }
 
 double getGotoDistance(RoverMapStruct *map){
-	
-	return 0.0;
+	return sqrt(map->gotoX*map->gotoX + map->gotoY*map->gotoY);
 }
