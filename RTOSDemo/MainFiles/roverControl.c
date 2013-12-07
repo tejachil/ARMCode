@@ -353,7 +353,7 @@ void roverControlTask( void *param ){
 			}
 		}
 		//received encoder data
-		else if (receivedMsg.message_type == PUB_MSG_T_ENCODER_DATA){
+		else if (receivedMsg.message_type == PUB_MSG_T_ENCODER_DATA && roverControlData->state == STOP){
 			// Variables to hold the distance readings for each encoder
 			double distSide1, distSide2, frontDist;
 
@@ -378,14 +378,14 @@ void roverControlTask( void *param ){
 			roverControlData->frontSensorAngle = anglePollTotal/anglePollCount; // This gets overwritten bellow with the qsort value
 			
 			// New quicksort implementation added here:
-			//qsort(anglesSamples, anglePollCount, sizeof(int), cmpfunc);
+			qsort(anglesSamples, anglePollCount, sizeof(int), cmpfunc);
 
-			/*roverControlData->frontSensorAngle = 0.0;
+			roverControlData->frontSensorAngle = 0.0;
 			uint8_t i = anglePollCount;
 			for((i = anglePollCount/2 - 2); i <= (anglePollCount/2 + 2); ++i){
 				roverControlData->frontSensorAngle += anglesSamples[i];
 			}
-			roverControlData->frontSensorAngle /= 5.0;*/
+			roverControlData->frontSensorAngle /= 5.0;
 			// sprintf(buf, "%d  %d  %d    %d  %d  %d \nSide: %f \nAngle: %f", receivedMsg.data[0], receivedMsg.data[1], receivedMsg.data[2], receivedMsg.data[3], receivedMsg.data[4], receivedMsg.data[5], newCorner.distSide, roverControlData->frontSensorAngle);
 			 //roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR]);
 			//printFloat("\t",  roverControlData->frontSensorAngle, 1);
