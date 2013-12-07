@@ -163,17 +163,21 @@ void roverControlTask( void *param ){
 					}
 					break;
 				case GOTO:
+					static double tempDist = 0.0
 					if(turnStatusReceived != 0){
 						//TODO if the turn is complete go strait
 						uint8_t revs = 0;
 						uint16_t ticksOffset = 0;
-						distanceToEncoder(getGotoDistance(roverMap), &revs, &ticksOffset);
+						distanceToEncoder(tempDist, &revs, &ticksOffset);
 						moveRoverDist(roverControlData, revs, ticksOffset);
 						requestType = REQUEST_TYPE_NULL;
 					}
 					else{
 						convertGotoCoordinates(roverMap);
 						stopRover(roverControlData);
+						tempDist = getGotoDistance(roverMap);
+						tempDist -= (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
+						tempDist -= ROVER_LENGTH;
 						turnRover(roverControlData, getGotoAngle(roverMap));
 						requestType = REQUEST_TYPE_TURN_STATUS;
 						roverControlData->state = GOTO;
