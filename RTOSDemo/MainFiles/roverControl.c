@@ -162,8 +162,17 @@ void roverControlTask( void *param ){
 					}
 					break;
 				case GOTO:
+					if(turnStatusReceived != 0){
+						//TODO if the turn is complete go strait
+						
+					}
+					else{
+						stopRover(roverControlData);
+						turnRover(roverControlData, getGotoAngle(roverMap));
+						requestType = REQUEST_TYPE_TURN_STATUS;
+						roverControlData->state = GOTO;
+					}
 
-					stopRover(roverControlData);
 					break;
 				case TRAVERSAL:
 					vtLEDOff(0x3F);
