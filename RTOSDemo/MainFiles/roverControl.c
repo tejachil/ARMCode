@@ -9,6 +9,7 @@
 #define REQUEST_TYPE_DISTANCE		0
 #define REQUEST_TYPE_ENCODER		1
 #define REQUEST_TYPE_TURN_STATUS	2
+#define REQUEST_TYPE_NULL			3
 
 float difference;
 static RoverMapStruct *roverMap;
@@ -77,6 +78,8 @@ void roverControlTask( void *param ){
 
 	double totalRevolve = 0;
 
+	static double tempDist = 0.0;
+
 	// Update the count and send the request
 	sensorRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
 	uartEnQ(roverControlData->uartDevice, sensorRequestMsg.msgType, sensorRequestMsg.msgID, sensorRequestMsg.txLen,
@@ -123,6 +126,17 @@ void roverControlTask( void *param ){
 				newCorner.tempBefore = sideAngle;
 			}
 			
+			// Check if goto location is set from gui and do that if it is set
+			if(roverMap->gotoX > 0.0 && roverMap->gotoY > 0.0){
+				roverControlData->state = GOTO;
+			}
+
+			if(polygonComplete() > 0){
+				stopRover(roverControlData);
+				roverControlData->state = NULL_STATE;
+				requestType = REQUEST_TYPE_DISTANCE;
+			}
+
 			switch(roverControlData->state){
 				case INIT:
 					if((roverMap->taskFlags)&REVOLVE){
@@ -167,6 +181,27 @@ void roverControlTask( void *param ){
 						turnRover(roverControlData, roverControlData->frontSensorAngle);
 						requestType = REQUEST_TYPE_TURN_STATUS;
 					}
+					break;
+				case GOTO:
+					if(turnStatusReceived != 0){
+						//TODO if the turn is complete go strait
+						uint8_t revs = 0;
+						uint16_t ticksOffset = 0;
+						distanceToEncoder(tempDist, &revs, &ticksOffset);
+						moveRoverDist(roverControlData, revs, ticksOffset);
+						requestType = REQUEST_TYPE_NULL;
+					}
+					else{
+						convertGotoCoordinates(roverMap);
+						stopRover(roverControlData);
+						tempDist = getGotoDistance(roverMap);
+						//tempDist -= (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
+						tempDist -= 2*ROVER_LENGTH;
+						turnRover(roverControlData, getGotoAngle(roverMap));
+						requestType = REQUEST_TYPE_TURN_STATUS;
+						roverControlData->state = GOTO;
+					}
+
 					break;
 				case TRAVERSAL:
 					vtLEDOff(0x3F);
@@ -382,6 +417,8 @@ void roverControlTask( void *param ){
 							encoderReceived = 0;
 						}
 					}
+					break;
+				case NULL_STATE:
 					break;
 			}
 		}

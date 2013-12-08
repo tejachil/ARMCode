@@ -37,6 +37,8 @@
 #define TURN						5
 #define STOP	  					6
 #define STRAIGHT					8
+#define GOTO						9
+#define NULL_STATE					10
 
 //front wall states
 #define FAR_FRONT_WALL				0
@@ -64,6 +66,11 @@
 //task ID values
 #define REGULAR						1
 #define REVOLVE						2
+
+//map parameters
+#define MAP_SCALE_FACTOR			4
+#define MAP_X_OFFSET				50
+#define MAP_Y_OFFSET				350
 
 typedef struct __RoverControlStruct {
 	UARTstruct *uartDevice;

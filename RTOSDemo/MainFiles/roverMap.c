@@ -9,9 +9,11 @@ static double xPoints[MAXIMUM_CORNERS];
 static double yPoints[MAXIMUM_CORNERS];
 
 #define BUFFER_SIZE		1000
+#define TOTAL_ANGLE_THRESHOLD 330
 
 static char guiMapCoordinates[BUFFER_SIZE];
 static char debugBuf[BUFFER_SIZE];
+static uint8_t polyComp;
 
 //static uint8_t cornersCount;
 //vtLCDStruct *lcdStruct;
@@ -67,6 +69,7 @@ void mapRoverTask( void *param ){
 	uint8_t cornersCount = 0;
 
 	sprintf(guiMapCoordinates, "");
+	polyComp = 0;
 	
 	for(;;){
 		if (xQueueReceive(roverMapStruct->inQ, (void *) &receivedCorner, portMAX_DELAY) != pdTRUE) {
@@ -102,9 +105,10 @@ void mapRoverTask( void *param ){
 
 			sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
 			strcat(debugBuf, buf);
-			if ((totalAngle) >= 330.0){
+			if ((totalAngle) >= TOTAL_ANGLE_THRESHOLD){
 				// TODO: calculate area;
 				// param for calculateArea (side) is 1 minus the number of sides
+				polyComp = cornersCount;
 				sprintf(buf, "** Polygon complete **, A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
 				strcat(debugBuf, buf);
 			}
@@ -115,7 +119,7 @@ void mapRoverTask( void *param ){
 			xPoints[0] = 0;
 		}
 
-		sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*5 + 100), (int)(yPoints[cornersCount]*-5 + 400));
+		sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*MAP_SCALE_FACTOR + MAP_X_OFFSET), (int)(yPoints[cornersCount]*-MAP_SCALE_FACTOR + MAP_Y_OFFSET));
 		strcat(guiMapCoordinates, buf);
 
 		/*sprintf(buf, "Deg=%f Len=%f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
@@ -180,4 +184,34 @@ double calculateArea(uint8_t sides, double *x, double *y){
 	
 	if (sum < 0.0)	sum *= -1.0;
 	return sum;
+}
+
+void convertGotoCoordinates(RoverMapStruct *map){
+	map->gotoX = (map->gotoX - MAP_X_OFFSET)/MAP_SCALE_FACTOR;
+	map->gotoY = (map->gotoY - MAP_Y_OFFSET)/-MAP_SCALE_FACTOR;
+
+	sprintf(debugBuf, "GOTOX=%.2f GOTOY=%.2f\n", map->gotoX, map->gotoY);
+}
+
+uint8_t getGotoAngle(RoverMapStruct *map){
+	uint8_t returnAngle = (uint8_t)(atanf(map->gotoX/map->gotoY)*180/M_PI);
+
+	char buf[20];
+	sprintf(buf, "gotoAng=%d\n", returnAngle);
+	strcat(debugBuf, buf);
+
+	return returnAngle;
+}
+
+double getGotoDistance(RoverMapStruct *map){
+	double returnDist = sqrt(map->gotoX*map->gotoX + map->gotoY*map->gotoY);
+
+	char buf[20];
+	sprintf(buf, "gotoDist=%f\n", returnDist);
+	strcat(debugBuf, buf);
+	return returnDist;
+}
+
+uint8_t polygonComplete(){
+	return polyComp;
 }

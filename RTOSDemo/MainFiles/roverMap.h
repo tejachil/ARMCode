@@ -39,5 +39,12 @@ typedef struct __MapCornerStruct {
 
 void startRoverMapping(RoverMapStruct *roverMapStruct, unsigned portBASE_TYPE uxPriority, xTaskHandle* taskHandle);
 
+void convertGotoCoordinates(RoverMapStruct *map);
+
+uint8_t getGotoAngle(RoverMapStruct *map);
+
+double getGotoDistance(RoverMapStruct *map);
+
+uint8_t polygonComplete();
 
 #endif
