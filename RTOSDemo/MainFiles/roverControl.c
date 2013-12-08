@@ -407,9 +407,6 @@ void roverControlTask( void *param ){
 							else{
 								sideAngle = -1*atanf((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
 							}
-							newCorner.tempSide = sideAngle;
-							newCorner.tempEncoder = newCorner.angleCornerExterior;
-							//newCorner.angleCornerExterior = (newCorner.angleCornerExterior + encoderAngle)/2.0;
 							newCorner.angleCornerExterior += sideAngle;
 							if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);	
 							moveRover(roverControlData);

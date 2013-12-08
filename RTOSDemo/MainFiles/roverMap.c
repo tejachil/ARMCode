@@ -100,7 +100,7 @@ void mapRoverTask( void *param ){
 			xPoints[cornersCount] = xPoints[cornersCount - 1] + receivedCorner.distSide*cos(totalCalcAngle*M_PI/180.0);
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
 			totalCalcAngle -= receivedCorner.angleCornerExterior;
-			sprintf(buf, "Deg=%.1f F=%.1f OA=%.1f SB=%.1f SA=%.1f E=%.1f Len=%.1f S=%d\n", receivedCorner.angleCornerExterior,receivedCorner.tempFront, ang, receivedCorner.tempBefore, receivedCorner.tempSide, receivedCorner.tempEncoder, receivedCorner.distSide, cornersCount);
+			sprintf(buf, "Deg=%.1f F=%.1f OA=%.1f SB=%.1f Len=%.1f S=%d\n", receivedCorner.angleCornerExterior,receivedCorner.tempFront, ang, receivedCorner.tempBefore, receivedCorner.distSide, cornersCount);
 			strcat(debugBuf, buf);
 
 			sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
@@ -108,19 +108,34 @@ void mapRoverTask( void *param ){
 			if ((totalAngle) >= TOTAL_ANGLE_THRESHOLD){
 				// TODO: calculate area;
 				// param for calculateArea (side) is 1 minus the number of sides
-				polyComp = cornersCount;
+				if(polyComp == 0){
+					polyComp = -1;
+					sprintf(buf, "%d,%d %d,%d", (int)(xPoints[cornersCount]*MAP_SCALE_FACTOR + MAP_X_OFFSET), (int)(yPoints[cornersCount]*-MAP_SCALE_FACTOR + MAP_Y_OFFSET), MAP_X_OFFSET, MAP_Y_OFFSET);
+					strcat(guiMapCoordinates, buf);
+				}
+				else{
+					polyComp = cornersCount;
+					sprintf(buf, "%d,%d", MAP_X_OFFSET, MAP_Y_OFFSET);
+					strcat(guiMapCoordinates, buf);
+				}
 				sprintf(buf, "** Polygon complete **, A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
 				strcat(debugBuf, buf);
+			}
+			else{
+				sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*MAP_SCALE_FACTOR + MAP_X_OFFSET), (int)(yPoints[cornersCount]*-MAP_SCALE_FACTOR + MAP_Y_OFFSET));
+				strcat(guiMapCoordinates, buf);
 			}
 		}
 		else{
 			totalCalcAngle = 90;
 			xPoints[0] = 0;
 			xPoints[0] = 0;
+			sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*MAP_SCALE_FACTOR + MAP_X_OFFSET), (int)(yPoints[cornersCount]*-MAP_SCALE_FACTOR + MAP_Y_OFFSET));
+			strcat(guiMapCoordinates, buf);
 		}
 
-		sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*MAP_SCALE_FACTOR + MAP_X_OFFSET), (int)(yPoints[cornersCount]*-MAP_SCALE_FACTOR + MAP_Y_OFFSET));
-		strcat(guiMapCoordinates, buf);
+		//sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*MAP_SCALE_FACTOR + MAP_X_OFFSET), (int)(yPoints[cornersCount]*-MAP_SCALE_FACTOR + MAP_Y_OFFSET));
+		//strcat(guiMapCoordinates, buf);
 
 		/*sprintf(buf, "Deg=%f Len=%f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
 		strcat(debugBuf, buf);
