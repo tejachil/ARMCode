@@ -8,7 +8,7 @@ static MapCorner mapCorners[MAXIMUM_CORNERS];
 static double xPoints[MAXIMUM_CORNERS];
 static double yPoints[MAXIMUM_CORNERS];
 
-#define BUFFER_SIZE		500
+#define BUFFER_SIZE		1000
 
 static char guiMapCoordinates[BUFFER_SIZE];
 static char debugBuf[BUFFER_SIZE];
@@ -83,6 +83,8 @@ void mapRoverTask( void *param ){
 		// Print the received distance reading
 		vtLEDToggle(0x40);
 		printFloat("Angle: ", receivedCorner.angleCornerExterior, 0);
+		double ang = receivedCorner.angleCornerExterior;
+		receivedCorner.angleCornerExterior = receivedCorner.angleCornerExterior + receivedCorner.tempBefore/2.0;
 		//printFloat("Side Dist: ", receivedCorner.distSide, 1);
 		
 		totalAngle += receivedCorner.angleCornerExterior;
@@ -95,8 +97,7 @@ void mapRoverTask( void *param ){
 			xPoints[cornersCount] = xPoints[cornersCount - 1] + receivedCorner.distSide*cos(totalCalcAngle*M_PI/180.0);
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
 			totalCalcAngle -= receivedCorner.angleCornerExterior;
-
-			sprintf(buf, "Deg=%.1f Len=%.1f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
+			sprintf(buf, "Deg=%.1f F=%.1f OA=%.1f SB=%.1f SA=%.1f E=%.1f Len=%.1f S=%d\n", receivedCorner.angleCornerExterior,receivedCorner.tempFront, ang, receivedCorner.tempBefore, receivedCorner.tempSide, receivedCorner.tempEncoder, receivedCorner.distSide, cornersCount);
 			strcat(debugBuf, buf);
 
 			sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));

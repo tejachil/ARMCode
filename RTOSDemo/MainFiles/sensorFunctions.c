@@ -109,7 +109,7 @@ int frontWallStatus(RoverControlStruct *roverControlData, double thresholdAngleP
 	if(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] < (FRONT_STOP_DISTANCE + thresholdAdjustment)){
 		return CLOSE_FRONT_WALL;
 	}
-	else if(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] < FRONT_AQUIRE_ANGLE_DISTANCE){ // between 10 inches and 15 inches
+	else if(roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] < FRONT_AQUIRE_ANGLE_DISTANCE && roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] > (FRONT_STOP_DISTANCE + thresholdAdjustment + 8)){ // between 10 inches and 15 inches
 		return ACQUIRE_FRONT_ANGLE;
 	}
 	else{

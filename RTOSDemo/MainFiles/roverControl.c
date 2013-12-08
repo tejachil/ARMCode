@@ -111,6 +111,17 @@ void roverControlTask( void *param ){
 			printFloat("Angle:", roverControlData->frontSensorAngle, 1);*/
 			/*sprintf(buf, "%f\n%f", roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]
 								 , roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]);*/
+
+			if(frontWallStatus(roverControlData, thresholdAnglePollTotal, thresholdAnglePollCount) == ACQUIRE_FRONT_ANGLE){
+				double sideAngle = 0;
+				if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]){
+		    		sideAngle = atanf((roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
+				}
+				else{
+					sideAngle = -1*atanf((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
+				}
+				newCorner.tempBefore = sideAngle;
+			}
 			
 			switch(roverControlData->state){
 				case INIT:
@@ -161,7 +172,6 @@ void roverControlTask( void *param ){
 					vtLEDOff(0x3F);
 					vtLEDOn(0x01);	
 					//sprintf(buf, "TRAVERSAL");
-
 					//if close to front wall move to stop state
 					if(frontWallStatus(roverControlData, thresholdAnglePollTotal, thresholdAnglePollCount) == CLOSE_FRONT_WALL){
 						stopRover(roverControlData);
@@ -362,7 +372,8 @@ void roverControlTask( void *param ){
 							else{
 								sideAngle = -1*atanf((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
 							}
-
+							newCorner.tempSide = sideAngle;
+							newCorner.tempEncoder = newCorner.angleCornerExterior;
 							//newCorner.angleCornerExterior = (newCorner.angleCornerExterior + encoderAngle)/2.0;
 							newCorner.angleCornerExterior += sideAngle;
 							if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);	
@@ -416,8 +427,8 @@ void roverControlTask( void *param ){
 			thresholdAnglePollTotal = 0.0;
 			thresholdAnglePollCount = 0;
 
-			newCorner.angleCornerExterior = roverControlData->frontSensorAngle;
-
+			//newCorner.angleCornerExterior = roverControlData->frontSensorAngle;
+			newCorner.tempFront = roverControlData->frontSensorAngle;
 			// TODO: Uncomment this block if you want to add the wheel circumference and the rover length
 			newCorner.distSide = newCorner.distSide*WHEEL_CIRCUMFERENCE;
 
