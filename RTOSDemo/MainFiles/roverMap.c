@@ -13,7 +13,7 @@ static double yPoints[MAXIMUM_CORNERS];
 
 static char guiMapCoordinates[BUFFER_SIZE];
 static char debugBuf[BUFFER_SIZE];
-static uint8_t polyComp;
+static int polyComp;
 
 //static uint8_t cornersCount;
 //vtLCDStruct *lcdStruct;
@@ -110,7 +110,7 @@ void mapRoverTask( void *param ){
 				// param for calculateArea (side) is 1 minus the number of sides
 				if(polyComp == 0){
 					polyComp = -1;
-					sprintf(buf, "%d,%d %d,%d", (int)(xPoints[cornersCount]*MAP_SCALE_FACTOR + MAP_X_OFFSET), (int)(yPoints[cornersCount]*-MAP_SCALE_FACTOR + MAP_Y_OFFSET), MAP_X_OFFSET, MAP_Y_OFFSET);
+					sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*MAP_SCALE_FACTOR + MAP_X_OFFSET), (int)(yPoints[cornersCount]*-MAP_SCALE_FACTOR + MAP_Y_OFFSET));
 					strcat(guiMapCoordinates, buf);
 				}
 				else{
@@ -134,18 +134,6 @@ void mapRoverTask( void *param ){
 			strcat(guiMapCoordinates, buf);
 		}
 
-		//sprintf(buf, "%d,%d ", (int)(xPoints[cornersCount]*MAP_SCALE_FACTOR + MAP_X_OFFSET), (int)(yPoints[cornersCount]*-MAP_SCALE_FACTOR + MAP_Y_OFFSET));
-		//strcat(guiMapCoordinates, buf);
-
-		/*sprintf(buf, "Deg=%f Len=%f S=%d\n", receivedCorner.angleCornerExterior, receivedCorner.distSide, cornersCount);
-		strcat(debugBuf, buf);
-		
-		sprintf(buf, "%f, %f\n", xPoints[cornersCount], yPoints[cornersCount]);
-		strcat(debugBuf, buf);
-
-		sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
-		strcat(debugBuf, buf);
-*/
 		if(cornersCount < MAXIMUM_CORNERS){
 			mapCorners[cornersCount] = receivedCorner;
 			++cornersCount;
@@ -153,35 +141,6 @@ void mapRoverTask( void *param ){
 
 
 		
-		/*if(totalAngle >= 370.0){
-			area = (mapCorners[1].distSide + mapCorners[0].distFromSide) * (mapCorners[2].distSide + mapCorners[1].distFromSide);
-
-			number = area;
-			intPart = (int)number;
-			decimalPart = (number - (int)number)*1000;
-			sprintf(lcdBuffer, "Area=%d.%d, ", intPart,decimalPart);
-			if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
-				VT_HANDLE_FATAL_ERROR(0);
-			}
-		}
-		else{*/
-			/*number = receivedCorner.distSide;
-			intPart = (int)number;
-			decimalPart = (number - (int)number)*1000;
-			sprintf(lcdBuffer, "%d.%d, ", intPart,decimalPart);
-			if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
-				VT_HANDLE_FATAL_ERROR(0);
-			}
-
-			number = receivedCorner.distFromSide;
-			intPart = (int)number;
-			decimalPart = (number - (int)number)*1000;
-			sprintf(lcdBuffer, "%d.%d", intPart,decimalPart);
-			if (SendLCDPrintMsg(lcdStruct,strnlen(lcdBuffer,vtLCDMaxLen),lcdBuffer,portMAX_DELAY) != pdTRUE) {
-				VT_HANDLE_FATAL_ERROR(0);
-			}*/
-
-		//}
 	}
 }
 
@@ -204,8 +163,6 @@ double calculateArea(uint8_t sides, double *x, double *y){
 void convertGotoCoordinates(RoverMapStruct *map){
 	map->gotoX = (map->gotoX - MAP_X_OFFSET)/MAP_SCALE_FACTOR;
 	map->gotoY = (map->gotoY - MAP_Y_OFFSET)/-MAP_SCALE_FACTOR;
-
-	sprintf(debugBuf, "GOTOX=%.2f GOTOY=%.2f\n", map->gotoX, map->gotoY);
 }
 
 uint8_t getGotoAngle(RoverMapStruct *map){
@@ -222,11 +179,11 @@ double getGotoDistance(RoverMapStruct *map){
 	double returnDist = sqrt(map->gotoX*map->gotoX + map->gotoY*map->gotoY);
 
 	char buf[20];
-	sprintf(buf, "gotoDist=%f\n", returnDist);
+	sprintf(buf, "gotoDist=%f\n", returnDist-2*ROVER_LENGTH);
 	strcat(debugBuf, buf);
 	return returnDist;
 }
 
-uint8_t polygonComplete(){
+int polygonComplete(){
 	return polyComp;
 }

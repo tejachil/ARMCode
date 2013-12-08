@@ -43,6 +43,6 @@ uint8_t getGotoAngle(RoverMapStruct *map);
 
 double getGotoDistance(RoverMapStruct *map);
 
-uint8_t polygonComplete();
+int polygonComplete();
 
 #endif
