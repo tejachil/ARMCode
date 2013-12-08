@@ -85,10 +85,16 @@ void mapRoverTask( void *param ){
 		printFloat("QReced:", receivedCorner.distSide, 1);
 		// Print the received distance reading
 		vtLEDToggle(0x40);
-		printFloat("Angle: ", receivedCorner.angleCornerExterior, 0);
-		double ang = receivedCorner.angleCornerExterior;
-		receivedCorner.angleCornerExterior = receivedCorner.angleCornerExterior + receivedCorner.tempBefore/2.0;
-		if(receivedCorner.angleCornerExterior>90) receivedCorner.angleCornerExterior = 90;
+		printFloat("Angle: ", receivedCorner.angleCornerExterior, 0);;
+		double ang;
+		if(roverMapStruct->taskFlags == REGULAR && roverMapStruct->numberSides != 0){
+			receivedCorner.angleCornerExterior = 360.0/roverMapStruct->numberSides;
+		}
+		else{
+			ang = receivedCorner.angleCornerExterior;
+			receivedCorner.angleCornerExterior = receivedCorner.angleCornerExterior + receivedCorner.tempBefore/2.0;
+			if(receivedCorner.angleCornerExterior>90) receivedCorner.angleCornerExterior = 90;
+		}
 		//printFloat("Side Dist: ", receivedCorner.distSide, 1);
 		receivedCorner.tempPow = mapCorners[cornersCount-1].distFromSide * pow(receivedCorner.angleCornerExterior/90.0, 5);
 		
