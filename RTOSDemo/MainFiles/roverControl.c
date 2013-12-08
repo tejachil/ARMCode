@@ -14,7 +14,6 @@
 float difference;
 static RoverMapStruct *roverMap;
 static int anglesSamples[ANGLE_SAMPLE_COUNT];
-int sideAngleCount = 0;
 
 int cmpfunc (const void * a, const void * b);
 
@@ -65,8 +64,9 @@ void roverControlTask( void *param ){
 	uint8_t encoderReceived = 0;
 	uint8_t turnStatusReceived = 0;
 	uint8_t isFirstCorner = 0;
-
+	int sideAngleCount = 0;
 	int val = 0;
+	double tempDistSide = 0;
 
 	MapCorner newCorner;
 	newCorner.distSide = 0;
@@ -124,6 +124,8 @@ void roverControlTask( void *param ){
 					sideAngle = -1*atanf((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
 				}
 				newCorner.tempBefore = sideAngle;
+
+				tempDistSide = roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR];
 			}
 			
 			// Check if goto location is set from gui and do that if it is set
@@ -360,15 +362,16 @@ void roverControlTask( void *param ){
 						//vtLEDOn(0x20);
 						//vtLEDOn(0x20);
 						//printFloat("PrintTest", newCorner.distFromSide, 1);
-						newCorner.distFromSide = roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR];
+						newCorner.distFromSide = tempDistSide;//roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR];// + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR];
+						//newCorner.distFromSide += ROVER_LENGTH_WIDTH_OFFSET;
+
 						//printFloat("PrintAdd", newCorner.distFromSide, 1);
-						newCorner.distFromSide /= 2.0;
+						//newCorner.distFromSide /= 2.0;
 						//printFloat("PrintDev2", newCorner.distFromSide, 1);
 						// Scale for compensating from the LENGTH WIDTH change
-						newCorner.distFromSide += ROVER_LENGTH_WIDTH_OFFSET;
 						//printFloat("PrintPoff", newCorner.distFromSide, 1);
 						//printFloat("PrintDev90", newCorner.distFromSide, 1);
-						newCorner.distFromSide *= pow(newCorner.angleCornerExterior/90.0, 5);
+						//newCorner.tempPow = newCorner.distFromSide * pow(newCorner.angleCornerExterior/90.0, 5);
 						// newCorner.distFromSide *= sin(newCorner.angleCornerExterior*M_PI/180)*sin(newCorner.angleCornerExterior*M_PI/180); // sin^2
 
 						//totalExternalAngle += newCorner.angleCorner;
@@ -479,11 +482,14 @@ void roverControlTask( void *param ){
 
 			// Adds the front distance
 			//if(newCorner.angleCornerExterior > 59.0){
-				frontDist = (roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/tan(newCorner.angleCornerExterior*M_PI/180.0);
+				frontDist = (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/tan(newCorner.angleCornerExterior*M_PI/180.0);
 				frontDist = roverControlData->sensorDistance[FRONT_LEFT_MEDIUM_SENSOR] - frontDist;
 				printFloat("Front Dist:", frontDist, 1);
-			if(frontDist > 0.0)
-				newCorner.distSide += frontDist;
+			//if(frontDist > 0.0)
+				newCorner.tempFrontDist = frontDist;
+			//else
+			//	newCorner.tempFrontDist = 0.0;
+				//newCorner.distSide += frontDist;
 			//}
 			//set request type to sensor distance 
 			requestType = REQUEST_TYPE_DISTANCE;

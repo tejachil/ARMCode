@@ -88,19 +88,25 @@ void mapRoverTask( void *param ){
 		printFloat("Angle: ", receivedCorner.angleCornerExterior, 0);
 		double ang = receivedCorner.angleCornerExterior;
 		receivedCorner.angleCornerExterior = receivedCorner.angleCornerExterior + receivedCorner.tempBefore/2.0;
+		if(receivedCorner.angleCornerExterior>90) receivedCorner.angleCornerExterior = 90;
 		//printFloat("Side Dist: ", receivedCorner.distSide, 1);
+		receivedCorner.tempPow = mapCorners[cornersCount-1].distFromSide * pow(receivedCorner.angleCornerExterior/90.0, 5);
 		
 		totalAngle += receivedCorner.angleCornerExterior;
 		if(cornersCount != 0){
 			//totalAngle += receivedCorner.angleCornerExterior;
-			receivedCorner.distSide += mapCorners[cornersCount-1].distFromSide;
+			//receivedCorner.distSide += mapCorners[cornersCount-1].distFromSide;
 			printFloat("PrevSide:", mapCorners[cornersCount-1].distFromSide, 1);
 			printFloat("WithPrevSide:", receivedCorner.distSide, 1);
+			
+			// Teja experimenting
+			receivedCorner.distSide +=  receivedCorner.tempFrontDist + mapCorners[cornersCount-1].distFromSide*sin(mapCorners[cornersCount-1].angleCornerExterior*M_PI/180.0)*sin(mapCorners[cornersCount-1].angleCornerExterior*M_PI/180.0);
+
 			// Yasir's conversion to coordinates
 			xPoints[cornersCount] = xPoints[cornersCount - 1] + receivedCorner.distSide*cos(totalCalcAngle*M_PI/180.0);
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
 			totalCalcAngle -= receivedCorner.angleCornerExterior;
-			sprintf(buf, "Deg=%.1f F=%.1f OA=%.1f SB=%.1f Len=%.1f S=%d\n", receivedCorner.angleCornerExterior,receivedCorner.tempFront, ang, receivedCorner.tempBefore, receivedCorner.distSide, cornersCount);
+			sprintf(buf, "Deg=%.1f F=%.1f OA=%.1f SB=%.1f SD=%.1f SDP=%1.f FD=%.1f Dist=%.1f S=%d\n", receivedCorner.angleCornerExterior,receivedCorner.tempFront, ang, receivedCorner.tempBefore, mapCorners[cornersCount-1].distFromSide, receivedCorner.tempPow, receivedCorner.tempFrontDist, receivedCorner.distSide, cornersCount);
 			strcat(debugBuf, buf);
 
 			sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));

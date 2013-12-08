@@ -31,6 +31,8 @@ typedef struct __MapCornerStruct {
 	double angleCornerExterior;
 	double tempFront;
 	double tempBefore;
+	double tempFrontDist;
+	double tempPow;
 	double distSide;
 	double distFromSide;
 } MapCorner;
