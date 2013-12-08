@@ -9,7 +9,7 @@ static double xPoints[MAXIMUM_CORNERS];
 static double yPoints[MAXIMUM_CORNERS];
 
 #define BUFFER_SIZE		1000
-#define TOTAL_ANGLE_THRESHOLD 330
+#define TOTAL_ANGLE_THRESHOLD 335
 
 static char guiMapCoordinates[BUFFER_SIZE];
 static char debugBuf[BUFFER_SIZE];
@@ -112,11 +112,15 @@ void mapRoverTask( void *param ){
 			xPoints[cornersCount] = xPoints[cornersCount - 1] + receivedCorner.distSide*cos(totalCalcAngle*M_PI/180.0);
 			yPoints[cornersCount] = yPoints[cornersCount - 1] + receivedCorner.distSide*sin(totalCalcAngle*M_PI/180.0);
 			totalCalcAngle -= receivedCorner.angleCornerExterior;
-			sprintf(buf, "Deg=%.1f F=%.1f OA=%.1f SB=%.1f SD=%.1f SDP=%1.f FD=%.1f Dist=%.1f S=%d\n", receivedCorner.angleCornerExterior,receivedCorner.tempFront, ang, receivedCorner.tempBefore, mapCorners[cornersCount-1].distFromSide, receivedCorner.tempPow, receivedCorner.tempFrontDist, receivedCorner.distSide, cornersCount);
+
+			sprintf(buf, "C=%d Deg=%.2f Dist=%.2f A=%.2f\n", cornersCount+1, receivedCorner.angleCornerExterior, receivedCorner.distSide, calculateArea(cornersCount+1, xPoints, yPoints));
 			strcat(debugBuf, buf);
 
-			sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
-			strcat(debugBuf, buf);
+			//sprintf(buf, "Deg=%.1f F=%.1f OA=%.1f SB=%.1f SD=%.1f SDP=%1.f FD=%.1f Dist=%.1f S=%d\n", receivedCorner.angleCornerExterior,receivedCorner.tempFront, ang, receivedCorner.tempBefore, mapCorners[cornersCount-1].distFromSide, receivedCorner.tempPow, receivedCorner.tempFrontDist, receivedCorner.distSide, cornersCount);
+			//strcat(debugBuf, buf);
+
+			//sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
+			//strcat(debugBuf, buf);
 			if ((totalAngle) >= TOTAL_ANGLE_THRESHOLD){
 				// TODO: calculate area;
 				// param for calculateArea (side) is 1 minus the number of sides
@@ -130,7 +134,7 @@ void mapRoverTask( void *param ){
 					sprintf(buf, "%d,%d", MAP_X_OFFSET, MAP_Y_OFFSET);
 					strcat(guiMapCoordinates, buf);
 				}
-				sprintf(buf, "** Polygon complete **, A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
+				sprintf(buf, "\n** Polygon complete ** Corners=%d A=%f\n\n", cornersCount+1,calculateArea(cornersCount+1, xPoints, yPoints));
 				strcat(debugBuf, buf);
 			}
 			else{
