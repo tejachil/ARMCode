@@ -65,7 +65,7 @@ HTTPD_CGI_CALL(io, "led-io", led_io ); //will be used to for map function
 static const struct httpd_cgi_call *calls[] = { &file, &tcp, &net, &rtos, &run, &io, NULL };
 
 static const char* debugTextAreaPointer = "hello world!";
-static const char* mapCoordinatesPointer = "100,100 400,75 500,400";
+static const char* mapCoordinatesPointer = "";
 static char debugTextTable[400] = "table";
 
 void setDebugTextAreaPointer(char* string){
@@ -290,7 +290,7 @@ extern long lParTestGetLEDState( void );
   // teja print to map right here
 
 	sprintf( uip_appdata, 
-    "<polyline fill=\"none\" stroke=\"blue\" stroke-width=\"2\" points=\"%s\" />",
+    "<polyline fill=\"none\" stroke=\"blue\" stroke-width=\"2\" points=\"%s\" /><polyline fill=\"none\" stroke=\"green\" stroke-width=\"2\" points=\"460,480 492,480\" /><text x=\"465\" y=\"495\" fill=\"Green\">8in</text>",
     mapCoordinatesPointer);
   //sprintf(uip_appdata, "%s <p>Area = %f square inches</p>", uip_appdata, 43.535);
 
