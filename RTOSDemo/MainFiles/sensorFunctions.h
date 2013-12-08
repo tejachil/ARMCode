@@ -13,4 +13,6 @@ int frontWallStatus(RoverControlStruct *roverControlData, double anglePollTotal,
 
 void printFloat(char* buf, float number, int newLine);
 
+double getEncoderDistance(uint8_t revolutions, uint16_t ticksOffset);
+
 #endif

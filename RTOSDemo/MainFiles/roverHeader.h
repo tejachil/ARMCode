@@ -14,6 +14,7 @@
 #define TOO_CLOSE_THRESHOLD				3
 #define SPEED_RANGE						3
 #define FRONT_THRESHOLD_ADJUSTMENT 		0.02
+#define ROVER_RADIUS					9.137221
 
 //number of things
 #define NUMBER_OF_SAMPLES 			5

@@ -13,6 +13,7 @@
 float difference;
 static RoverMapStruct *roverMap;
 static int anglesSamples[ANGLE_SAMPLE_COUNT];
+int sideAngleCount = 0;
 
 int cmpfunc (const void * a, const void * b);
 
@@ -330,7 +331,7 @@ void roverControlTask( void *param ){
 						printFloat("BeforeQ:", newCorner.distSide, 1);
 
 						// Send the reading to the map task
-						if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);
+						//if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);
 
 						//vtLEDOn(0x40);
 						//turn rover and keep asking for turning status
@@ -346,8 +347,29 @@ void roverControlTask( void *param ){
 					//sprintf(buf, "TURN");
 					// wait here till rover turn by the specified angle
 					if(turnStatusReceived != 0){
-						moveRover(roverControlData);
+						requestType = REQUEST_TYPE_ENCODER;
 						turnStatusReceived = 0;
+					}
+					else if(encoderReceived != 0){
+						double sideAngle = 0;
+						sideAngleCount++;
+						//wait till 5 values of side is available 
+						if(sideAngleCount>=5){
+							//find the adjustment to encoderAngle
+							if(roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR] < roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]){
+					    		sideAngle = atanf((roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
+							}
+							else{
+								sideAngle = -1*atanf((roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR]-roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR])/DISTANCE_BETWEEN_SIDE_SHORT) * 180/M_PI;
+							}
+
+							//newCorner.angleCornerExterior = (newCorner.angleCornerExterior + encoderAngle)/2.0;
+							newCorner.angleCornerExterior += sideAngle;
+							if(xQueueSend(roverMap->inQ, &newCorner,portMAX_DELAY) != pdTRUE)	VT_HANDLE_FATAL_ERROR(0);	
+							moveRover(roverControlData);
+							sideAngleCount = 0;
+							encoderReceived = 0;
+						}
 					}
 					break;
 			}
@@ -421,6 +443,25 @@ void roverControlTask( void *param ){
 			//set request type to sensor distance 
 			requestType = REQUEST_TYPE_DISTANCE;
 			//getEncoderDistance(receivedMsg.data[2], );
+		}
+		//encoder recieved with angle
+		else if (receivedMsg.message_type == PUB_MSG_T_ENCODER_DATA && roverControlData->state == TURN){
+			double encoderAngle, arc, arc1, arc2;
+			encoderReceived = 1;
+			arc1 = (receivedMsg.data[0] + (receivedMsg.data[1] << 8))/TICKS_PER_REVOLUTION;
+			arc1 += receivedMsg.data[2];		
+			arc2 = (receivedMsg.data[3] + (receivedMsg.data[4] << 8))/TICKS_PER_REVOLUTION;
+			arc2 += receivedMsg.data[5];
+
+			// Average the two angles
+			arc = (arc1 + arc2)*WHEEL_CIRCUMFERENCE/2.0;
+			// convert arc distance to angle
+			// angle = s/r
+			encoderAngle = (arc/ROVER_RADIUS) * 180 / M_PI;
+
+			//newCorner.angleCornerExterior = (newCorner.angleCornerExterior + encoderAngle)/2.0;
+			newCorner.angleCornerExterior = encoderAngle;
+			requestType = REQUEST_TYPE_DISTANCE;
 		}
 		//received turn status
 		else if (receivedMsg.message_type ==  PUB_MSG_T_TURN_STATUS){

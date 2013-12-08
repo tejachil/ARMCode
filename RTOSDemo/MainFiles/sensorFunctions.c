@@ -2,8 +2,6 @@
 #include <math.h>
 #include <stdio.h> //for printf()
 
-double getEncoderDistance(uint8_t revolutions, uint16_t ticksOffset);
-
 static double sideAngle = 0.0;
 
 void readNewMsg(RoverControlStruct *roverControlData, public_message_t *receivedMsg){
