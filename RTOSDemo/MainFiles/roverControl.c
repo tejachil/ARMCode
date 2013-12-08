@@ -119,6 +119,12 @@ void roverControlTask( void *param ){
 				roverControlData->state = GOTO;
 			}
 
+			if(polygonComplete() > 0){
+				stopRover(roverControlData);
+				roverControlData->state = NULL_STATE;
+				requestType = REQUEST_TYPE_DISTANCE;
+			}
+
 			switch(roverControlData->state){
 				case INIT:
 					if((roverMap->taskFlags)&REVOLVE){
@@ -177,8 +183,8 @@ void roverControlTask( void *param ){
 						convertGotoCoordinates(roverMap);
 						stopRover(roverControlData);
 						tempDist = getGotoDistance(roverMap);
-						tempDist -= (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
-						tempDist -= ROVER_LENGTH;
+						//tempDist -= (roverControlData->sensorDistance[SIDE_REAR_SHORT_SENSOR] + roverControlData->sensorDistance[SIDE_FRONT_SHORT_SENSOR])/2;
+						tempDist -= 2*ROVER_LENGTH;
 						turnRover(roverControlData, getGotoAngle(roverMap));
 						requestType = REQUEST_TYPE_TURN_STATUS;
 						roverControlData->state = GOTO;
@@ -378,6 +384,8 @@ void roverControlTask( void *param ){
 						moveRover(roverControlData);
 						turnStatusReceived = 0;
 					}
+					break;
+				case NULL_STATE:
 					break;
 			}
 		}

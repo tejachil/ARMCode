@@ -37,6 +37,7 @@
 #define STOP	  					6
 #define STRAIGHT					8
 #define GOTO						9
+#define NULL_STATE					10
 
 //front wall states
 #define FAR_FRONT_WALL				0

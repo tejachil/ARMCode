@@ -9,9 +9,11 @@ static double xPoints[MAXIMUM_CORNERS];
 static double yPoints[MAXIMUM_CORNERS];
 
 #define BUFFER_SIZE		500
+#define TOTAL_ANGLE_THRESHOLD 330
 
 static char guiMapCoordinates[BUFFER_SIZE];
 static char debugBuf[BUFFER_SIZE];
+static uint8_t polyComp;
 
 //static uint8_t cornersCount;
 //vtLCDStruct *lcdStruct;
@@ -67,6 +69,7 @@ void mapRoverTask( void *param ){
 	uint8_t cornersCount = 0;
 
 	sprintf(guiMapCoordinates, "");
+	polyComp = 0;
 	
 	for(;;){
 		if (xQueueReceive(roverMapStruct->inQ, (void *) &receivedCorner, portMAX_DELAY) != pdTRUE) {
@@ -101,9 +104,10 @@ void mapRoverTask( void *param ){
 
 			sprintf(buf, "A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
 			strcat(debugBuf, buf);
-			if ((totalAngle) >= 330.0){
+			if ((totalAngle) >= TOTAL_ANGLE_THRESHOLD){
 				// TODO: calculate area;
 				// param for calculateArea (side) is 1 minus the number of sides
+				polyComp = cornersCount;
 				sprintf(buf, "** Polygon complete **, A=%f\n", calculateArea(cornersCount+1, xPoints, yPoints));
 				strcat(debugBuf, buf);
 			}
@@ -205,4 +209,8 @@ double getGotoDistance(RoverMapStruct *map){
 	sprintf(buf, "gotoDist=%f\n", returnDist);
 	strcat(debugBuf, buf);
 	return returnDist;
+}
+
+uint8_t polygonComplete(){
+	return polyComp;
 }
