@@ -77,6 +77,8 @@ void roverControlTask( void *param ){
 
 	double totalRevolve = 0;
 
+	static double tempDist = 0.0;
+
 	// Update the count and send the request
 	sensorRequestMsg.msgID = public_message_get_count(PUB_MSG_T_SENS_DIST);
 	uartEnQ(roverControlData->uartDevice, sensorRequestMsg.msgType, sensorRequestMsg.msgID, sensorRequestMsg.txLen,
@@ -163,7 +165,6 @@ void roverControlTask( void *param ){
 					}
 					break;
 				case GOTO:
-					static double tempDist = 0.0
 					if(turnStatusReceived != 0){
 						//TODO if the turn is complete go strait
 						uint8_t revs = 0;
