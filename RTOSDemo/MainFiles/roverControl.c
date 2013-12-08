@@ -131,7 +131,7 @@ void roverControlTask( void *param ){
 				roverControlData->state = GOTO;
 			}
 
-			if(polygonComplete() > 0){
+			if(polygonComplete() > 0 && roverControlData->state == TRAVERSAL){
 				stopRover(roverControlData);
 				roverControlData->state = NULL_STATE;
 				requestType = REQUEST_TYPE_DISTANCE;
@@ -344,7 +344,7 @@ void roverControlTask( void *param ){
 						vtLEDOn(0x80);
 					}
 					else */
-					if(anglePollCount < 30){
+					if(anglePollCount < 20){
 						findAngle(roverControlData);
 						anglePollTotal += roverControlData->frontSensorAngle;
 						// Teja does the angle array adding here for the quicksort
